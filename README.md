@@ -17,10 +17,10 @@
 - [Java开发实战之星络ERP（3）：完善登录状态时跳转（2026-3-16更新）](https://www.bilibili.com/video/BV16g411w7vJ/)
 - [Java开发实战之星络ERP（4）：通过看板进行任务管理，利用Jenkins实现自动化部署，修复一些bug（2021-12-14更新）](https://www.bilibili.com/video/BV1dF411z78F/)
 ## 开源地址
-https://gitee.com/LuckyRaining/main-xingluo-erp
+https://gitee.com/LuckyRaining/starnet-erp
 
 ## 开发计划
-[总开发计划](https://gitee.com/LuckyRaining/main-xingluo-erp/wikis/pages)
+[总开发计划](https://gitee.com/LuckyRaining/starnet-erp/wikis/pages)
 
 2020-08-17~2020-08-23
 
@@ -36,7 +36,7 @@ https://gitee.com/LuckyRaining/main-xingluo-erp
 ## 已完成的功能
 
 ## 操作文档
-- [官方文档](http://LuckyRaining.gitee.io/main-xingluo-erp/)
+- [官方文档](http://LuckyRaining.gitee.io/starnet-erp/)
 - 视频教程
 
 ## 开发指南
@@ -86,16 +86,16 @@ https://gitee.com/LuckyRaining/main-xingluo-erp
 
 ## 技术框架
 ### 后端技术
-技术|名称|版本
----|---|---
-[SpringBoot](http://spring.io/projects/spring-boot)|核心框架|2.3.2.RELEASE
-[MyBatis](http://www.mybatis.org/mybatis-3/zh/index.html)|ORM框架
-[MyBatisPlus](https://mybatis.plus/)|MyBatis加强组件
-[Druid](https://github.com/alibaba/druid)|数据库连接池|
-[Maven](http://maven.apache.org/)|项目构建管理|
-Java|Java|1.8
-MySQL|数据库|8.0.12
-SpringSecurity|安全框架
+|技术|名称|版本|
+|---|---|---|
+|[SpringBoot](http://spring.io/projects/spring-boot)|核心框架|2.3.2.RELEASE|
+|[MyBatis](http://www.mybatis.org/mybatis-3/zh/index.html)|ORM框架|
+|[MyBatisPlus](https://mybatis.plus/)|MyBatis加强组件|
+|[Druid](https://github.com/alibaba/druid)|数据库连接池||
+|[Maven](http://maven.apache.org/)|项目构建管理||
+|Java|Java|1.8|
+|MySQL|数据库|8.0.12|
+|SpringSecurity|安全框架|
 
 ## 产品原型与历史开发计划
 [开发计划与产品原型](https://gitee.com/LuckyRaining/main-xingluo-erp/wikis/pages)
