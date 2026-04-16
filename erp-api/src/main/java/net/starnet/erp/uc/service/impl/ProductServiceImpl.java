@@ -19,16 +19,33 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     public Page<Product> pageSearch(long current, long size, JSONObject query) {
         QueryWrapper<Product> wrapper = new QueryWrapper<>();
 
-        if (StrKit.notBlank(query.getString("categoryId"))) {
-            wrapper.eq("categoryId", query.getString("categoryId"));
+        String keyword = query.getString("keyword");
+        if (StrKit.notBlank(keyword)) {
+            wrapper.and(w -> w.like("code", keyword)
+                    .or()
+                    .like("name", keyword)
+                    .or()
+                    .like("barcode", keyword));
         }
+
+        String categoryId = query.getString("categoryId");
+        if (StrKit.notBlank(categoryId)) {
+            wrapper.eq("categoryId", categoryId);
+        }
+
+        String unitId = query.getString("unitId");
+        if (StrKit.notBlank(unitId)) {
+            wrapper.eq("unitId", unitId);
+        }
+
+        String name = query.getString("name");
         if (StrKit.notBlank(query.getString("name"))) {
             wrapper.and(nameWrapper ->
-                    nameWrapper.like("code", query.getString("name"))
+                    nameWrapper.like("code", name)
                     .or()
-                    .like("name", query.getString("name"))
+                    .like("name", name)
                     .or()
-                    .like("spec", query.getString("name")));
+                    .like("spec", name));
         }
 
         wrapper.orderByDesc("createdTime");
