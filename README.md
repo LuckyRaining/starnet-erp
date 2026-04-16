@@ -6,8 +6,8 @@
 [![MySQL](https://img.shields.io/badge/mysql-8.0.12-brightgreen)](https://www.mysql.com/)
 [![vue](https://img.shields.io/badge/vue-2.5.22-brightgreen.svg)](https://github.com/vuejs/vue)
 [![element-ui](https://img.shields.io/badge/element--ui-2.4.5-brightgreen.svg)](https://github.com/ElemeFE/element)
-[![license](https://img.shields.io/badge/license-GPL-blue)](https://gitee.com/kingborn/master-erp/blob/master/LICENSE)
-[![Gitee stars](https://gitee.com/kingborn/master-erp/badge/star.svg?theme=social)](https://gitee.com/kingborn/master-erp)
+[![license](https://img.shields.io/badge/license-GPL-blue)](https://gitee.com/LuckyRaining/starnet-erp/blob/master/LICENSE)
+[![Gitee stars](https://gitee.com/LuckyRaining/starnet-erp/badge/star.svg?theme=social)](https://gitee.com/LuckyRaining/starnet-erp)
 
 ## [在线演示](http://erp.starnet.net/)
 
