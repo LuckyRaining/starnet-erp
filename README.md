@@ -9,7 +9,7 @@
 [![license](https://img.shields.io/badge/license-GPL-blue)](https://gitee.com/kingborn/master-erp/blob/master/LICENSE)
 [![Gitee stars](https://gitee.com/kingborn/master-erp/badge/star.svg?theme=social)](https://gitee.com/kingborn/master-erp)
 
-## [在线演示](http://erp.xingluo.net/)
+## [在线演示](http://erp.starnet.net/)
 
 ## 视频教程
 - [Java开发实战之星络ERP（1）：ERP快速开始，安装与运行](https://www.bilibili.com/video/BV1Rr4y1k7Ag/)
@@ -20,7 +20,7 @@
 https://gitee.com/LuckyRaining/starnet-erp
 
 ## 开发计划
-[总开发计划](https://gitee.com/LuckyRaining/starnet-erp/wikis/pages)
+[总开发计划](https://gitee.com/LuckyRaining/starnet-erp/wikis/Home)
 
 2020-08-17~2020-08-23
 
@@ -98,12 +98,12 @@ https://gitee.com/LuckyRaining/starnet-erp
 |SpringSecurity|安全框架|
 
 ## 产品原型与历史开发计划
-[开发计划与产品原型](https://gitee.com/LuckyRaining/main-xingluo-erp/wikis/pages)
+[开发计划与产品原型](https://gitee.com/LuckyRaining/starnet-erp/wikis/Home)
 
 ## API接口说明
 
 ## 官方网站
-- [星络科技官网](https://www.xingluo.net)
+- [星络科技官网](https://www.starnet.net)
 - 产品讨论
 - 技术讨论
 
