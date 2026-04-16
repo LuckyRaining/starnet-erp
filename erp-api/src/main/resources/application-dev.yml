@@ -1,0 +1,24 @@
+erp:
+  devMode: true
+
+server:
+  port: 9090
+  # port: 80
+
+spring:
+  datasource:
+    druid:
+      # url: jdbc:mysql://localhost:3306/erp?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowMultiQueries=true
+      url: jdbc:mysql://localhost:3306/erp?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true&sessionVariables=sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+      username: root  #用户名
+      password: 123456  #密码
+#  redis:
+#    host: localhost
+#    port: 6379
+#    password:
+#    database: 0
+
+jwt:
+  config:
+    key: 49c089f061d4d546f259a14b49c35249
+    ttl: 604800000 # 7天

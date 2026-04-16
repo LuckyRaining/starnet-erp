@@ -1,0 +1,127 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/product/product",
+			"style": {
+				"navigationBarTitleText": "商品"
+			}
+		},
+		{
+			"path": "pages/checkout/checkout",
+			"style": {
+				"navigationBarTitleText": "收银"
+			}
+		},
+		{
+			"path": "pages/statistics/statistics",
+			"style": {
+				"navigationBarTitleText": "统计"
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "subpackages/auth",
+			"pages": [
+				{
+					"path": "login",
+					"style": {
+						"navigationBarTitleText": "登录"
+					}
+				}
+			]
+		},
+		{
+			"root": "subpackages/search",
+			"pages": [
+				{
+					"path": "search",
+					"style": {
+						"navigationBarTitleText": "搜索"
+					}
+				}
+			]
+		},
+		{
+			"root": "subpackages/business",
+			"pages": [
+				{
+					"path": "holdorder",
+					"style": {
+						"navigationBarTitleText": "挂单"
+					}
+				}
+			]
+		},
+		{
+			"root": "subpackages/system",
+			"pages": [
+				{
+					"path": "about",
+					"style": {
+						"navigationBarTitleText": "关于系统"
+					}
+				}
+			]
+		}
+	],
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#2979ff",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png"
+			},
+			{
+				"pagePath": "pages/product/product",
+				"text": "商品",
+				"iconPath": "static/tabbar/product.png",
+				"selectedIconPath": "static/tabbar/product-active.png"
+			},
+			{
+				"pagePath": "pages/checkout/checkout",
+				"text": "收银",
+				"iconPath": "static/tabbar/checkout.png",
+				"selectedIconPath": "static/tabbar/checkout-active.png"
+			},
+			{
+				"pagePath": "pages/statistics/statistics",
+				"text": "统计",
+				"iconPath": "static/tabbar/statistics.png",
+				"selectedIconPath": "static/tabbar/statistics-active.png"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"text": "我的",
+				"iconPath": "static/tabbar/mine.png",
+				"selectedIconPath": "static/tabbar/mine-active.png"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "星络ERP",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"background": "#efeff4"
+		}
+	}
+}

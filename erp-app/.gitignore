@@ -1,0 +1,39 @@
+# uni-app 构建输出
+unpackage/
+dist/
+
+# 依赖
+node_modules/
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 环境变量
+.env.local
+.env.*.local
+
+# 编辑器
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+.DS_Store
+
+# 系统文件
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# HBuilderX 特定文件
+.hbuilderx/
+
+# 临时文件
+*.tmp
+*.temp
+*.log
