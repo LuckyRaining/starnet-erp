@@ -42,7 +42,7 @@
 
 所有接口返回统一的JSON格式：
 
-```json
+```json5
 {
   "code": 200,
   "message": "success",

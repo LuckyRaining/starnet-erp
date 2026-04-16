@@ -44,7 +44,7 @@
 
 所有接口返回统一的JSON格式：
 
-```json
+```json5
 {
   "code": 200,
   "message": "success",
@@ -64,7 +64,7 @@
 
 分页查询接口返回的数据结构：
 
-```json
+```json5
 {
   "records": [],      // 数据列表
   "total": 100,       // 总记录数
