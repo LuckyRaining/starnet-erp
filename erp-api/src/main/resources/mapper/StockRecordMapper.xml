@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="net.xingluo.erp.wc.dao.StockRecordDao">
+<mapper namespace="net.starnet.erp.wc.dao.StockRecordDao">
 
 
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
     <!-- 收发明细表 -->
-    <select id="analysisList" resultType="net.xingluo.erp.wc.model.StockRecord">
+    <select id="analysisList" resultType="net.starnet.erp.wc.model.StockRecord">
         SELECT sr.* from wc_stock_record sr WHERE 1 = 1
         <if test="productIdList != null and productIdList.size() > 0">
             AND sr.`productId` IN
@@ -72,7 +72,7 @@
     </select>
 
     <!-- 商品在仓库最近的出入记录 -->
-    <select id="findLatestRecord" resultType="net.xingluo.erp.wc.model.StockRecord">
+    <select id="findLatestRecord" resultType="net.starnet.erp.wc.model.StockRecord">
         SELECT sr.* from wc_stock_record sr WHERE 1 = 1
         <if test="productId != null and productId != ''">
             AND sr.`productId` = #{productId}
@@ -90,7 +90,7 @@
     </select>
 
     <!-- 不同的商品仓库ID列表 -->
-    <select id="distinctProductWarehouseIdList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.wc.model.StockRecord">
+    <select id="distinctProductWarehouseIdList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.StockRecord">
         SELECT DISTINCT sr.`productId`, sr.`warehouseId` from wc_stock_record sr WHERE 1 = 1
         <if test="query.productIdList != null and query.productIdList.size() > 0">
             AND sr.`productId` IN

@@ -41,11 +41,11 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml  #配置映射文件
-  type-aliases-package: net.xingluo.erp.**.model #配置实体类
+  type-aliases-package: net.starnet.erp.**.model #配置实体类
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
-    net.xingluo.erp.mapper: debug
+    net.starnet.erp.mapper: debug

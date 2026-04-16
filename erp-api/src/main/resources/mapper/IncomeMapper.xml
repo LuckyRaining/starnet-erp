@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="net.xingluo.erp.fc.dao.IncomeDao">
+<mapper namespace="net.starnet.erp.fc.dao.IncomeDao">
 
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
-    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.fc.model.Income">
+    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.fc.model.Income">
         SELECT co.* from fc_income co left join
         uc_customer c on co.customerId = c.id WHERE 1 = 1
         <if test="query.name != null and query.name != ''">

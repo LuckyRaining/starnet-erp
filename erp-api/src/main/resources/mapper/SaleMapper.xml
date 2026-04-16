@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="net.xingluo.erp.bc.dao.SaleDao">
+<mapper namespace="net.starnet.erp.bc.dao.SaleDao">
 
 
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
-    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.bc.model.Sale">
+    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.bc.model.Sale">
         SELECT s.* from bc_sale s left join
         uc_customer c on s.customerId = c.id WHERE 1 = 1
         <if test="query.type != null">

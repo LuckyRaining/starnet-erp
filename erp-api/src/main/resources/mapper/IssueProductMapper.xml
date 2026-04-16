@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="net.xingluo.erp.wc.dao.IssueProductDao">
+<mapper namespace="net.starnet.erp.wc.dao.IssueProductDao">
 
 
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
     <!-- 销售明细表 -->
-    <select id="analysisSaleList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.wc.model.IssueProduct">
+    <select id="analysisSaleList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
         SELECT sp.* from wc_issue_product sp left join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
         <if test="query.customerIdList != null and query.customerIdList.size() > 0">
@@ -43,7 +43,7 @@
     </select>
 
     <!-- 销售汇总表（按商品） -->
-    <select id="analysisSaleListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.wc.model.IssueProduct">
+    <select id="analysisSaleListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
         SELECT sp.productId, sp.warehouseId, SUM(sp.quantity) as quantity, sp.price, SUM(sp.amount) as amount
                from wc_issue_product sp left join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
@@ -76,7 +76,7 @@
     </select>
 
     <!-- 销售汇总表（按客户） -->
-    <select id="analysisSaleListByCustomer" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.sc.model.SaleCustomerSummary">
+    <select id="analysisSaleListByCustomer" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.sc.model.SaleCustomerSummary">
         SELECT s.customerId, sp.productId, sp.warehouseId, SUM(sp.quantity) as quantity, sp.price, SUM(sp.amount) as amount
         from wc_issue_product sp left join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
@@ -109,7 +109,7 @@
     </select>
 
     <!-- 采购明细表 -->
-    <select id="analysisPurchaseList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.wc.model.IssueProduct">
+    <select id="analysisPurchaseList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
         SELECT pp.* from wc_issue_product pp left join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')
         <if test="query.supplierIdList != null and query.supplierIdList.size() > 0">
@@ -140,7 +140,7 @@
     </select>
 
     <!-- 采购汇总表（按商品） -->
-    <select id="analysisPurchaseListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.wc.model.IssueProduct">
+    <select id="analysisPurchaseListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
         SELECT pp.productId, pp.warehouseId, SUM(pp.quantity) as quantity, pp.price, SUM(pp.amount) as amount
         from wc_issue_product pp left join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')
@@ -173,7 +173,7 @@
     </select>
 
     <!-- 采购汇总表（按供应商） -->
-    <select id="analysisPurchaseListBySupplier" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.xingluo.erp.sc.model.PurchaseSupplierSummary">
+    <select id="analysisPurchaseListBySupplier" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.sc.model.PurchaseSupplierSummary">
         SELECT p.supplierId, pp.productId, pp.warehouseId, SUM(pp.quantity) as quantity, pp.price, SUM(pp.amount) as amount
         from wc_issue_product pp left join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')

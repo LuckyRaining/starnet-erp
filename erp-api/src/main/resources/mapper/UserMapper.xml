@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="net.xingluo.erp.uc.dao.UserDao">
+<mapper namespace="net.starnet.erp.uc.dao.UserDao">
 
-    <resultMap id="baseResultMap" type="net.xingluo.erp.uc.model.User">
+    <resultMap id="baseResultMap" type="net.starnet.erp.uc.model.User">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <id column="username" property="username" jdbcType="VARCHAR"/>
         <id column="mobile" property="mobile" jdbcType="VARCHAR"/>
@@ -22,7 +22,7 @@
         WHERE id = #{id}
     </select>
 
-    <insert id="add" parameterType="net.xingluo.erp.uc.model.User">
+    <insert id="add" parameterType="net.starnet.erp.uc.model.User">
         INSERT INTO uc_user(id, username, mobile, salt, password)
         VALUES (#{id}, #{username}, #{mobile}, #{salt}, #{password})
     </insert>

@@ -22,7 +22,7 @@ Vue.prototype.$moment = moment
 Vue.prototype.$_ = _
 moment.locale('zh-cn')
 // 配置请求的根路径
-axios.defaults.baseURL = 'http://api.erp.xingluo.net'
+axios.defaults.baseURL = 'http://api.erp.starnet.net'
 // axios.defaults.baseURL = 'http://网址'
 // 在 request 拦截器中，展示进度条 NProgress.start()
 axios.interceptors.request.use(config => {
