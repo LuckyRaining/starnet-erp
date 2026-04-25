@@ -4,7 +4,7 @@
     <el-header>
       <div>
         <span class="logo"
-              @click="toWelcome">星络ERP</span>
+              @click="toWelcome">星络收银系统</span>
       </div>
       <el-button type="info"
                  @click="logout">退出</el-button>
