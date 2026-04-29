@@ -1,5 +1,5 @@
-# 星络ERP前端工程
-前端工程是基于Vue+ElementUI进行开发的。
+# 星络收银系统 前端工程
+前端工程是基于 Vue + ElementUI 进行开发的。
 
 # 安装步骤
 - 在代码根目录执行： ```npm install``` （NodeJs环境为v12.11.1）

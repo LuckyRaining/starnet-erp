@@ -1,9 +1,9 @@
-# 星络ERP服务端
+# 星络收银系统服务端
 基于 SpringBoot + MyBatis 打造
 
 # 📦 erp-api 模块介绍
 
-**erp-api** 是整个 ERP 系统的**后端核心服务模块**，基于 **Spring Boot + MyBatis** 框架开发，提供 RESTful API 接口供前端（erp-web）和小程序（erp-app）调用。
+**erp-api** 是整个 星络收银系统 的**后端核心服务模块**，基于 **Spring Boot + MyBatis** 框架开发，提供 RESTful API 接口供前端（erp-web）和小程序（erp-app）调用。
 
 ---
 

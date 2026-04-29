@@ -1,6 +1,6 @@
-# 星络ERP 数据库 E-R 图
+# 星络收银系统 数据库 E-R 图
 
-本文档描述“星络ERP系统”的数据库表结构及关系，使用 Mermaid 语法绘制。
+本文档描述“星络收银系统”的数据库表结构及关系，使用 Mermaid 语法绘制。
 
 ## E-R图
 
@@ -899,4 +899,4 @@ erDiagram
 - 所有表均包含`createdTime`和`updatedTime`字段，用于记录创建和更新时间。
 - 主键均为字符串类型（VARCHAR(20)），部分表为BIGINT。
 
-此ER图完整反映了ERP系统的数据结构，你可以直接复制Mermaid代码到支持Mermaid的编辑器（如Typora、VS Code插件、GitHub Markdown）中查看交互式图表。
+此ER图完整反映了收银系统的数据结构，你可以直接复制Mermaid代码到支持Mermaid的编辑器（如Typora、VS Code插件、GitHub Markdown）中查看交互式图表。

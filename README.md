@@ -1,5 +1,5 @@
-# 星络ERP · 赋能中国制造2026
-星络ERP包括前端工程erp-web，后端工程erp-api和移动端小程序工程erp-app。应用框架自主研发，简单易用，性能极致，代码完全开源，持续更新！
+# 星络收银系统 · 赋能中国制造2026
+星络收银系统 包括前端工程erp-web，后端工程erp-api和移动端小程序工程erp-app。应用框架自主研发，简单易用，性能极致，代码完全开源，持续更新！
 
 [![Spring Boot](https://img.shields.io/badge/spring--boot-2.3.2.RELEASE-brightgreen)](https://github.com/spring-projects/spring-boot)
 [![MyBatis3](https://img.shields.io/badge/mybatis-3.5.5-brightgreen)](http://www.mybatis.org/mybatis-3/zh/index.html)

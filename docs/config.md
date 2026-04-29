@@ -1,4 +1,4 @@
 ---
-title: 星络ERP
+title: 星络收银系统
 lang: zh-CN
 ---

@@ -19,6 +19,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     public Page<Product> pageSearch(long current, long size, JSONObject query) {
         QueryWrapper<Product> wrapper = new QueryWrapper<>();
 
+        // 通过 keyword 搜索
         String keyword = query.getString("keyword");
         if (StrKit.notBlank(keyword)) {
             wrapper.and(w -> w.like("code", keyword)
@@ -28,24 +29,27 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
                     .like("barcode", keyword));
         }
 
+        // 通过 categoryId 搜索
         String categoryId = query.getString("categoryId");
         if (StrKit.notBlank(categoryId)) {
             wrapper.eq("categoryId", categoryId);
         }
 
+        // 通过 unitId 搜索
         String unitId = query.getString("unitId");
         if (StrKit.notBlank(unitId)) {
             wrapper.eq("unitId", unitId);
         }
 
+        // 通过 code、name、spec 搜索
         String name = query.getString("name");
         if (StrKit.notBlank(query.getString("name"))) {
             wrapper.and(nameWrapper ->
                     nameWrapper.like("code", name)
-                    .or()
-                    .like("name", name)
-                    .or()
-                    .like("spec", name));
+                            .or()
+                            .like("name", name)
+                            .or()
+                            .like("spec", name));
         }
 
         wrapper.orderByDesc("createdTime");

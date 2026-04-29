@@ -1,9 +1,8 @@
 # uni-app 构建输出
-unpackage/
-dist/
+/unpackage/dist/
 
 # 依赖
-node_modules/
+/node_modules
 
 # 日志
 npm-debug.log*

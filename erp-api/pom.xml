@@ -10,7 +10,7 @@
     </parent>
     <artifactId>erp-api</artifactId>
     <name>erp-api</name>
-    <description>星络ERP</description>
+    <description>星络收银系统</description>
 
     <dependencies>
         <dependency>
