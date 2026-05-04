@@ -22,6 +22,7 @@ function normalizeUrl(url) {
  */
 function request(options = {}) {
 	const token = getToken();
+	console.log('--------------------');
 	console.log(options.data);
 
 	return new Promise((resolve, reject) => {
@@ -44,6 +45,7 @@ function request(options = {}) {
 				if (result.code === 0 || result.code === 200) { // 判断响应状态码, 请求成功
 
 					resolve(result.data || {});
+					console.log(result.data);
 
 				} else if (result.code === 401) { // 判断响应状态码, 登录已过期, 请重新登录
 

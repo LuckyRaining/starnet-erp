@@ -1,8 +1,13 @@
 <template>
 	<view class="page">
-		<view class="search-wrap">
-			<uni-search-bar placeholder="按名称/条码搜索商品" v-model="keyword" @confirm="loadProducts" @clear="clearSearch" />
-		</view>
+		<!-- 点击搜索区 → 搜索页；扫码 → 用条码调接口并可能进详情 -->
+		<my-search
+			class="top-search"
+			:bgcolor="'#ffffff'"
+			:radius="'36rpx'"
+			@click="goSearch"
+			@scan="onScan"
+		/>
 
 		<view class="list">
 			<view v-for="item in products" :key="item.id" class="card" @click="openDetail(item)">
@@ -26,7 +31,6 @@
 export default {
 	data() {
 		return {
-			keyword: '',
 			products: [],
 			loading: false // 是否正在请求数据
 		};
@@ -35,17 +39,58 @@ export default {
 	onShow() {
 		this.loadProducts();
 	},
-	methods: {
-		// 获取商品列表数据的方法
-		async loadProducts() {
-			// 打开节流阀，表示 正在请求数据
-			this.loading = true;
 
-			// 发起请求
+	methods: {
+		goSearch() {
+			uni.navigateTo({
+				url: '/subpackages/business/search'
+			});
+		},
+
+		/** 扫码结果当作 keyword 查 product/page；无记录提示；有记录默认打开第一条详情 */
+		async onScan() {
+			try {
+				// 调用 uni 扫码接口，获取扫码结果
+				// onlyFromCamera: true, 表示只从相机获取扫码结果
+				// scanType: ['barCode', 'qrCode'] 表示扫码类型，可以是条码或二维码
+				const res = await uni.scanCode({
+					onlyFromCamera: true,
+					scanType: ['barCode', 'qrCode']
+				});
+				// 获取扫码结果，将扫码结果赋值给 keyword
+				const keyword = res.result || '';
+				// 如果扫码结果为空，则不进行后续操作
+				if (!keyword) return;
+
+				const data = await this.$api.productPage({
+					query: { keyword },
+					current: 1,
+					size: 10
+				});
+
+				const records = (data.productPage && data.productPage.records) || [];
+				if (!records.length) {
+					uni.$showMsg('不存在该商品');
+					return;
+				}
+				const first = records[0];
+				uni.navigateTo({
+					url: `/subpackages/business/product-detail?id=${first.id}`
+				});
+			} catch (error) {
+				const msg = error.errMsg || error.message || '';
+				if (msg.includes('cancel') || msg.includes('取消')) return;
+				uni.$showMsg(error.message || '扫码失败');
+			}
+		},
+
+		/** 分类 Tab：拉一页商品列表（不按关键词筛选，keyword 传空） */
+		async loadProducts() {
+			this.loading = true;
 			try {
 				const data = await this.$api.productPage({
 					query: {
-						keyword: this.keyword
+						keyword: ''
 					},
 					current: 1,
 					size: 50
@@ -58,14 +103,8 @@ export default {
 					icon: 'none'
 				});
 			} finally {
-				// 关闭节流阀
 				this.loading = false;
 			}
-		},
-
-		clearSearch() {
-			this.keyword = '';
-			this.loadProducts();
 		},
 
 		openDetail(item) {
@@ -82,10 +121,7 @@ export default {
 	padding: 20rpx;
 }
 
-.search-wrap {
-	background: #fff;
-	border-radius: 14rpx;
-	padding: 8rpx;
+.top-search {
 	margin-bottom: 20rpx;
 }
 

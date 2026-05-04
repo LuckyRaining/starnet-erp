@@ -9,7 +9,7 @@
 			<view class="line">库存：{{ product.stock || 0 }}</view>
 		</view>
 
-		<view v-else class="empty">商品不存在或已下架</view>
+		<view v-else class="empty">商品不存在或已下架！</view>
 	</view>
 </template>
 
@@ -22,13 +22,16 @@ export default {
 	},
 
 	onLoad(query) {
-		if (query.id) this.loadDetail(query.id);
+		// 页面传参：商品id
+		const id = query.id ? decodeURIComponent(query.id) : '';
+		if (id) this.loadDetail(id);
 	},
 
 	methods: {
-		async loadDetail(id) {
+		// 加载商品详情
+		async loadDetail(productId) {
 			try {
-				const data = await this.$api.productDetail({ id });
+				const data = await this.$api.productDetail({ productId });
 				this.product = data.product || {};
 			} catch (error) {
 				uni.$showMsg(error.message || '加载失败');

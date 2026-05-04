@@ -18,12 +18,12 @@
 </template>
 
 <script>
-import SalesEchart from '@/components/sales-echart.vue';
+// import SalesEchart from '@/components/sales-echart.vue';
 
 export default {
-	components: {
-		SalesEchart
-	},
+	// components: {
+	// 	SalesEchart
+	// },
 
 	data() {
 		return {
@@ -72,7 +72,7 @@ export default {
 				});
 				this.summaryList = (data.summaryList || []).slice(0, 8);
 			} catch (error) {
-				uni.showToast({ title: error.message, icon: 'none' });
+				uni.$showMsg(error.message || '不存在该商品');
 			}
 		}
 	}

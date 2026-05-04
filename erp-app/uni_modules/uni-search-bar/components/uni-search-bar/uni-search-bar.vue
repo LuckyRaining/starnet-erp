@@ -114,8 +114,9 @@
 		},
 		data() {
 			return {
-				show: false,
-				showSync: false,
+				// 项目定制：默认展开真实 input，并 focus（作业要求；原为 false 需先点一下才输入）
+				show: true,
+				showSync: true,
 				searchVal: ''
 			}
 		},
