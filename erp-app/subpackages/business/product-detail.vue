@@ -26,12 +26,12 @@ export default {
 	},
 
 	methods: {
-		async loadDetail(productId) {
+		async loadDetail(id) {
 			try {
-				const data = await this.$api.productDetail({ productId });
+				const data = await this.$api.productDetail({ id });
 				this.product = data.product || {};
 			} catch (error) {
-				uni.showToast({ title: error.message, icon: 'none' });
+				uni.$showMsg(error.message || '加载失败');
 			}
 		}
 	}

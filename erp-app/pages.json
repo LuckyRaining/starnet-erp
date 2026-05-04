@@ -89,6 +89,12 @@
 					"style": {
 						"navigationBarTitleText": "关于系统"
 					}
+				},
+				{
+					"path": "external-web",
+					"style": {
+						"navigationBarTitleText": "浏览网页"
+					}
 				}
 			]
 		}

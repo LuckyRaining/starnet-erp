@@ -84,7 +84,7 @@ function request(options = {}) {
 					title: err.data || "网络异常",
 					icon: "none"
 				});
-				console.log(err.message);
+				console.log(err.data);
 
 				reject(new Error(err.data || "网络异常")) // 网络异常
 			}

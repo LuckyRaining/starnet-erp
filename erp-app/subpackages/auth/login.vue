@@ -28,7 +28,7 @@ export default {
 	methods: {
 		async submit() {
 			if (!this.form.loginName || !this.form.password) {
-				uni.showToast({ title: '请填写账号密码', icon: 'none' });
+				uni.$showMsg('请填写账号密码');
 				return;
 			}
 
@@ -43,7 +43,8 @@ export default {
 
 				uni.switchTab({ url: '/pages/home/home' });
 			} catch (error) {
-				uni.showToast({ title: error.message, icon: 'none' });
+				// 接口失败时用统一轻提示，便于后续全局改为日志/埋点
+				uni.$showMsg(error.message || '登录失败');
 			} finally {
 				// 关闭节流阀
 				this.loading = false;
