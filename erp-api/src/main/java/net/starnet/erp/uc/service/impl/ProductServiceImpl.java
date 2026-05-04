@@ -22,11 +22,17 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
         // 通过 keyword 搜索
         String keyword = query.getString("keyword");
         if (StrKit.notBlank(keyword)) {
-            wrapper.and(w -> w.like("code", keyword)
+            wrapper.and(w -> w.like("id", keyword)
+                    .or()
+                    .like("code", keyword)
                     .or()
                     .like("name", keyword)
                     .or()
-                    .like("barcode", keyword));
+                    .like("barcode", keyword)
+                    .or()
+                    .like("categoryId", keyword)
+                    .or()
+                    .like("unitId", keyword));
         }
 
         // 通过 categoryId 搜索
@@ -39,17 +45,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
         String unitId = query.getString("unitId");
         if (StrKit.notBlank(unitId)) {
             wrapper.eq("unitId", unitId);
-        }
-
-        // 通过 code、name、spec 搜索
-        String name = query.getString("name");
-        if (StrKit.notBlank(query.getString("name"))) {
-            wrapper.and(nameWrapper ->
-                    nameWrapper.like("code", name)
-                            .or()
-                            .like("name", name)
-                            .or()
-                            .like("spec", name));
         }
 
         wrapper.orderByDesc("createdTime");
