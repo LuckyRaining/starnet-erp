@@ -1,7 +1,13 @@
 <template>
 	<view class="chart-wrap">
 		<!-- #ifdef H5 -->
-		<view id="sales-echart" class="chart" :prop="optionText" :change:prop="echartRenderer.render"></view>
+		<view
+			id="sales-echart"
+			class="chart"
+			:style="{ height: chartHeight }"
+			:prop="optionText"
+			:change:prop="echartRenderer.render"
+		></view>
 		<!-- #endif -->
 
 		<!-- #ifndef H5 -->
@@ -28,6 +34,11 @@ export default {
 		option: {
 			type: Object,
 			default: () => ({})
+		},
+		/** 图表高度，如 360rpx / 420rpx */
+		chartHeight: {
+			type: String,
+			default: '420rpx'
 		}
 	},
 
@@ -88,7 +99,7 @@ export default {
 
 .chart {
 	width: 100%;
-	height: 420rpx;
+	min-height: 280rpx;
 }
 
 .fallback {
