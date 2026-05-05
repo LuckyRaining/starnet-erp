@@ -71,6 +71,31 @@ const mutations = {
 	setCart(state, list) {
 		state.cart = Array.isArray(list) ? list.map(rowFromPayload).filter(Boolean) : [];
 		mutations.saveCartToStorage(state);
+	},
+
+	/** 更新单行商品的勾选状态 */
+	updateGoodsState(state, payload) {
+		const product_id = payload && payload.product_id;
+		const cart_state = payload && payload.cart_state;
+		const target = state.cart.find((item) => item.product_id === product_id);
+		if (target) target.cart_state = cart_state !== false;
+		mutations.saveCartToStorage(state);
+	},
+
+	/** 按商品 Id 从购物车中移除一行 */
+	removeGoodsById(state, product_id) {
+		if (product_id == null || product_id === '') return;
+		state.cart = state.cart.filter((item) => item.product_id !== product_id);
+		mutations.saveCartToStorage(state);
+	},
+
+	/** 全选 / 反选：将所有行的 cart_state 设为同一值 */
+	updateAllProductsState(state, newState) {
+		const on = newState !== false;
+		state.cart.forEach((item) => {
+			item.cart_state = on;
+		});
+		mutations.saveCartToStorage(state);
 	}
 };
 
@@ -116,14 +141,30 @@ export default {
 		};
 	},
 
-    // 模块的 mutations 方法
 	mutations,
 
-    // 模块的 mutations 方法
 	getters: {
+		/** 购物车「全部」商品件数（不管是否勾选），TabBar 徽标用这个 */
 		total(state) {
-			// reduce(function, 0) === 从 0 开始加的 forEach() 函数
 			return state.cart.reduce((sum, item) => sum + (Number(item.product_count) || 0), 0);
+		},
+
+		/** 仅统计 cart_state !== false 的行的件数，与底部「已选 x 件」一致 */
+		checkedCount(state) {
+			return state.cart.reduce((sum, item) => {
+				if (item.cart_state === false) return sum;
+				return sum + (Number(item.product_count) || 0);
+			}, 0);
+		},
+
+		/** Σ(单价 × 数量)，只含已勾选行 */
+		checkedGoodsAmount(state) {
+			return state.cart.reduce((sum, item) => {
+				if (item.cart_state === false) return sum;
+				const price = Number(item.product_price) || 0;
+				const count = Number(item.product_count) || 0;
+				return sum + price * count;
+			}, 0);
 		}
 	}
 };

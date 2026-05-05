@@ -1,61 +1,39 @@
 <template>
 	<view class="page">
-		<view class="profile">
-			<uni-icons type="contact" size="44" color="#2f7df6" />
-			<view class="info">
-				<text class="name">{{ userName }}</text>
-				<text class="hint">欢迎使用星络收银</text>
-			</view>
-		</view>
-
-		<view class="menu">
-			<view class="item" @click="go('/subpackages/business/purchase-orders')">
-				<text>我的采购订单</text>
-				<uni-icons type="right" size="16" color="#999" />
-			</view>
-
-			<view class="item" @click="go('/subpackages/system/company-setting')">
-				<text>公司设置</text>
-				<uni-icons type="right" size="16" color="#999" />
-			</view>
-
-			<view class="item" @click="go('/subpackages/system/about-system')">
-				<text>关于系统</text>
-				<uni-icons type="right" size="16" color="#999" />
-			</view>
-		</view>
-
-		<view class="logout">
-			<button @click="logout">退出登录</button>
-		</view>
+		<my-login v-if="!isLoggedIn" />
+		<my-userinfo v-else />
 	</view>
 </template>
 
 <script>
-import userUtils from '@/utils/user';
+import { mapMutations, mapState } from 'vuex';
 import tabbarBadge from '@/mixins/tabbar-badge.js';
-
-const { getUserInfo, clearLoginState } = userUtils;
+import MyLogin from '@/components/my-login/my-login.vue';
+import MyUserinfo from '@/components/my-userinfo/my-userinfo.vue';
 
 export default {
+	components: {
+		MyLogin,
+		MyUserinfo
+	},
+
 	mixins: [tabbarBadge],
 
 	computed: {
-		userName() {
-			const user = getUserInfo() || {};
-			return user.name || user.loginName || '未登录用户';
+		...mapState('m_user', ['token']),
+
+		isLoggedIn() {
+			const t = this.token != null ? String(this.token).trim() : '';
+			return !!t;
 		}
 	},
 
-	methods: {
-		go(url) {
-			uni.navigateTo({ url });
-		},
+	onShow() {
+		this.hydrateFromStorage();
+	},
 
-		logout() {
-			clearLoginState();
-			uni.reLaunch({ url: '/subpackages/auth/login' });
-		}
+	methods: {
+		...mapMutations('m_user', ['hydrateFromStorage'])
 	}
 };
 </script>
@@ -63,50 +41,8 @@ export default {
 <style lang="scss">
 .page {
 	padding: 20rpx;
-}
-
-.profile {
-	background: #fff;
-	border-radius: 16rpx;
-	padding: 24rpx;
-	display: flex;
-	align-items: center;
-	gap: 18rpx;
-}
-
-.name {
-	font-size: 30rpx;
-	font-weight: 600;
-	display: block;
-}
-
-.hint {
-	font-size: 24rpx;
-	color: #999;
-	display: block;
-	margin-top: 6rpx;
-}
-
-.menu {
-	background: #fff;
-	border-radius: 16rpx;
-	margin-top: 20rpx;
-	padding: 0 20rpx;
-}
-
-.item {
-	height: 92rpx;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	border-bottom: 1px solid #f2f2f2;
-}
-
-.item:last-child {
-	border-bottom: none;
-}
-
-.logout {
-	margin-top: 24rpx;
+	min-height: 100vh;
+	box-sizing: border-box;
+	background: #f8f8f8;
 }
 </style>

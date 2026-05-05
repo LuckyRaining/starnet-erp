@@ -1,65 +1,113 @@
+<!--
+  收银页（购物车）：自上而下
+  1）扫码/搜索 → 加商品到 Vuex m_cart；
+  2）my-warehouse → 选收货仓库（Vuex m_user）；
+  3）商品列表 → mapState 的 cart + my-product-item；左滑 uni-swipe-action 删除；
+  4）my-settle → 全选/合计/挂单/结算（进采购待支付页）/取单。
+-->
 <template>
 	<view class="page">
-		<view class="toolbar">
-			<button size="mini" type="primary" @click="scanCode">扫码加购</button>
-			<button size="mini" @click="goSearch">搜索商品</button>
-			<button size="mini" @click="holdCurrentOrder">挂单</button>
-			<button size="mini" @click="goHoldList">取单</button>
-		</view>
+		<!-- 支持 搜索 和 扫码 功能 -->
+		<my-search placeholder="按名称/编码/条码搜索商品" :bgcolor="'#FFFFFF'" :radius="'36rpx'" @click="goSearch" @scan="onScan" />
 
-		<view class="cart-box">
+		<!-- 收货仓库：内部已 mapState('m_user') -->
+		<my-warehouse />
+
+		<!-- 商品列表：cart 来自 mapState('m_cart') -->
+		<view v-if="cart.length" class="cart-box">
 			<view class="row title">
-				<text>购物车（{{ cart.length }}）</text>
+				<text class="title-text">商品列表（{{ cart.length }}）</text>
 				<text class="clear" @click="clearCart">清空</text>
 			</view>
 
-			<view v-for="item in cart" :key="item.product_id" class="row item">
-				<view>
-					<text class="name">{{ item.product_name }}</text>
-					<text class="price">¥{{ item.product_price }}</text>
-				</view>
-				<uni-number-box
-					:min="1"
-					:value="item.product_count"
-					@change="(val) => updateCount(item.product_id, val)"
-				/>
-			</view>
-
-			<view v-if="!cart.length" class="empty">请扫码或搜索商品后添加</view>
+			<!-- 每条一行外包一层 swipe：options 定义右侧「删除」按钮样式与文案 -->
+			<uni-swipe-action>
+				<uni-swipe-action-item
+					v-for="item in cart"
+					:key="item.product_id"
+					:right-options="options"
+					@click="onSwipeClick($event, item)"
+				>
+					<my-product-item
+						:item="item"
+						:show-radio="true"
+						:show-num="true"
+						@radio-change="onRadioChange"
+						@num-change="onNumChange"
+					/>
+				</uni-swipe-action-item>
+			</uni-swipe-action>
 		</view>
 
-		<view class="footer">
-			<view>
-				<text>合计：</text>
-				<text class="total">¥{{ totalAmount }}</text>
+		<!-- 购物车为空 -->
+		<view v-else class="empty-wrap">
+			<image class="empty-img" src="/static/tabbar_icons/cart.png" mode="aspectFit" />
+			<text class="empty-title">购物车还是空的</text>
+			<text class="empty-sub">请扫码或搜索商品后加入采购清单</text>
+			<view class="empty-actions">
+				<button type="primary" size="mini" @click="scanCode">扫码加购</button>
+				<button size="mini" @click="goSearch">搜索商品</button>
 			</view>
-			<button type="warn" :disabled="!cart.length" @click="payNow">模拟支付</button>
 		</view>
+
+		<!-- 底栏：无商品时组件仍挂载，仅隐藏结算条，保留「取单」 -->
+		<my-settle @hold="holdCurrentOrder" @settle="payNow" @pick="goHoldList" />
 	</view>
 </template>
 
 <script>
-// 从 vuex 中按需导出 mapState 辅助方法
+/**
+ * mapState：读 cart
+ * mapMutations：改购物车（加减数量、勾选、删除、清空等）
+ * mapGetters：读「已选合计」等（结算弹窗里用 checkedGoodsAmount）
+ * tabbarBadge：混入里监听 total，刷新底部购物车 tab 角标
+ */
 import { mapState, mapMutations, mapGetters } from 'vuex';
 import { formatDate, formatMoney } from '@/utils/format';
-import { getHoldOrders, saveHoldOrder } from '@/utils/hold';
+import { saveHoldOrder } from '@/utils/hold';
 import tabbarBadge from '@/mixins/tabbar-badge.js';
+import CONFIG from '@/utils/config';
+import MyWarehouse from '@/components/my-warehouse/my-warehouse.vue';
+import MySettle from '@/components/my-settle/my-settle.vue';
+import MyProductItem from '@/components/my-product-item/my-product-item.vue';
 
 export default {
-	// 将 tabbarBadge 混入到当前的页面中进行使用
+	components: {
+		MyWarehouse,
+		MySettle,
+		MyProductItem
+	},
+
 	mixins: [tabbarBadge],
+
+	data() {
+		return {
+			/** uni-swipe-action-item 右侧按钮配置 */
+			options: [
+				{
+					text: '删除',
+					style: {
+						backgroundColor: '#C00000'
+					}
+				}
+			]
+		};
+	},
 
 	computed: {
 		...mapState('m_cart', ['cart']),
-		...mapGetters('m_cart', ['total']),
-		totalAmount() {
+		...mapGetters('m_cart', ['checkedCount', 'checkedGoodsAmount']),
+
+		/** 挂单快照总金额（全部行） */
+		holdSheetAmount() {
 			return formatMoney(
-				this.cart.reduce((sum, item) => sum + item.product_price * item.product_count, 0)
+				this.cart.reduce((sum, item) => sum + Number(item.product_price || 0) * Number(item.product_count || 0), 0)
 			);
 		}
 	},
 
 	onShow() {
+		// 从详情等页「带一件商品回收银」：读本地缓存后 addToCart，再清缓存避免重复加
 		const selected = uni.getStorageSync('STAR_NET_SELECTED_PRODUCT');
 
 		if (selected && selected.id != null) {
@@ -79,15 +127,58 @@ export default {
 			uni.removeStorageSync('STAR_NET_SELECTED_PRODUCT');
 		}
 
+		// 从挂单列表「取单」：整单替换当前购物车
 		const holdOrder = uni.getStorageSync('STAR_NET_SELECTED_HOLD_ORDER');
 		if (holdOrder && holdOrder.id) {
 			this.setCart(holdOrder.items || []);
 			uni.removeStorageSync('STAR_NET_SELECTED_HOLD_ORDER');
 		}
+
+		const doneIds = uni.getStorageSync(CONFIG.PURCHASE_DONE_IDS_KEY);
+		if (Array.isArray(doneIds) && doneIds.length) {
+			doneIds.forEach((id) => this.removeGoodsById(id));
+			uni.removeStorageSync(CONFIG.PURCHASE_DONE_IDS_KEY);
+		}
 	},
 
 	methods: {
-		...mapMutations('m_cart', ['addToCart', 'updateGoodsCount', 'clearCart', 'setCart']),
+		...mapMutations('m_cart', [
+			'addToCart',
+			'updateGoodsCount',
+			'updateGoodsState',
+			'removeGoodsById',
+			'clearCart',
+			'setCart'
+		]),
+
+		/** 子组件用 goods_id，Vuex 里字段名是 product_id */
+		onRadioChange(e) {
+			const id = e && e.goods_id;
+			if (id == null || id === '') return;
+			this.updateGoodsState({
+				product_id: id,
+				cart_state: !!e.cart_state
+			});
+		},
+
+		/** goods_count → Mutation updateGoodsCount 的 product_count */
+		onNumChange(e) {
+			const id = e && e.goods_id;
+			if (id == null || id === '') return;
+			this.updateGoodsCount({
+				product_id: id,
+				product_count: e.goods_count
+			});
+		},
+
+		/** uni-swipe-action-item 点击右侧按钮时触发，e.content 对应 options 里的一项 */
+		onSwipeClick(e, item) {
+			const content = e && e.content;
+			if (content && content.text === '删除' && item && item.product_id != null) {
+				this.removeGoodsById(item.product_id);
+			}
+		},
+
 		async scanCode() {
 			try {
 				const res = await uni.scanCode({
@@ -108,16 +199,17 @@ export default {
 					current: 1,
 					size: 1
 				});
-				const item = (data.productPage && data.productPage.records && data.productPage.records[0]) || null;
-				if (!item) throw new Error('未匹配到商品');
+				const row =
+					(data.productPage && data.productPage.records && data.productPage.records[0]) || null;
+				if (!row) throw new Error('未匹配到商品');
 				this.addToCart({
-					product_id: item.id,
-					product_name: item.name || '',
+					product_id: row.id,
+					product_name: row.name || '',
 					product_price: Number(
-						item.estimatedPurchasePrice != null
-							? item.estimatedPurchasePrice
-							: item.wholesalePrice != null
-								? item.wholesalePrice
+						row.estimatedPurchasePrice != null
+							? row.estimatedPurchasePrice
+							: row.wholesalePrice != null
+								? row.wholesalePrice
 								: 0
 					),
 					product_count: 1,
@@ -126,10 +218,6 @@ export default {
 			} catch (error) {
 				uni.showToast({ title: error.message, icon: 'none' });
 			}
-		},
-
-		updateCount(product_id, count) {
-			this.updateGoodsCount({ product_id, product_count: count });
 		},
 
 		goSearch() {
@@ -148,72 +236,34 @@ export default {
 			saveHoldOrder({
 				createdAt: Date.now(),
 				createdDate: formatDate(new Date()),
-				amount: this.totalAmount,
+				amount: this.holdSheetAmount,
 				items: this.cart
 			});
 			this.clearCart();
 			uni.showToast({ title: '挂单成功', icon: 'success' });
 		},
 
-		async payNow() {
-			try {
-				const codeData = await this.$api.saleCreateCode({ type: 'sell' });
-				const saleCode = codeData.code;
-				uni.showModal({
-					title: '模拟支付',
-					content: `应收 ¥${this.totalAmount}，确认支付成功？`,
-					success: async ({ confirm }) => {
-						if (!confirm) return;
-						await this.submitSale(saleCode);
-						uni.showToast({ title: '支付成功', icon: 'success' });
-						this.clearCart();
-					}
-				});
-			} catch (error) {
-				uni.showToast({ title: error.message, icon: 'none' });
+		payNow() {
+			const lines = this.cart.filter((item) => item.cart_state !== false);
+			if (!lines.length) {
+				uni.showToast({ title: '请先勾选要结算的商品', icon: 'none' });
+				return;
 			}
-		},
 
-		async submitSale(code) {
-			const hold = getHoldOrders();
-			const warehouseId = (uni.getStorageSync('STAR_NET_COMPANY_SETTING') || {}).defaultWarehouseId || '';
-			const sellerId = (uni.getStorageSync('STAR_NET_USER') || {}).employeeId || '';
-			const customerId = (uni.getStorageSync('STAR_NET_COMPANY_SETTING') || {}).defaultCustomerId || '';
-			if (!warehouseId || !sellerId || !customerId) {
-				throw new Error('请先在公司设置中配置默认仓库/客户，并确保登录用户绑定职员');
-			}
-			const productList = this.cart.map((item) => ({
-				productId: item.product_id,
-				warehouseId,
-				quantity: item.product_count,
-				price: item.product_price,
-				discountRate: 0,
-				discountAmount: 0,
-				amount: item.product_price * item.product_count
-			}));
-
-			await this.$api.saleSave({
-				sale: {
-					type: 'sell',
-					code,
-					issueDate: formatDate(new Date()),
-					customerId,
-					sellerId,
-					quantity: this.cart.reduce((sum, item) => sum + item.product_count, 0),
-					discountAmount: 0,
-					amount: Number(this.totalAmount),
-					preferentialRate: 0,
-					preferentialAmount: 0,
-					preferredAmount: Number(this.totalAmount),
-					customerFee: 0,
-					currentAmount: Number(this.totalAmount),
-					debtAmount: 0,
-					listerId: sellerId,
-					remark: `小程序收银，挂单数量：${hold.length}`
-				},
-				productList,
-				accountList: []
+			uni.setStorageSync(CONFIG.PURCHASE_CHECKOUT_KEY, {
+				lines: lines.map((row) => ({
+					product_id: row.product_id,
+					product_name: row.product_name,
+					product_price: row.product_price,
+					product_count: row.product_count,
+					cart_state: row.cart_state
+				})),
+				checkedCount: this.checkedCount,
+				checkedGoodsAmount: this.checkedGoodsAmount,
+				ts: Date.now()
 			});
+
+			uni.navigateTo({ url: '/subpackages/business/purchase-checkout' });
 		}
 	}
 };
@@ -221,48 +271,34 @@ export default {
 
 <style lang="scss">
 .page {
-	padding: 20rpx 20rpx 170rpx;
+	padding: 0rpx 20rpx 280rpx;
+	min-height: 100vh;
+	box-sizing: border-box;
+	background: #f8f8f8;
 }
 
 .toolbar {
 	display: flex;
 	gap: 16rpx;
 	flex-wrap: wrap;
-	margin-bottom: 20rpx;
+	margin-bottom: 16rpx;
 }
 
 .cart-box {
-	background: #fff;
-	border-radius: 16rpx;
-	padding: 20rpx;
+	background: transparent;
 }
 
-.row {
+.row.title {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	padding: 8rpx 4rpx 18rpx;
 }
 
-.title {
-	padding-bottom: 18rpx;
-	border-bottom: 1px solid #f0f0f0;
-}
-
-.item {
-	padding: 18rpx 0;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.name {
-	display: block;
+.title-text {
 	font-size: 28rpx;
-}
-
-.price {
-	display: block;
-	font-size: 24rpx;
-	color: #ff5f2e;
-	margin-top: 6rpx;
+	font-weight: 600;
+	color: #333;
 }
 
 .clear {
@@ -270,29 +306,40 @@ export default {
 	font-size: 24rpx;
 }
 
-.empty {
-	text-align: center;
-	font-size: 24rpx;
-	color: #999;
-	padding: 40rpx 0;
-}
-
-.footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
+.empty-wrap {
 	background: #fff;
-	padding: 20rpx;
+	border-radius: 16rpx;
+	padding: 80rpx 40rpx 100rpx;
 	display: flex;
-	justify-content: space-between;
+	flex-direction: column;
 	align-items: center;
-	box-shadow: 0 -6rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
-.total {
-	font-size: 40rpx;
-	color: #ff5f2e;
+.empty-img {
+	width: 160rpx;
+	height: 160rpx;
+	opacity: 0.35;
+	margin-bottom: 24rpx;
+}
+
+.empty-title {
+	font-size: 32rpx;
+	color: #333;
 	font-weight: 600;
+}
+
+.empty-sub {
+	margin-top: 12rpx;
+	font-size: 26rpx;
+	color: #999;
+	text-align: center;
+}
+
+.empty-actions {
+	margin-top: 40rpx;
+	display: flex;
+	gap: 24rpx;
+	flex-wrap: wrap;
+	justify-content: center;
 }
 </style>

@@ -27,9 +27,13 @@ export default {
 		...mapGetters('m_cart', ['total'])
 	},
 
+	// 购物车 total（ getters ）一变就刷新角标；immediate 保证第一次进入页面也会执行一次
 	watch: {
-		total() {
-			this.setBadge();
+		total: {
+			handler() {
+				this.setBadge();
+			},
+			immediate: true
 		}
 	},
 

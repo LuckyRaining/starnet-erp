@@ -11,6 +11,8 @@
 
 <script>
 import userUtils from '@/utils/user';
+import store from '@/store/store.js';
+
 const { setToken, setUserInfo } = userUtils;
 
 export default {
@@ -40,6 +42,8 @@ export default {
 
 				setToken(data.token);
 				setUserInfo({ loginName: this.form.loginName });
+				store.commit('m_user/updateToken', data.token);
+				store.commit('m_user/updateUserinfo', { loginName: this.form.loginName });
 
 				uni.switchTab({ url: '/pages/home/home' });
 			} catch (error) {

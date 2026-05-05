@@ -173,7 +173,11 @@ export default {
 			if (this.keyword) {
 				this.pushKeyword(this.keyword);
 			}
-			uni.setStorageSync('STAR_NET_SELECTED_PRODUCT', item);
+
+			uni.navigateTo({
+				url: `/subpackages/business/product-detail?id=${encodeURIComponent(item.id)}`
+			});
+			// uni.setStorageSync('STAR_NET_SELECTED_PRODUCT', item);
 			// uni.navigateBack(); // 返回上一页
 		},
 

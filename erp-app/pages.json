@@ -62,6 +62,30 @@
 					}
 				},
 				{
+					"path": "warehouse",
+					"style": {
+						"navigationBarTitleText": "选择收货仓库"
+					}
+				},
+				{
+					"path": "purchase-checkout",
+					"style": {
+						"navigationBarTitleText": "采购待支付"
+					}
+				},
+				{
+					"path": "supplier-pick",
+					"style": {
+						"navigationBarTitleText": "选择供应商"
+					}
+				},
+				{
+					"path": "settlement-account-pick",
+					"style": {
+						"navigationBarTitleText": "选择结算账户"
+					}
+				},
+				{
 					"path": "purchase-orders",
 					"style": {
 						"navigationBarTitleText": "我的采购订单"
