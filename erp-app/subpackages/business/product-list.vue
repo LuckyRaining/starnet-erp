@@ -31,6 +31,9 @@ export default {
 		return {
 			/** 关键词 */
 			keyword: '',
+			/** 三级分类 id（从分类页带入，用于按类别筛选商品） */
+			categoryId: '',
+
 
 			/** 当前页码 */
 			products: [],
@@ -66,6 +69,11 @@ export default {
 	onLoad(query) {
 		// 与 navigateTo 路径中的 “路径参数=encodeURIComponent(路径参数)” 对应
 		this.keyword = query.keyword ? decodeURIComponent(query.keyword) : '';
+		this.categoryId = query.categoryId ? decodeURIComponent(query.categoryId) : '';
+		const categoryName = query.categoryName ? decodeURIComponent(query.categoryName) : '';
+		if (categoryName) {
+			uni.setNavigationBarTitle({ title: categoryName });
+		}
 		this.resetAndLoad();
 	},
 
@@ -100,10 +108,12 @@ export default {
 			// 打开节流阀，表示 正在请求数据
 			this.loading = true;
 			try {
+				const queryPayload = {};
+				if (this.keyword) queryPayload.keyword = this.keyword;
+				if (this.categoryId) queryPayload.categoryId = this.categoryId;
+
 				const data = await this.$api.productPage({
-					query: {
-						keyword: this.keyword
-					},
+					query: queryPayload,
 					current: this.current,
 					size: this.size
 				});

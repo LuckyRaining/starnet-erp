@@ -2,6 +2,8 @@
 	"pages": [{
 			"path": "pages/home/home",
 			"style": {
+				"navigationStyle": "default",
+				"navigationBarTextStyle": "black",
 				"navigationBarTitleText": "首页"
 			}
 		},

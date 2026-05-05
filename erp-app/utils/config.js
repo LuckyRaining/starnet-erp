@@ -16,7 +16,17 @@ const CONFIG = {
 	TOKEN_KEY: "STAR_NET_TOKEN", // 令牌
 	USER_INFO_KEY: "STAR_NET_USER_INFO", // 用户信息
 
-	HISTORY_STORAGE_KEY : 'STAR_NET_SEARCH_HISTORY', // 搜索历史
+	HISTORY_STORAGE_KEY: 'STAR_NET_SEARCH_HISTORY', // 搜索历史
+	
+	CURRENT: 1, // 当前页码
+	SIZE: 15, // 每页记录数
+	
+    // ----- ----- ----- ----- ----- -----类别类型
+    CATEGORY_TYPE_CUSTOMER : 10, // 客户
+    CATEGORY_TYPE_SUPPLIER : 20, // 供应商
+    CATEGORY_TYPE_PRODUCT : 30, // 商品
+    CATEGORY_TYPE_EXPENSE : 40, // 支出
+    CATEGORY_TYPE_INCOME : 50, // 收入
 };
 
 export default CONFIG;

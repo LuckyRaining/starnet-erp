@@ -42,7 +42,7 @@ export default {
 	computed: {
 		// radius 若为数字，则按 px 拼接；若为字符串（如 36rpx），则原样用于 border-radius
 		radiusCss() {
-			return typeof this.radius === 'number' ? `${this.radius}px` : this.radius;
+			return typeof this.radius === 'number' ? `${this.radius}rpx` : this.radius;
 		},
 		containerStyle() {
 			return {
@@ -73,6 +73,7 @@ export default {
 $my-search-height: 72rpx;
 
 .my-search-row {
+	margin-bottom: 14rpx;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -83,6 +84,8 @@ $my-search-height: 72rpx;
 .my-search-container {
 	flex: 1;
 	height: $my-search-height;
+	margin: auto;
+	margin-left: 16rpx;
 	box-sizing: border-box;
 	padding: 0 24rpx;
 	display: flex;
@@ -114,5 +117,6 @@ $my-search-height: 72rpx;
 	align-items: center;
 	justify-content: center;
 	margin-left: 16rpx;
+	margin-right: 10rpx;
 }
 </style>
