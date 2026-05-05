@@ -54,10 +54,12 @@
 import { mapState } from 'vuex';
 import { formatDate, formatMoney } from '@/utils/format';
 import CONFIG from '@/utils/config';
+import { getPendingPurchaseDraft, removePendingPurchaseDraft } from '@/utils/pending-pay-purchase';
 
 export default {
 	data() {
 		return {
+			pendingId: '',
 			lines: [],
 			supplier: null,
 			settlementAccount: null,
@@ -91,14 +93,27 @@ export default {
 		}
 	},
 
-	onLoad() {
-		const draft = uni.getStorageSync(CONFIG.PURCHASE_CHECKOUT_KEY);
-		if (!draft || !Array.isArray(draft.lines) || !draft.lines.length) {
+	onLoad(options) {
+		const pid = options && options.pendingId ? decodeURIComponent(options.pendingId) : '';
+		if (pid) {
+			const draft = getPendingPurchaseDraft(pid);
+			if (!draft || !Array.isArray(draft.lines) || !draft.lines.length) {
+				uni.showToast({ title: '待付款订单不存在或已失效', icon: 'none' });
+				setTimeout(() => uni.navigateBack(), 1200);
+				return;
+			}
+			this.pendingId = pid;
+			this.lines = draft.lines;
+			return;
+		}
+
+		const legacy = uni.getStorageSync(CONFIG.PURCHASE_CHECKOUT_KEY);
+		if (!legacy || !Array.isArray(legacy.lines) || !legacy.lines.length) {
 			uni.showToast({ title: '没有待结算商品', icon: 'none' });
 			setTimeout(() => uni.navigateBack(), 1200);
 			return;
 		}
-		this.lines = draft.lines;
+		this.lines = legacy.lines;
 	},
 
 	async onShow() {
@@ -236,6 +251,9 @@ export default {
 				});
 
 				uni.removeStorageSync(CONFIG.PURCHASE_CHECKOUT_KEY);
+				if (this.pendingId) {
+					removePendingPurchaseDraft(this.pendingId);
+				}
 				const ids = this.lines.map((row) => row.product_id).filter((id) => id != null);
 				uni.setStorageSync(CONFIG.PURCHASE_DONE_IDS_KEY, ids);
 

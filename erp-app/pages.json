@@ -90,6 +90,18 @@
 					"style": {
 						"navigationBarTitleText": "我的采购订单"
 					}
+				},
+				{
+					"path": "order-pending-pay",
+					"style": {
+						"navigationBarTitleText": "待付款"
+					}
+				},
+				{
+					"path": "order-all",
+					"style": {
+						"navigationBarTitleText": "全部订单"
+					}
 				}
 			]
 		},

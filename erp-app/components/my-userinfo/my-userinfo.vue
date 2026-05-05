@@ -73,10 +73,10 @@ export default {
 				{ label: '足迹', action: 'toast' }
 			],
 			row2: [
-				{ label: '待付款', action: 'toast' },
+				{ label: '待付款', path: '/subpackages/business/order-pending-pay' },
 				{ label: '待收货', action: 'toast' },
 				{ label: '退款/退货', action: 'toast' },
-				{ label: '全部订单', action: 'toast' }
+				{ label: '全部订单', path: '/subpackages/business/order-all' }
 			]
 		};
 	},
@@ -107,6 +107,10 @@ export default {
 		},
 
 		onShortcut(item) {
+			if (item && item.path) {
+				uni.navigateTo({ url: item.path });
+				return;
+			}
 			if (item && item.action === 'toast') {
 				uni.showToast({ title: `${item.label}（敬请期待）`, icon: 'none' });
 			}

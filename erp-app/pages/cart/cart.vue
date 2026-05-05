@@ -67,6 +67,7 @@ import { formatDate, formatMoney } from '@/utils/format';
 import { saveHoldOrder } from '@/utils/hold';
 import tabbarBadge from '@/mixins/tabbar-badge.js';
 import CONFIG from '@/utils/config';
+import { addPendingPurchaseDraft } from '@/utils/pending-pay-purchase';
 import MyWarehouse from '@/components/my-warehouse/my-warehouse.vue';
 import MySettle from '@/components/my-settle/my-settle.vue';
 import MyProductItem from '@/components/my-product-item/my-product-item.vue';
@@ -250,20 +251,23 @@ export default {
 				return;
 			}
 
-			uni.setStorageSync(CONFIG.PURCHASE_CHECKOUT_KEY, {
-				lines: lines.map((row) => ({
-					product_id: row.product_id,
-					product_name: row.product_name,
-					product_price: row.product_price,
-					product_count: row.product_count,
-					cart_state: row.cart_state
-				})),
+			const snapshot = lines.map((row) => ({
+				product_id: row.product_id,
+				product_name: row.product_name,
+				product_price: row.product_price,
+				product_count: row.product_count,
+				cart_state: row.cart_state
+			}));
+
+			const pendingId = addPendingPurchaseDraft({
+				lines: snapshot,
 				checkedCount: this.checkedCount,
-				checkedGoodsAmount: this.checkedGoodsAmount,
-				ts: Date.now()
+				checkedGoodsAmount: this.checkedGoodsAmount
 			});
 
-			uni.navigateTo({ url: '/subpackages/business/purchase-checkout' });
+			uni.navigateTo({
+				url: `/subpackages/business/purchase-checkout?pendingId=${encodeURIComponent(pendingId)}`
+			});
 		}
 	}
 };
