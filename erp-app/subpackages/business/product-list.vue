@@ -9,18 +9,6 @@
 				:item="item"
 				@click="openProductDetail"
 			>
-				<!-- 通过 slot 插槽进行模板插入 -->
-				<template #price>
-					<!-- #ifdef VUE2 -->
-					<!-- 使用管道符 “|”，调用过滤函数 -->
-					<text class="price">¥{{ item.retailPrice | priceDecimaltoFixed_2_father }}</text>
-					<!-- #endif -->
-
-					<!-- #ifdef VUE3 -->
-					<!-- 使用普通函数，进行过滤 -->
-					<text class="price">¥{{ priceDecimaltoFixed_2_father(item.retailPrice) }}</text>
-					<!-- #endif -->
-				</template>
 			</my-product-item>
 
 			<!-- 加载更多 -->
@@ -31,11 +19,6 @@
 
 <script>
 import MyProductItem from '@/components/my-product-item/my-product-item.vue';
-
-function priceDecimaltoFixed_2_father(val) {
-	const n = Number(val);
-	return (Number.isFinite(n) ? n : 0).toFixed(2);
-}
 
 export default {
 	components: {
@@ -70,10 +53,6 @@ export default {
 		};
 	},
 
-	filters: {
-		priceDecimaltoFixed_2_father
-	},
-
 	computed: {
 		loadStatus() {
 			if (this.loading) return 'loading';
@@ -106,8 +85,6 @@ export default {
 	},
 
 	methods: {
-		priceDecimaltoFixed_2_father,
-
 		resetAndLoad() {
 			this.current = 1;
 			this.products = [];

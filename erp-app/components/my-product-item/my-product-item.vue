@@ -2,9 +2,7 @@
 	<view class="card" @click="onProductItemClick">
 		<view class="row">
 			<text class="name">{{ item.name }}</text>
-			<slot name="price">
-				<text class="price">¥{{ priceDecimaltoFixed_2_children }}</text>
-			</slot>
+			<text class="price">¥{{ priceDecimaltoFixed_2_children }}</text>
 		</view>
 
 		<view class="row sub">
