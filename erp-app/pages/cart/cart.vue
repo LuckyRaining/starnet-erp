@@ -13,12 +13,16 @@
 				<text class="clear" @click="clearCart">清空</text>
 			</view>
 
-			<view v-for="item in cart" :key="item.id" class="row item">
+			<view v-for="item in cart" :key="item.product_id" class="row item">
 				<view>
-					<text class="name">{{ item.name }}</text>
-					<text class="price">¥{{ item.price }}</text>
+					<text class="name">{{ item.product_name }}</text>
+					<text class="price">¥{{ item.product_price }}</text>
 				</view>
-				<uni-number-box :min="1" :value="item.count" @change="(val) => updateCount(item.id, val)" />
+				<uni-number-box
+					:min="1"
+					:value="item.product_count"
+					@change="(val) => updateCount(item.product_id, val)"
+				/>
 			</view>
 
 			<view v-if="!cart.length" class="empty">请扫码或搜索商品后添加</view>
@@ -35,38 +39,55 @@
 </template>
 
 <script>
+// 从 vuex 中按需导出 mapState 辅助方法
+import { mapState, mapMutations, mapGetters } from 'vuex';
 import { formatDate, formatMoney } from '@/utils/format';
 import { getHoldOrders, saveHoldOrder } from '@/utils/hold';
+import tabbarBadge from '@/mixins/tabbar-badge.js';
 
 export default {
-	data() {
-		return {
-			cart: []
-		};
-	},
+	// 将 tabbarBadge 混入到当前的页面中进行使用
+	mixins: [tabbarBadge],
 
 	computed: {
+		...mapState('m_cart', ['cart']),
+		...mapGetters('m_cart', ['total']),
 		totalAmount() {
-			return formatMoney(this.cart.reduce((sum, item) => sum + item.price * item.count, 0));
+			return formatMoney(
+				this.cart.reduce((sum, item) => sum + item.product_price * item.product_count, 0)
+			);
 		}
 	},
 
 	onShow() {
 		const selected = uni.getStorageSync('STAR_NET_SELECTED_PRODUCT');
 
-		if (selected && selected.id) {
-			this.addToCart(selected);
+		if (selected && selected.id != null) {
+			this.addToCart({
+				product_id: selected.id,
+				product_name: selected.name || '',
+				product_price: Number(
+					selected.estimatedPurchasePrice != null
+						? selected.estimatedPurchasePrice
+						: selected.wholesalePrice != null
+							? selected.wholesalePrice
+							: 0
+				),
+				product_count: 1,
+				cart_state: true
+			});
 			uni.removeStorageSync('STAR_NET_SELECTED_PRODUCT');
 		}
 
 		const holdOrder = uni.getStorageSync('STAR_NET_SELECTED_HOLD_ORDER');
 		if (holdOrder && holdOrder.id) {
-			this.cart = holdOrder.items || [];
+			this.setCart(holdOrder.items || []);
 			uni.removeStorageSync('STAR_NET_SELECTED_HOLD_ORDER');
 		}
 	},
 
 	methods: {
+		...mapMutations('m_cart', ['addToCart', 'updateGoodsCount', 'clearCart', 'setCart']),
 		async scanCode() {
 			try {
 				const res = await uni.scanCode({
@@ -89,29 +110,26 @@ export default {
 				});
 				const item = (data.productPage && data.productPage.records && data.productPage.records[0]) || null;
 				if (!item) throw new Error('未匹配到商品');
-				this.addToCart(item);
+				this.addToCart({
+					product_id: item.id,
+					product_name: item.name || '',
+					product_price: Number(
+						item.estimatedPurchasePrice != null
+							? item.estimatedPurchasePrice
+							: item.wholesalePrice != null
+								? item.wholesalePrice
+								: 0
+					),
+					product_count: 1,
+					cart_state: true
+				});
 			} catch (error) {
 				uni.showToast({ title: error.message, icon: 'none' });
 			}
 		},
 
-		addToCart(product) {
-			const found = this.cart.find((item) => item.id === product.id);
-			if (found) {
-				found.count += 1;
-				return;
-			}
-			this.cart.push({
-				id: product.id,
-				name: product.name,
-				price: Number(product.retailPrice || 0),
-				count: 1
-			});
-		},
-
-		updateCount(id, count) {
-			const target = this.cart.find((item) => item.id === id);
-			if (target) target.count = count || 1;
+		updateCount(product_id, count) {
+			this.updateGoodsCount({ product_id, product_count: count });
 		},
 
 		goSearch() {
@@ -133,12 +151,8 @@ export default {
 				amount: this.totalAmount,
 				items: this.cart
 			});
-			this.cart = [];
+			this.clearCart();
 			uni.showToast({ title: '挂单成功', icon: 'success' });
-		},
-
-		clearCart() {
-			this.cart = [];
 		},
 
 		async payNow() {
@@ -152,7 +166,7 @@ export default {
 						if (!confirm) return;
 						await this.submitSale(saleCode);
 						uni.showToast({ title: '支付成功', icon: 'success' });
-						this.cart = [];
+						this.clearCart();
 					}
 				});
 			} catch (error) {
@@ -169,13 +183,13 @@ export default {
 				throw new Error('请先在公司设置中配置默认仓库/客户，并确保登录用户绑定职员');
 			}
 			const productList = this.cart.map((item) => ({
-				productId: item.id,
+				productId: item.product_id,
 				warehouseId,
-				quantity: item.count,
-				price: item.price,
+				quantity: item.product_count,
+				price: item.product_price,
 				discountRate: 0,
 				discountAmount: 0,
-				amount: item.price * item.count
+				amount: item.product_price * item.product_count
 			}));
 
 			await this.$api.saleSave({
@@ -185,7 +199,7 @@ export default {
 					issueDate: formatDate(new Date()),
 					customerId,
 					sellerId,
-					quantity: this.cart.reduce((sum, item) => sum + item.count, 0),
+					quantity: this.cart.reduce((sum, item) => sum + item.product_count, 0),
 					discountAmount: 0,
 					amount: Number(this.totalAmount),
 					preferentialRate: 0,

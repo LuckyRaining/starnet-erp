@@ -33,9 +33,13 @@
 
 <script>
 import userUtils from '@/utils/user';
+import tabbarBadge from '@/mixins/tabbar-badge.js';
+
 const { getUserInfo, clearLoginState } = userUtils;
 
 export default {
+	mixins: [tabbarBadge],
+
 	computed: {
 		userName() {
 			const user = getUserInfo() || {};

@@ -36,11 +36,14 @@
 <script>
 import MySearch from '@/components/my-search/my-search.vue';
 import CONFIG from '../../utils/config';
+import tabbarBadge from '@/mixins/tabbar-badge.js';
 
 export default {
 	components: {
 		MySearch
 	},
+
+	mixins: [tabbarBadge],
 
 	data() {
 		return {

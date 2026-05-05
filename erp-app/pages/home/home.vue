@@ -74,6 +74,7 @@
 
 <script>
 import userUtils from '@/utils/user';
+import tabbarBadge from '@/mixins/tabbar-badge.js';
 
 const { getUserInfo } = userUtils;
 
@@ -90,6 +91,8 @@ function timeGreetingPrefix(hour) {
 }
 
 export default {
+	mixins: [tabbarBadge],
+
 	data() {
 		return {
 			displayName: 'XXX',

@@ -17,7 +17,14 @@ const CONFIG = {
 	USER_INFO_KEY: "STAR_NET_USER_INFO", // 用户信息
 
 	HISTORY_STORAGE_KEY: 'STAR_NET_SEARCH_HISTORY', // 搜索历史
+	CART_STORAGE_KEY: 'STAR_NET_CART', // 购物车
 	
+	TABBAR_INDEX_HOME: 0, // home 页面的 tabbar_index
+	TABBAR_INDEX_CATEGORY: 1, // category 页面的 tabbar_index
+	TABBAR_INDEX_CART: 2, // cart 页面的 tabbar_index
+	TABBAR_INDEX_STATISTIC: 3, // statistic 页面的 tabbar_index
+	TABBAR_INDEX_MINE: 4, // mine 页面的 tabbar_index
+
 	CURRENT: 1, // 当前页码
 	SIZE: 15, // 每页记录数
 	

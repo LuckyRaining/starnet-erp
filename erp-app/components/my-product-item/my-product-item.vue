@@ -32,7 +32,7 @@ export default {
 
 	computed: {
 		priceDecimaltoFixed_2_children() {
-			const n = Number(this.item.retailPrice);
+			const n = Number(this.item.estimatedPurchasePrice);
 			return (Number.isFinite(n) ? n : 0).toFixed(2);
 		}
 	},

@@ -1,0 +1,7 @@
+{
+	"name": "erp-app",
+	"private": true,
+	"dependencies": {
+		"vuex": "^4.1.0"
+	}
+}
