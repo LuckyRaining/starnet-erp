@@ -170,7 +170,7 @@ export default {
 		openProductList(lv3) {
 			if (!lv3 || !lv3.id) return;
 
-			const query = `categoryId=${encodeURIComponent(lv3.id)}&categoryName=${encodeURIComponent(lv3.name || '')}`;
+			const query = `keyword=${encodeURIComponent(lv3.id)}&categoryName=${encodeURIComponent(lv3.name || '')}`;
 			uni.navigateTo({
 				url: `/subpackages/business/product-list?${query}`
 			});
