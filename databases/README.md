@@ -627,8 +627,8 @@
 | name | VARCHAR(255) | ❌ | NULL | 联系人姓名 |
 | mobile | VARCHAR(64) | ❌ | NULL | 手机号 |
 | phone | VARCHAR(64) | ❌ | NULL | 座机 |
+| position | VARCHAR(255) | ❌ | NULL | 职位 |
 | qq | VARCHAR(255) | ❌ | NULL | QQ号 |
-| email | VARCHAR(255) | ❌ | NULL | 邮箱 |
 | address | TEXT | ❌ | NULL | 地址 |
 | primary | BIT(1) | ❌ | 0 | 是否首要联系人：0=否，1=是 |
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |

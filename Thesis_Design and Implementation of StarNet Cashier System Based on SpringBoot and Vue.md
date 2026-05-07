@@ -634,7 +634,7 @@ graph TB
 
 - 操作系统：Windows 10/11 64位
 - JDK版本：JDK 1.8
-- 数据库：MySQL 8.0.12
+- 数据库：MySQL 8.0.42
 - Node.js：Node.js 18.x
 - Maven：Maven 3.6+
 
@@ -737,7 +737,6 @@ graph TB
     Product["商品"]
     Warehouse["仓库"]
     Employee["职员"]
-    Account["结算账户"]
     
     Purchase["购货单"]
     Order["订单"]
@@ -830,103 +829,488 @@ graph TB
 
 #### 4.1.2 数据库表结构设计
 
-数据库表的设计构成了构建数据库系统的基础，其核心在于依据业务需求和数据模型来精心规划表结构及其相互之间的关系。在确定了实体属性之后，定义表与表之间的关系是重要步骤。对表格进行标准化是保证数据质量的重要环节，标准化可以有效消除数据的重复，确保数据的完整与一致。通过遵守第一范式、第二范式、第三范式等标准化原理，可有效降低数据存储中的冗余信息，提升数据库的运行效率与可靠性。 本系统主要数据表如下：
+数据库表的设计构成了构建数据库系统的基础,其核心在于依据业务需求和数据模型来精心规划表结构及其相互之间的关系。在确定了实体属性之后,定义表与表之间的关系是重要步骤。对表格进行标准化是保证数据质量的重要环节,标准化可以有效消除数据的重复,确保数据的完整与一致。通过遵守第一范式、第二范式、第三范式等标准化原理,可有效降低数据存储中的冗余信息,提升数据库的运行效率与可靠性。
 
-**(1) 客户表(uc_customer)**
+(1) 客户的相关信息见表1。
 
-存储客户基本信息，包括客户编码、名称、分类、等级、期初应收款、期初预收款等。
+**表1　客户表（uc_customer）**
 
-**(2) 供应商表(uc_supplier)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 编号（客户编码） |
+| name | VARCHAR(255) | ❌ | NULL | 名称（客户名称） |
+| categoryId | VARCHAR(20) | ❌ | NULL | 客户类别ID（关联rc_category.id，type=10） |
+| level | VARCHAR(20) | ❌ | 10 | 客户等级ID（关联rc_dict_item.id，字典编码customer_level） |
+| balanceTime | TIMESTAMP | ❌ | NULL | 余额日期 |
+| beginReceivableAmount | BIGINT | ❌ | NULL | 期初应收款 |
+| beginPrepaidAmount | BIGINT | ❌ | NULL | 期初预收款 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储供应商基本信息，包括供应商编码、名称、分类、增值税税率、期初应付款、期初预付款等。
+(2) 客户联系人表相关信息见表2。
 
-**(3) 商品表(uc_product)**
+**表2　客户联系人表（uc_customer_contact）**
 
-存储商品基本信息，包括商品编码、名称、条码、规格、分类、计量单位、零售价、批发价、VIP价格、折扣率、预计采购价、最低库存、最高库存等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| customerId | VARCHAR(20) | ❌ | NULL | 客户ID（关联uc_customer.id） |
+| name | VARCHAR(255) | ❌ | NULL | 联系人姓名 |
+| mobile | VARCHAR(64) | ❌ | NULL | 手机号 |
+| phone | VARCHAR(64) | ❌ | NULL | 座机 |
+| position | VARCHAR(255) | ❌ | NULL | 职位 |
+| qq | VARCHAR(255) | ❌ | NULL | QQ号 |
+| address | TEXT | ❌ | NULL | 地址 |
+| primary | BIT(1) | ❌ | 0 | 是否首要联系人：0=否，1=是 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(4) 仓库表(uc_warehouse)**
+(3) 供应商表相关信息见表3。
 
-存储仓库基本信息，包括仓库编码、名称、启用状态等。
+**表3　供应商表（uc_supplier）**
 
-**(5) 职员表(uc_employee)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 编号（供应商编码） |
+| name | VARCHAR(255) | ❌ | NULL | 名称（供应商名称） |
+| categoryId | VARCHAR(20) | ❌ | NULL | 供应商类别ID（关联rc_category.id，type=20） |
+| balanceTime | TIMESTAMP | ❌ | NULL | 余额日期 |
+| beginReceivableAmount | BIGINT | ❌ | NULL | 期初应收款 |
+| beginPrepaidAmount | BIGINT | ❌ | NULL | 期初预收款 |
+| vatRate | SMALLINT | ❌ | NULL | 增值税税率（如：17表示17%） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储企业职员信息，包括职员编码、名称、启用状态等。
+(4) 供应商联系人表相关信息见表4。
 
-**(6) 结算账户表(uc_settlement_account)**
+**表4　供应商联系人表（uc_supplier_contact）**
 
-存储结算账户信息，包括账户编号、名称、期初余额、当前余额、账户类别等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| supplierId | VARCHAR(20) | ❌ | NULL | 供应商ID（关联uc_supplier.id） |
+| name | VARCHAR(255) | ❌ | NULL | 联系人姓名 |
+| mobile | VARCHAR(64) | ❌ | NULL | 手机号 |
+| phone | VARCHAR(64) | ❌ | NULL | 座机 |
+| qq | VARCHAR(255) | ❌ | NULL | QQ号 |
+| address | TEXT | ❌ | NULL | 地址 |
+| primary | BIT(1) | ❌ | 0 | 是否首要联系人：0=否，1=是 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(7) 客户订单表(bc_order)**
+(5) 商品表相关信息见表5。
 
-存储客户订货和退货订单，包括单据日期、交货日期、单据编号、业务类型(订货/退货)、客户ID、总金额、优惠后金额、制单人、审核人、审核状态等。
+**表5　商品表（uc_product）**
 
-**(8) 购货单表(bc_purchase)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 编号（商品编码） |
+| name | VARCHAR(255) | ❌ | NULL | 名称（商品名称） |
+| barcode | VARCHAR(255) | ❌ | NULL | 条码（商品条形码） |
+| spec | VARCHAR(255) | ❌ | NULL | 规格（商品规格型号） |
+| categoryId | VARCHAR(20) | ❌ | NULL | 类别ID（关联rc_category.id，type=30） |
+| primaryWarehouseId | VARCHAR(20) | ❌ | NULL | 首选仓库ID（关联uc_warehouse.id） |
+| unitId | VARCHAR(20) | ❌ | NULL | 计量单位ID（关联rc_dict_item.id，字典编码unit） |
+| retailPrice | DOUBLE | ❌ | NULL | 零售价 |
+| wholesalePrice | DOUBLE | ❌ | NULL | 批发价 |
+| vipPrice | DOUBLE | ❌ | NULL | VIP价格 |
+| discountRate1 | DOUBLE | ❌ | NULL | 折扣率1 |
+| discountRate2 | DOUBLE | ❌ | NULL | 折扣率2 |
+| estimatedPurchasePrice | DOUBLE | ❌ | NULL | 预计采购价 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| minimumStock | DOUBLE | ❌ | NULL | 最低库存（库存预警下限） |
+| maximumStock | DOUBLE | ❌ | NULL | 最高库存（库存预警上限） |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储采购和采购退货单，包括供应商ID、类型(采购/退货)、单据日期、单据编号、付款状态、数量、折扣额、购货金额、优惠率、优惠金额、优惠后金额、本次付款金额、欠款金额、制单人、审核人、审核状态等。
+(6) 仓库表相关信息见表6。
 
-**(9) 销售单表(bc_sale)**
+**表6　仓库表（uc_warehouse）**
 
-存储销货和销售退货单，包括类型(销货/退货)、单据日期、单据编号、客户ID、销售人ID、联系人、地址、电话、数量、折扣额、金额、优惠率、优惠金额、优惠后金额、客户费用、本次收款金额、欠款金额、收款状态、制单人、审核人、审核状态等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | BIGINT | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 编号（仓库编码） |
+| name | VARCHAR(255) | ❌ | NULL | 名称（仓库名称） |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(10) 收款单表(fc_collection)**
+(7) 职员表相关信息见表7。
 
-存储收款单信息，包括单据日期、单据编号、客户ID、收款金额、单据金额、整单折扣、已核销金额、未核销金额、本次核销金额、预收款、制单人等。
+**表7　职员表（uc_employee）**
 
-**(11) 付款单表(fc_payment)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | BIGINT | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 编号（职员编码） |
+| name | VARCHAR(255) | ❌ | NULL | 名称（职员姓名） |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储付款单信息，包括单据日期、单据编号、供应商ID、付款金额、单据金额、整单折扣、已核销金额、未核销金额、本次核销金额、预付款、制单人等。
+(8) 结算账户表相关信息见表8。
 
-**(12) 应收账款记录表(fc_receivable)**
+**表8　结算账户表（uc_settlement_account）**
 
-跟踪与客户的应收款变动，包括客户ID、单据日期、业务类型(销货/退货/收款)、业务ID、增加应收款金额、支付应收款金额等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| code | VARCHAR(255) | ❌ | NULL | 账户编号 |
+| name | VARCHAR(255) | ❌ | NULL | 账户名称 |
+| balanceTime | TIMESTAMP | ❌ | NULL | 余额日期 |
+| beginBalance | DOUBLE | ❌ | 0 | 期初余额 |
+| currentBalance | DOUBLE | ❌ | 0 | 当前余额 |
+| type | VARCHAR(20) | ❌ | NULL | 账户类别（关联rc_dict_item.id，字典编码account_type） |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(13) 应付账款记录表(fc_payable)**
+(9) 用户表相关信息见表9。
 
-跟踪与供应商的应付款变动，包括供应商ID、单据日期、业务类型(采购/退货/付款)、业务ID、增加应付款金额、支付应付款金额等。
+**表9　用户表（uc_user）**
 
-**(14) 调拨单表(wc_transfer)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 用户ID |
+| username | VARCHAR(255) | ❌ | NULL | 用户名（登录名） |
+| mobile | VARCHAR(64) | ❌ | NULL | 手机号 |
+| password | VARCHAR(255) | ❌ | NULL | 密码（BCrypt加密） |
+| name | VARCHAR(255) | ❌ | NULL | 真实姓名 |
+| active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
+| deleted | BIT(1) | ❌ | 0 | 是否删除：0=未删除，1=已删除 |
+| createdTime | TIMESTAMP | ✅ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ✅ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储仓库调拨单，包括单据日期、单据编号、数量、审核状态、制单人、审核人等。
+(10) 客户订单表相关信息见表10。
 
-**(15) 入库单表(wc_store)**
+**表10　客户订单表（bc_order）**
 
-存储其他入库单(盘盈/其他入库)，包括单据日期、单据编号、类型、供应商ID、入库金额、数量、制单人等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| deliveryDate | VARCHAR(255) | ❌ | NULL | 交货日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：CO2021121506202128603） |
+| businessType | SMALLINT | ❌ | 10 | 业务类型：10=订货，20=退货 |
+| customerId | VARCHAR(20) | ❌ | NULL | 客户ID（关联uc_customer.id） |
+| totalAmount | DOUBLE | ❌ | NULL | 总金额 |
+| discountedAmount | DOUBLE | ❌ | NULL | 优惠后金额 |
+| quantity | DOUBLE | ❌ | NULL | 数量 |
+| discountRate | DOUBLE | ❌ | NULL | 优惠率 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| auditorId | VARCHAR(20) | ❌ | NULL | 审核人ID（关联uc_user.id） |
+| checked | BIT(1) | ❌ | 0 | 是否已审核：0=未审核，1=已审核 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(16) 出库单表(wc_checkout)**
+(11) 购货单表相关信息见表11。
 
-存储其他出库单(盘亏/其他出库)，包括单据日期、单据编号、类型、客户ID、出库成本、数量、制单人等。
+**表11　购货单表（bc_purchase）**
 
-**(17) 单据商品明细表(wc_issue_product)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| supplierId | VARCHAR(20) | ❌ | NULL | 供应商ID（关联uc_supplier.id） |
+| type | VARCHAR(20) | ❌ | NULL | 类型：buy=采购，refund=采购退货 |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：PL2021121406484617077） |
+| status | SMALLINT | ❌ | 10 | 付/退款状态：10=未付/退款，20=已付/退部分金额，30=全部付/退款 |
+| quantity | DOUBLE | ❌ | NULL | 数量 |
+| discountAmount | DOUBLE | ❌ | NULL | 折扣额 |
+| amount | DOUBLE | ❌ | NULL | 购货金额 |
+| preferentialRate | DOUBLE | ❌ | NULL | 优惠率 |
+| preferentialAmount | DOUBLE | ❌ | NULL | 优惠金额 |
+| preferredAmount | DOUBLE | ❌ | NULL | 优惠后金额 |
+| currentAmount | DOUBLE | ❌ | NULL | 本次付/退款金额 |
+| contracts | TEXT | ❌ | NULL | 采购合同（JSON格式） |
+| debtAmount | DOUBLE | ❌ | NULL | 本次欠款 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| auditorId | VARCHAR(20) | ❌ | NULL | 审核人ID（关联uc_user.id） |
+| checked | BIT(1) | ❌ | 0 | 是否已审核：0=未审核，1=已审核 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-存储各类业务单据的商品明细，包括单据日期、业务类型、业务ID、商品ID、仓库ID、数量、单价、折扣率、折扣额、金额等。这是系统的核心关联表，通过businessType和businessId可以追溯到具体的业务单据。
+(12) 销货单表相关信息见表12。
 
-**(18) 库存商品表(wc_stock)**
+**表12　销货单表（bc_sale）**
 
-存储各仓库中商品的实时库存，包括商品ID、仓库ID、数量、单价、成本等。按“商品+仓库”维度存储库存信息。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| type | VARCHAR(20) | ❌ | NULL | 类型：sell=销货，returned=销货退货 |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：SE2021121607225508117） |
+| customerId | VARCHAR(20) | ❌ | NULL | 客户ID（关联uc_customer.id） |
+| sellerId | VARCHAR(20) | ❌ | NULL | 销售人ID：职员（关联uc_employee.id） |
+| contactName | VARCHAR(20) | ❌ | NULL | 联系人姓名 |
+| address | VARCHAR(512) | ❌ | NULL | 地址 |
+| phone | VARCHAR(64) | ❌ | NULL | 电话号码 |
+| quantity | DOUBLE | ❌ | NULL | 数量 |
+| discountAmount | DOUBLE | ❌ | NULL | 折扣额 |
+| amount | DOUBLE | ❌ | NULL | 金额 |
+| preferentialRate | DOUBLE | ❌ | NULL | 优惠率 |
+| preferentialAmount | DOUBLE | ❌ | NULL | 优惠金额 |
+| preferredAmount | DOUBLE | ❌ | NULL | 优惠后金额 |
+| customerFee | DOUBLE | ❌ | NULL | 客户费用 |
+| currentAmount | DOUBLE | ❌ | NULL | 本次收/退款金额 |
+| debtAmount | DOUBLE | ❌ | NULL | 本次欠款 |
+| status | SMALLINT | ❌ | NULL | 收款状态：10=未收/退款，20=部分收/退款，30=全部收/退款 |
+| attachments | TEXT | ❌ | NULL | 销售附件（JSON格式） |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| auditorId | VARCHAR(20) | ❌ | NULL | 审核人ID（关联uc_user.id） |
+| checked | BIT(1) | ❌ | 0 | 是否已审核：0=未审核，1=已审核 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-**(19) 出入库记录表(wc_stock_record)**
+(13) 收款单表相关信息见表13。
 
-记录所有库存变动的流水账，包括单据日期、业务类型、业务ID、商品ID、仓库ID、数量(正数入库/负数出库)、出入库类型、当前数量、单价、金额等。
+**表13　收款单表（fc_collection）**
 
-**(20) 用户表(uc_user)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：CL2021122307414267958） |
+| customerId | VARCHAR(20) | ❌ | NULL | 销货单位ID（关联uc_customer.id） |
+| collectAmount | DOUBLE | ❌ | NULL | 收款金额 |
+| issueAmount | DOUBLE | ❌ | NULL | 单据金额 |
+| discountAmount | DOUBLE | ❌ | NULL | 整单折扣 |
+| verifiedAmount | DOUBLE | ❌ | NULL | 已核销金额 |
+| unverifiedAmount | DOUBLE | ❌ | NULL | 未核销金额 |
+| currentVerifiedAmount | DOUBLE | ❌ | NULL | 本次核销金额 |
+| advanceCollectAmount | DOUBLE | ❌ | NULL | 预收款 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-存储系统用户账号，包括用户名、手机号、密码(BCrypt加密)、真实姓名、启用状态、删除状态等。
+(14) 收款单据表相关信息见表14。
 
-**(21) 类别表(rc_category)**
+**表14　收款单据表（fc_collection_issue）**
 
-存储各种分类信息，支持树形结构，包括类型(客户/供应商/商品/支出/收入)、父ID、名称、排序号等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| collectionId | VARCHAR(20) | ❌ | NULL | 收款ID（关联fc_collection.id） |
+| sourceCode | VARCHAR(255) | ❌ | NULL | 源单编码（销售单或退货单的code） |
+| type | SMALLINT | ❌ | NULL | 类别：10=销货，20=退货 |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| issueAmount | DOUBLE | ❌ | NULL | 单据金额 |
+| verifiedAmount | DOUBLE | ❌ | NULL | 已核销金额 |
+| unverifiedAmount | DOUBLE | ❌ | NULL | 未核销金额 |
+| currentVerifiedAmount | DOUBLE | ❌ | NULL | 本次核销金额 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-**(22) 字典表(rc_dict)和字典项表(rc_dict_item)**
+(15) 付款单表相关信息见表15。
 
-存储系统字典数据，包括计量单位、结算方式、客户等级、账户类别等。
+**表15　付款单表（fc_payment）**
 
-**(23) 系统日志表(rc_log)**
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：FK2021122707520065067） |
+| supplierId | VARCHAR(20) | ❌ | NULL | 购货单位ID（关联uc_supplier.id） |
+| paidAmount | DOUBLE | ❌ | NULL | 付款金额 |
+| issueAmount | DOUBLE | ❌ | NULL | 单据金额 |
+| discountAmount | DOUBLE | ❌ | NULL | 整单折扣 |
+| verifiedAmount | DOUBLE | ❌ | NULL | 已核销金额 |
+| unverifiedAmount | DOUBLE | ❌ | NULL | 未核销金额 |
+| currentVerifiedAmount | DOUBLE | ❌ | NULL | 本次核销金额 |
+| advancePaidAmount | DOUBLE | ❌ | NULL | 预付款 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-记录用户操作日志，包括日志类型、用户ID、用户名、操作内容等。
+(16) 付款单据表相关信息见表16。
 
-**(24) 菜单表(rc_menu)**
+**表16　付款单据表（fc_payment_issue）**
 
-存储系统菜单配置，支持树形结构，包括父ID、图标、标题、路径、排序号等。
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| paymentId | VARCHAR(20) | ❌ | NULL | 付款ID（关联fc_payment.id） |
+| sourceCode | VARCHAR(255) | ❌ | NULL | 源单编码（购货单或采购退货单的code） |
+| type | SMALLINT | ❌ | NULL | 类别：10=购货，20=购货退货 |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| issueAmount | DOUBLE | ❌ | NULL | 单据金额 |
+| verifiedAmount | DOUBLE | ❌ | NULL | 已核销金额 |
+| unverifiedAmount | DOUBLE | ❌ | NULL | 未核销金额 |
+| currentVerifiedAmount | DOUBLE | ❌ | NULL | 本次核销金额 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(17) 应收账款记录表相关信息见表17。
+
+**表17　应收账款记录表（fc_receivable）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| customerId | VARCHAR(20) | ❌ | NULL | 客户ID（关联uc_customer.id） |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(32) | ❌ | NULL | 业务类型：sell=销货，returned=销货退货，collection=收款 |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联bc_sale.id或fc_collection.id） |
+| increasedAmount | DOUBLE | ❌ | 0 | 增加应收款金额（正数表示增加，负数表示减少） |
+| paidAmount | DOUBLE | ❌ | 0 | 支付应收款金额（实际收款金额） |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(18) 应付账款记录表相关信息见表18。
+
+**表18　应付账款记录表（fc_payable）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| supplierId | VARCHAR(20) | ❌ | NULL | 供应商ID（关联uc_supplier.id） |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(32) | ❌ | NULL | 业务类型：buy=采购，refund=采购退货，payment=付款 |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联bc_purchase.id或fc_payment.id） |
+| increasedAmount | DOUBLE | ❌ | 0 | 增加应付款金额（正数表示增加，负数表示减少） |
+| paidAmount | DOUBLE | ❌ | 0 | 支付应付款金额 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(19) 收入单表相关信息见表19。
+
+**表19　收入单表（fc_income）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| customerId | VARCHAR(20) | ❌ | NULL | 销货单位ID（关联uc_customer.id，可为空） |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：SR2021122808300451396） |
+| amount | DOUBLE | ❌ | NULL | 金额 |
+| collectAmount | DOUBLE | ❌ | NULL | 收款金额 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(20) 支出单表相关信息见表20。
+
+**表20　支出单表（fc_expense）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| supplierId | VARCHAR(20) | ❌ | NULL | 供应商ID（关联uc_supplier.id，可为空） |
+| issueDate | VARCHAR(255) | ❌ | NULL | 单据日期 |
+| code | VARCHAR(255) | ❌ | NULL | 单据编号（如：ZC2021122808540257274） |
+| amount | DOUBLE | ❌ | NULL | 金额 |
+| paidAmount | DOUBLE | ❌ | NULL | 付款金额 |
+| listerId | VARCHAR(20) | ❌ | NULL | 制单人ID（关联uc_user.id） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(21) 收支记录表相关信息见表21。
+
+**表21　收支记录表（fc_flow_record）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(20) | ❌ | NULL | 业务类型：income=收入，expense=支出 |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联fc_income.id或fc_expense.id） |
+| categoryId | VARCHAR(20) | ❌ | NULL | 类别ID（关联rc_category.id，类别类型为40=支出或50=收入） |
+| amount | DOUBLE | ❌ | 0 | 金额 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(22) 账户流水表相关信息见表22。
+
+**表22　账户流水表（fc_account_record）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| type | VARCHAR(20) | ❌ | NULL | 类型：in=收入，out=支出 |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(32) | ❌ | NULL | 业务类型：collection/payment/income/expense/buy/sell等 |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联对应业务表的主键） |
+| accountId | VARCHAR(20) | ❌ | NULL | 账户ID（关联uc_settlement_account.id） |
+| amount | DOUBLE | ❌ | 0 | 结算金额 |
+| settlementType | VARCHAR(20) | ❌ | NULL | 结算方式ID（关联rc_dict_item.id，字典编码settlement） |
+| settlementCode | VARCHAR(255) | ❌ | NULL | 结算号（如支票号、转账单号等） |
+| currentAmount | DOUBLE | ❌ | 0 | 当前余额（操作后的账户余额） |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
+
+(23) 单据商品表相关信息见表23。
+
+**表23　单据商品表（wc_issue_product）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(20) | ❌ | NULL | 业务类型（见下方说明） |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联对应业务表的主键） |
+| productId | VARCHAR(20) | ❌ | NULL | 商品ID（关联uc_product.id） |
+| warehouseId | VARCHAR(20) | ❌ | NULL | 仓库ID（关联uc_warehouse.id） |
+| quantity | DOUBLE | ❌ | NULL | 数量 |
+| price | DOUBLE | ❌ | NULL | 单价 |
+| discountRate | DOUBLE | ❌ | NULL | 折扣率 |
+| discountAmount | DOUBLE | ❌ | NULL | 折扣额 |
+| amount | DOUBLE | ❌ | NULL | 金额 |
+| code | VARCHAR(255) | ❌ | NULL | 序列号 |
+| remark | VARCHAR(255) | ❌ | NULL | 备注 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
+
+(24) 库存商品表相关信息见表24。
+
+**表24　库存商品表（wc_stock）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| productId | VARCHAR(20) | ❌ | NULL | 商品ID（关联uc_product.id） |
+| warehouseId | VARCHAR(20) | ❌ | NULL | 仓库ID（关联uc_warehouse.id） |
+| quantity | DOUBLE | ❌ | 0 | 数量（当前库存数量） |
+| price | DOUBLE | ❌ | 0 | 单价（库存成本单价） |
+| amount | DOUBLE | ❌ | 0 | 成本（库存总成本 = quantity × price） |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
+
+(25) 出入库记录表相关信息见表25。
+
+**表25　出入库记录表（wc_stock_record）**
+
+| 字段名 | 数据类型 | 必填 | 默认值 | 说明 |
+|--------|---------|------|--------|------|
+| id | VARCHAR(20) | ✅ | - | 主键ID |
+| issueDate | VARCHAR(20) | ❌ | NULL | 单据日期 |
+| businessType | VARCHAR(20) | ❌ | NULL | 业务类型（同wc_issue_product.businessType） |
+| businessId | VARCHAR(20) | ❌ | NULL | 业务ID（关联对应业务表的主键） |
+| productId | VARCHAR(20) | ❌ | NULL | 商品ID（关联uc_product.id） |
+| warehouseId | VARCHAR(20) | ❌ | NULL | 仓库ID（关联uc_warehouse.id） |
+| quantity | DOUBLE | ❌ | 0 | 数量（正数表示入库，负数表示出库） |
+| stockType | VARCHAR(20) | ❌ | NULL | 出入库类型：in=入库，out=出库 |
+| currentQuantity | VARCHAR(20) | ❌ | 0 | 当前数量（操作后的库存数量） |
+| price | DOUBLE | ❌ | 0 | 单价 |
+| amount | DOUBLE | ❌ | 0 | 金额 |
+| createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
+| updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
 ### 4.2 系统的实现
 
