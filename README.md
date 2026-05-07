@@ -86,15 +86,15 @@ https://gitee.com/LuckyRaining/starnet-erp
 
 ## 技术框架
 ### 后端技术
-|技术|名称|版本|
-|---|---|---|
-|[SpringBoot](http://spring.io/projects/spring-boot)|核心框架|2.3.2.RELEASE|
+|技术|名称| 版本            |
+|---|---|---------------|
+|[SpringBoot](http://spring.io/projects/spring-boot)|核心框架| 2.3.2.RELEASE |
 |[MyBatis](http://www.mybatis.org/mybatis-3/zh/index.html)|ORM框架|
 |[MyBatisPlus](https://mybatis.plus/)|MyBatis加强组件|
-|[Druid](https://github.com/alibaba/druid)|数据库连接池||
-|[Maven](http://maven.apache.org/)|项目构建管理||
-|Java|Java|1.8|
-|MySQL|数据库|8.0.12|
+|[Druid](https://github.com/alibaba/druid)|数据库连接池|               |
+|[Maven](http://maven.apache.org/)|项目构建管理|               |
+|Java|Java| 1.8           |
+|MySQL|数据库| 8.0.42        |
 |SpringSecurity|安全框架|
 
 ## 产品原型与历史开发计划
