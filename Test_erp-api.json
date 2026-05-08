@@ -1,0 +1,86 @@
+[
+  {
+    "product": {
+      "id": "",
+      "code": "6923644295844",
+      "name": "特仑苏有机纯牛奶250ml*10",
+      "barcode": "6923644295844",
+      "spec": "250ml*10",
+      "categoryId": "2051716270415540226",
+      "primaryWarehouseId": "2051710387774156801",
+      "unitId": "2051706832434622465",
+      "retailPrice": 58.00,
+      "wholesalePrice": 55.2000,
+      "vipPrice": 0,
+      "discountRate1": 0,
+      "discountRate2": 0,
+      "estimatedPurchasePrice": 55.2000,
+      "remark": null,
+      "minimumStock": 0,
+      "maximumStock": 0
+    }
+  },
+  {
+    "product": {
+      "id": "",
+      "code": "6923644285036",
+      "name": "特仑苏有机纯牛奶250ml",
+      "barcode": "6923644285036",
+      "spec": "250ml",
+      "categoryId": "2051716270415540226",
+      "primaryWarehouseId": "2051710387774156801",
+      "unitId": "1292602021718786049",
+      "retailPrice": 6.50,
+      "wholesalePrice": 5.5200,
+      "vipPrice": 0,
+      "discountRate1": 0,
+      "discountRate2": 0,
+      "estimatedPurchasePrice": 5.5200,
+      "remark": null,
+      "minimumStock": 0,
+      "maximumStock": 0
+    }
+  },
+  {
+    "product": {
+      "id": "",
+      "code": "6923644266318",
+      "name": "特仑苏纯牛奶250ml*12",
+      "barcode": "6923644266318",
+      "spec": "250ml*12",
+      "categoryId": "2051716270415540226",
+      "primaryWarehouseId": "2051710387774156801",
+      "unitId": "2051706832434622465",
+      "retailPrice": 45.00,
+      "wholesalePrice": 42.0000,
+      "vipPrice": 0,
+      "discountRate1": 0,
+      "discountRate2": 0,
+      "estimatedPurchasePrice": 42.0000,
+      "remark": null,
+      "minimumStock": 0,
+      "maximumStock": 0
+    }
+  },
+  {
+    "product": {
+      "id": "",
+      "code": "6923644266066",
+      "name": "特仑苏纯牛奶250ml",
+      "barcode": "6923644266066",
+      "spec": "250ml",
+      "categoryId": "2051716270415540226",
+      "primaryWarehouseId": "2051710387774156801",
+      "unitId": "1292602021718786049",
+      "retailPrice": 3.90,
+      "wholesalePrice": 3.5000,
+      "vipPrice": 0,
+      "discountRate1": 0,
+      "discountRate2": 0,
+      "estimatedPurchasePrice": 3.5000,
+      "remark": null,
+      "minimumStock": 0,
+      "maximumStock": 0
+    }
+  }
+]

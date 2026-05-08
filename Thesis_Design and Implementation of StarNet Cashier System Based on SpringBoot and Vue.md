@@ -568,27 +568,111 @@ graph TB
 
 #### 2.3.1 用户登录流程
 
-用户进入系统后，首先需要进行登录验证。在登录界面输入用户名和密码，系统会通过BCrypt算法验证密码是否正确。如果验证通过，系统生成JWT Token并返回给前端，用户成功登录进入系统主页；如果用户名或密码输入错误，系统会提示错误信息，用户需重新输入。登录流程图如图5所示。
+用户进入系统后,首先需要进行登录验证。在登录界面输入用户名和密码,系统会通过BCrypt算法验证密码是否正确。如果验证通过,系统生成JWT Token并返回给前端,用户成功登录进入系统主页;如果用户名或密码输入错误,系统会提示错误信息,用户需重新输入。登录流程图如图5所示。
 
 *图5 用户登录流程图*
 
+```mermaid
+graph TB
+    Start([开始]) --> Input[输入用户名和密码]
+    Input --> Validate{验证用户名是否存在}
+    Validate -->|不存在| Error1[提示:用户不存在]
+    Error1 --> Input
+    Validate -->|存在| CheckPwd{验证密码是否正确}
+    CheckPwd -->|不正确| Error2[提示:密码错误]
+    Error2 --> Input
+    CheckPwd -->|正确| GenerateToken[生成JWT Token]
+    GenerateToken --> LogLogin[记录登录日志]
+    LogLogin --> ReturnToken[返回Token给前端]
+    ReturnToken --> End([登录成功])
+```
+
 #### 2.3.2 采购业务流程
 
-采购业务流程如下：管理员登录系统后，进入采购管理模块，创建购货单。选择供应商，添加采购商品明细，设置单价、数量、优惠率等信息。提交购货单后，需要进行审核。审核通过后，系统自动生成入库单，增加商品库存，同时生成应付账款记录。后续可以通过付款单进行付款，核销应付账款。采购业务流程图如图6所示。
+采购业务流程如下:管理员登录系统后,进入采购管理模块,创建购货单。选择供应商,添加采购商品明细,设置单价、数量、优惠率等信息。提交购货单后,需要进行审核。审核通过后,系统自动生成入库单,增加商品库存,同时生成应付账款记录。后续可以通过付款单进行付款,核销应付账款。采购业务流程图如图6所示。
 
 *图6 采购业务流程图*
 
+```mermaid
+graph TB
+    Start([开始]) --> CreatePurchase[创建购货单]
+    CreatePurchase --> SelectSupplier[选择供应商]
+    SelectSupplier --> AddProducts[添加商品明细]
+    AddProducts --> SetInfo[设置单价/数量/优惠率]
+    SetInfo --> Calculate[计算总金额/折扣/欠款]
+    Calculate --> SaveDraft[保存购货单草稿]
+    SaveDraft --> Audit{是否审核}
+    Audit -->|否| End1([待审核状态])
+    Audit -->|是| CheckAudit{审核通过?}
+    CheckAudit -->|否| End2([审核驳回])
+    CheckAudit -->|是| GenStore[生成入库单]
+    GenStore --> UpdateStock[更新商品库存增加]
+    UpdateStock --> GenPayable[生成应付账款记录]
+    GenPayable --> RecordAccount[记录账户流水]
+    RecordAccount --> Payment{是否立即付款}
+    Payment -->|是| CreatePayment[创建付款单]
+    CreatePayment --> VerifyPayable[核销应付账款]
+    VerifyPayable --> End3([采购完成])
+    Payment -->|否| End4([挂账待付])
+```
+
 #### 2.3.3 销售业务流程
 
-销售业务流程如下：管理员登录系统后，进入销售管理模块，创建销货单。选择客户和销售人，填写联系人信息和地址，添加销售商品明细。提交销货单后，需要进行审核。审核通过后，系统自动生成出库单，减少商品库存，同时生成应收账款记录。后续可以通过收款单进行收款，核销应收账款。销售业务流程图如图7所示。
+销售业务流程如下:管理员登录系统后,进入销售管理模块,创建销货单。选择客户和销售人,填写联系人信息和地址,添加销售商品明细。提交销货单后,需要进行审核。审核通过后,系统自动生成出库单,减少商品库存,同时生成应收账款记录。后续可以通过收款单进行收款,核销应收账款。销售业务流程图如图7所示。
 
 *图7 销售业务流程图*
 
+```mermaid
+graph TB
+    Start([开始]) --> CreateSale[创建销货单]
+    CreateSale --> SelectCustomer[选择客户]
+    SelectCustomer --> SelectSeller[选择销售人]
+    SelectSeller --> FillContact[填写联系人/地址/电话]
+    FillContact --> AddProducts[添加商品明细]
+    AddProducts --> SetInfo[设置单价/数量/优惠率]
+    SetInfo --> Calculate[计算总金额/折扣/欠款]
+    Calculate --> SaveDraft[保存销货单草稿]
+    SaveDraft --> Audit{是否审核}
+    Audit -->|否| End1([待审核状态])
+    Audit -->|是| CheckAudit{审核通过?}
+    CheckAudit -->|否| End2([审核驳回])
+    CheckAudit -->|是| GenCheckout[生成出库单]
+    GenCheckout --> UpdateStock[更新商品库存减少]
+    UpdateStock --> GenReceivable[生成应收账款记录]
+    GenReceivable --> RecordAccount[记录账户流水]
+    RecordAccount --> Collection{是否立即收款}
+    Collection -->|是| CreateCollection[创建收款单]
+    CreateCollection --> VerifyReceivable[核销应收账款]
+    VerifyReceivable --> End3([销售完成])
+    Collection -->|否| End4([挂账待收])
+```
+
 #### 2.3.4 库存调拨流程
 
-库存调拨流程如下：管理员创建调拨单，选择调出仓库和调入仓库，添加调拨商品明细。提交调拨单后，需要审核。审核通过后，系统自动生成调拨出库记录（减少调出仓库库存）和调拨入库记录（增加调入仓库库存），完成商品在仓库间的转移。库存调拨流程图如图8所示。
+库存调拨流程如下:管理员创建调拨单,选择调出仓库和调入仓库,添加调拨商品明细。提交调拨单后,需要审核。审核通过后,系统自动生成调拨出库记录(减少调出仓库库存)和调拨入库记录(增加调入仓库库存),完成商品在仓库间的转移。库存调拨流程图如图8所示。
 
 *图8 库存调拨流程图*
+
+```mermaid
+graph TB
+    Start([开始]) --> CreateTransfer[创建调拨单]
+    CreateTransfer --> SelectFromWarehouse[选择调出仓库]
+    SelectFromWarehouse --> SelectToWarehouse[选择调入仓库]
+    SelectToWarehouse --> AddProducts[添加调拨商品明细]
+    AddProducts --> SetQuantity[设置调拨数量]
+    SetQuantity --> Calculate[计算总数量]
+    Calculate --> SaveDraft[保存调拨单草稿]
+    SaveDraft --> Audit{是否审核}
+    Audit -->|否| End1([待审核状态])
+    Audit -->|是| CheckAudit{审核通过?}
+    CheckAudit -->|否| End2([审核驳回])
+    CheckAudit -->|是| GenTransferOut[生成调拨出库记录]
+    GenTransferOut --> ReduceFromStock[减少调出仓库库存]
+    ReduceFromStock --> GenTransferIn[生成调拨入库记录]
+    GenTransferIn --> IncreaseToStock[增加调入仓库库存]
+    IncreaseToStock --> RecordStock[记录出入库流水]
+    RecordStock --> End3([调拨完成])
+```
 
 ### 2.4 系统主要特点
 
@@ -681,13 +765,104 @@ graph TB
 
 #### 3.3.1 系统需求分析
 
-在软件开发的整个流程中，系统需求分析占据着极为关键的位置。它不仅清晰地界定了目标系统应当实现的功能特性、性能指标、安全标准、用户交互界面以及各种非功能性需求，而且通过深入剖析业务需求、用户需求以及运行环境，将模糊的概念具体化，并转化为可度量的系统规格。
+在软件开发的整个流程中,系统需求分析占据着极为关键的位置。它不仅清晰地界定了目标系统应当实现的功能特性、性能指标、安全标准、用户交互界面以及各种非功能性需求,而且通过深入剖析业务需求、用户需求以及运行环境,将模糊的概念具体化,并转化为可度量的系统规格。
 
-本系统面向中小型零售企业，确定了管理员一种主要角色，通过用例图的方式，详细描述了该角色所具有的功能内容。管理员可以登录系统，进行基础资料管理（客户、供应商、商品、仓库、职员、账户等）、采购管理（购货单、购货退货单）、销售管理（客户订单、销货单、销货退货单）、仓库管理（调拨单、其他出入库、库存查询）、资金管理（收款单、付款单、应收应付账款、收支记录）和统计分析（采购/销售/库存/资金报表）等操作。管理员的用例图如图9所示。
+本系统面向中小型零售企业,确定了管理员一种主要角色,通过用例图的方式,详细描述了该角色所具有的功能内容。管理员可以登录系统,进行基础资料管理(客户、供应商、商品、仓库、职员、账户等)、采购管理(购货单、购货退货单)、销售管理(客户订单、销货单、销货退货单)、仓库管理(调拨单、其他出入库、库存查询)、资金管理(收款单、付款单、应收应付账款、收支记录)和统计分析(采购/销售/库存/资金报表)等操作。管理员的用例图如图9所示。
 
 *图9 管理员用例图*
 
-移动端小程序面向门店操作人员，提供商品浏览、扫码加购、采购清单管理等功能，支持通过uni.scanCode() API调用手机摄像头扫描商品条码，快速添加商品到采购清单。
+```mermaid
+graph TB
+    Admin([管理员])
+    
+    subgraph 基础资料管理
+        A1[客户管理]
+        A2[供应商管理]
+        A3[商品管理]
+        A4[仓库管理]
+        A5[职员管理]
+        A6[结算账户管理]
+        A7[分类管理]
+        A8[字典管理]
+        A9[用户管理]
+        A10[系统设置]
+    end
+    
+    subgraph 采购管理
+        B1[购货单管理]
+        B2[购货退货单管理]
+    end
+    
+    subgraph 销售管理
+        C1[客户订单管理]
+        C2[销货单管理]
+        C3[销货退货单管理]
+    end
+    
+    subgraph 仓库管理
+        D1[调拨单管理]
+        D2[其他入库管理]
+        D3[其他出库管理]
+        D4[库存查询]
+        D5[出入库记录]
+    end
+    
+    subgraph 资金管理
+        E1[收款单管理]
+        E2[付款单管理]
+        E3[应收账款管理]
+        E4[应付账款管理]
+        E5[其他收入管理]
+        E6[其他支出管理]
+        E7[现金银行报表]
+    end
+    
+    subgraph 统计分析
+        F1[采购报表]
+        F2[销售报表]
+        F3[库存报表]
+        F4[资金报表]
+    end
+    
+    Admin --> A1
+    Admin --> A2
+    Admin --> A3
+    Admin --> A4
+    Admin --> A5
+    Admin --> A6
+    Admin --> A7
+    Admin --> A8
+    Admin --> A9
+    Admin --> A10
+    
+    Admin --> B1
+    Admin --> B2
+    
+    Admin --> C1
+    Admin --> C2
+    Admin --> C3
+    
+    Admin --> D1
+    Admin --> D2
+    Admin --> D3
+    Admin --> D4
+    Admin --> D5
+    
+    Admin --> E1
+    Admin --> E2
+    Admin --> E3
+    Admin --> E4
+    Admin --> E5
+    Admin --> E6
+    Admin --> E7
+    
+    Admin --> F1
+    Admin --> F2
+    Admin --> F3
+    Admin --> F4
+```
+
+移动端小程序面向门店操作人员,提供商品浏览、扫码加购、采购清单管理等功能,支持通过uni.scanCode() API调用手机摄像头扫描商品条码,快速添加商品到采购清单。
 
 #### 3.3.2 开发技术介绍
 
