@@ -13,7 +13,11 @@ import net.starnet.erp.rc.service.CategoryService;
 import net.starnet.erp.rc.service.DictItemService;
 import net.starnet.erp.uc.model.Product;
 import net.starnet.erp.uc.service.ProductService;
+import net.starnet.erp.wc.model.Stock;
+import net.starnet.erp.wc.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * 商品分页
@@ -27,6 +31,8 @@ public class CProductPage extends BaseCommand {
     private CategoryService categoryService;
     @Autowired
     private DictItemService itemService;
+    @Autowired
+    private StockService stockService;
 
     @Param(defaultValue = "{}")
     private JSONObject query; // 查询对象
@@ -55,8 +61,13 @@ public class CProductPage extends BaseCommand {
                 product.put("unitName", unit.getName());
             }
 
-            // TODO 计算当前库存
-            product.put("stock", 2345.67);
+            // 计算当前库存:查询该商品在所有仓库的库存总量
+            List<Stock> stockList = stockService.list(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Stock>()
+                    .eq("productId", product.getId()));
+            double totalStock = stockList.stream()
+                    .mapToDouble(Stock::getQuantity)
+                    .sum();
+            product.put("stock", totalStock);
         }
 
         data.put("productPage", productPage);

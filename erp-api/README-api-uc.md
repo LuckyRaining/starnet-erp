@@ -641,7 +641,7 @@
 ```json
 {
   "supplier": {
-    "id": "供应商ID（更新时必填，新增时不传）",
+    "id": "供应商ID（更新时必填）",
     "code": "GYS001",
     "name": "供应商名称",
     "categoryId": "分类ID",
@@ -650,8 +650,19 @@
     "beginPrepaidAmount": 3000.00,
     "vatRate": 13,
     "remark": "备注"
-  }
+  },
+  "contactList": [
+    {
+      "name": "联系人姓名",
+      "mobile": "手机号",
+      "phone": "座机",
+      "qq": "QQ/微信",
+      "address": "联系地址",
+      "primary": true
+    }
+  ]
 }
+
 ```
 
 **supplier对象字段说明**:
