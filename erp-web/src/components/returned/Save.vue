@@ -155,7 +155,8 @@
           <el-col :span="6">
             <el-form-item label="优惠率"
                           prop="preferentialRate">
-              <el-input v-model.number="saveForm.preferentialRate">
+              <el-input v-model.number="saveForm.preferentialRate"
+                        @input="onPreferentialRateInput">
                 <template slot="append">%</template>
               </el-input>
             </el-form-item>
@@ -163,19 +164,22 @@
           <el-col :span="6">
             <el-form-item label="优惠金额"
                           prop="preferentialAmount">
-              <el-input v-model="saveForm.preferentialAmount"></el-input>
+              <el-input v-model="saveForm.preferentialAmount"
+                        @input="onPreferentialAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="优惠后金额"
                           prop="preferredAmount">
-              <el-input v-model="saveForm.preferredAmount"></el-input>
+              <el-input v-model="saveForm.preferredAmount"
+                        @input="onPreferredAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="客户承担费用"
                           prop="customerFee">
-              <el-input v-model="saveForm.customerFee"></el-input>
+              <el-input v-model="saveForm.customerFee"
+                        @input="onCustomerFeeInput"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -183,7 +187,8 @@
           <el-col :span="6">
             <el-form-item label="本次退款"
                           prop="currentAmount">
-              <el-input v-model="saveForm.currentAmount"></el-input>
+              <el-input v-model="saveForm.currentAmount"
+                        @input="onCurrentAmountInput"></el-input>
             </el-form-item>
           </el-col>
 
@@ -204,7 +209,8 @@
           <el-col :span="6">
             <el-form-item label="本次欠款"
                           prop="debtAmount">
-              <el-input v-model="saveForm.debtAmount"></el-input>
+              <el-input v-model="saveForm.debtAmount"
+                        @input="onDebtAmountInput"></el-input>
             </el-form-item>
           </el-col>
 
@@ -296,7 +302,8 @@
           <el-col :span="8">
             <el-form-item label="折扣率(%)"
                           prop="discountRate">
-              <el-input v-model="saveProductForm.discountRate"></el-input>
+              <el-input v-model="saveProductForm.discountRate"
+                        @input="onDiscountRateInput"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -304,13 +311,15 @@
           <el-col :span="8">
             <el-form-item label="折扣额"
                           prop="discountAmount">
-              <el-input v-model="saveProductForm.discountAmount"></el-input>
+              <el-input v-model="saveProductForm.discountAmount"
+                        @input="onDiscountAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="金额"
                           prop="amount">
-              <el-input v-model="saveProductForm.amount"></el-input>
+              <el-input v-model="saveProductForm.amount"
+                        disabled></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -353,10 +362,30 @@ import SelectProductDialog from '../common/SelectProductDialog'
 Vue.component('select-product-dialog', SelectProductDialog)
 
 export default {
+  watch: {
+    // 数量/单价变更时，按当前编辑模式自动重算
+    'saveProductForm.quantity': 'handleQuantityOrPriceChanged',
+    'saveProductForm.price': 'handleQuantityOrPriceChanged',
+    // 折扣率和折扣额双向联动，分别走不同计算分支
+    'saveProductForm.discountRate': 'handleDiscountRateChanged',
+    'saveProductForm.discountAmount': 'handleDiscountAmountChanged',
+    // 结算信息联动：优惠三字段互算 + 退款/欠款互算（含客户承担费用）
+    'saveForm.preferentialRate': 'handlePreferentialRateChanged',
+    'saveForm.preferentialAmount': 'handlePreferentialAmountChanged',
+    'saveForm.preferredAmount': 'handlePreferredAmountChanged',
+    'saveForm.currentAmount': 'handleCurrentAmountChanged',
+    'saveForm.debtAmount': 'handleDebtAmountChanged',
+    'saveForm.customerFee': 'handleCustomerFeeChanged',
+    'saveForm.productList': {
+      handler: 'handleSaleProductListChanged',
+      deep: true
+    }
+  },
   data() {
     return {
       // 客户列表
       customerList: [],
+      customerLevelList: [],
       sellerList: [],
       contactList: [],
       accountList: [],
@@ -396,7 +425,17 @@ export default {
         current: 1,
         size: 5
       },
-      warehouseList: []
+      warehouseList: [],
+      // rate: 以折扣率为主输入；amount: 以折扣额为主输入
+      discountCalcMode: 'rate',
+      // 同步联动字段时的保护锁，避免 watcher 循环触发
+      isDiscountSyncing: false,
+      // rate: 以优惠率为主输入；amount: 以优惠金额为主输入；preferred: 以优惠后金额为主输入
+      settlementCalcMode: 'rate',
+      // current: 以本次退款为主输入；debt: 以本次欠款为主输入
+      paymentCalcMode: 'current',
+      isSettlementSyncing: false,
+      isPaymentSyncing: false
     }
   },
   created() {
@@ -409,6 +448,7 @@ export default {
     }
 
     this.getCustomerList()
+    this.getCustomerLevelList()
     this.getSellerList()
     this.getAccountList()
     this.getWarehouseList()
@@ -423,6 +463,15 @@ export default {
       if (!result.success) return this.$message.error(result.message)
 
       this.customerList = result.data.customerPage.records
+    },
+    // 获取客户等级列表
+    async getCustomerLevelList() {
+      const { data: result } = await this.$http.post('/dict/itemList', {
+        dictCode: 'customer_level'
+      })
+      if (!result.success) return this.$message.error(result.message)
+
+      this.customerLevelList = result.data.itemList
     },
     // 获取销售人员列表
     async getSellerList() {
@@ -455,6 +504,7 @@ export default {
       }
 
       this.saveForm.code = result.data.code
+      this.recalculateSettlementByMode()
     },
     // 获取结算账户列表
     async getAccountList() {
@@ -472,6 +522,7 @@ export default {
 
       console.log(result.data)
       this.saveForm = result.data.sale
+      this.recalculateSettlementByMode()
     },
 
     // 获取客户联系人列表
@@ -491,11 +542,14 @@ export default {
 
     // 选择了联系人
     selectContactChanged(contactName) {
-      console.log('contactName', contactName)
-      let index = this.$_.findIndex(this.contactList, { name: contactName })
-      // this.saveForm.address = contact.address
-      // this.saveForm.phone = contact.mobile
-      console.log(this.contactList[index])
+      const contact = this.$_.find(this.contactList, { name: contactName })
+      if (contact === undefined) {
+        this.saveForm.address = ''
+        this.saveForm.phone = ''
+        return
+      }
+      this.saveForm.address = contact.address || ''
+      this.saveForm.phone = contact.phone || contact.mobile || ''
     },
 
     // 选择了结算账户
@@ -533,6 +587,7 @@ export default {
     // 显示保存商品对话框
     showProductAddDialog() {
       this.isProductAdd = true
+      this.discountCalcMode = 'rate'
       this.saveProductForm = {
         quantity: 1.0,
         price: 0.0,
@@ -545,6 +600,7 @@ export default {
     // 显示修改商品对话框
     showProductEditDialog(contact, index) {
       this.isProductAdd = false
+      this.discountCalcMode = 'rate'
       this.saveProductForm = this.$_.cloneDeep(contact)
       this.modifyProductIndex = index
       this.saveProductDialogVisible = true
@@ -573,6 +629,7 @@ export default {
           this.saveForm.productList.push(product)
           this.$message.success('添加商品成功！')
         }
+        this.recalculateSettlementByMode()
 
         // 隐藏添加商品的对话框
         this.saveProductDialogVisible = false
@@ -597,6 +654,7 @@ export default {
         this.saveForm.productList.findIndex((existedProduct) => existedProduct === product),
         1
       )
+      this.recalculateSettlementByMode()
 
       this.$message.success('删除商品成功！')
     },
@@ -610,7 +668,322 @@ export default {
         this.saveProductForm.productName = product.name
         this.saveProductForm.productId = product.id
         this.saveProductForm.unitName = product.unitName
+        const customerLevelName = this.getCurrentCustomerLevelName()
+        this.saveProductForm.price = this.getProductPriceByCustomerLevel(product, customerLevelName)
+        this.saveProductForm.discountRate = this.getProductDiscountRateByCustomerLevel(product, customerLevelName)
+        this.discountCalcMode = 'rate'
+        this.calculateByDiscountRate()
       }
+    },
+    // 获取当前客户等级名称（如：零售客户、批发客户）
+    getCurrentCustomerLevelName() {
+      const customer = this.$_.find(this.customerList, { id: this.saveForm.customerId })
+      if (customer === undefined) {
+        return ''
+      }
+      const level = this.$_.find(this.customerLevelList, { id: customer.level })
+      return level === undefined ? '' : level.name
+    },
+    // 根据客户等级获取销售单价
+    getProductPriceByCustomerLevel(product, levelName) {
+      if (levelName === '批发客户') {
+        return this.toFixedNumber(this.toNumber(product.wholesalePrice || product.retailPrice || product.price))
+      }
+      if (levelName === 'VIP客户') {
+        return this.toFixedNumber(this.toNumber(product.vipPrice || product.retailPrice || product.price))
+      }
+      // 零售客户/折扣等级一/折扣等级二：默认按零售价
+      return this.toFixedNumber(this.toNumber(product.retailPrice || product.price))
+    },
+    // 根据客户等级获取默认折扣率
+    getProductDiscountRateByCustomerLevel(product, levelName) {
+      if (levelName === '折扣等级一') {
+        return this.toFixedNumber(this.toNumber(product.discountRate1 || product.discountRate))
+      }
+      if (levelName === '折扣等级二') {
+        return this.toFixedNumber(this.toNumber(product.discountRate2 || product.discountRate))
+      }
+      return this.toFixedNumber(this.toNumber(product.discountRate))
+    },
+    onDiscountRateInput() {
+      // 用户正在改折扣率，后续计算优先由折扣率驱动
+      this.discountCalcMode = 'rate'
+    },
+    onDiscountAmountInput() {
+      // 用户正在改折扣额，后续计算优先由折扣额驱动
+      this.discountCalcMode = 'amount'
+    },
+    handleQuantityOrPriceChanged() {
+      this.recalculateByMode()
+    },
+    handleDiscountRateChanged() {
+      if (this.isDiscountSyncing || this.discountCalcMode !== 'rate') {
+        return
+      }
+      this.calculateByDiscountRate()
+    },
+    handleDiscountAmountChanged() {
+      if (this.isDiscountSyncing || this.discountCalcMode !== 'amount') {
+        return
+      }
+      this.calculateByDiscountAmount()
+    },
+    recalculateByMode() {
+      if (this.discountCalcMode === 'amount') {
+        this.calculateByDiscountAmount()
+      } else {
+        this.calculateByDiscountRate()
+      }
+    },
+    // 公式：折扣额 = 数量 * 单价 * 折扣率；销售金额 = 小计 - 折扣额
+    calculateByDiscountRate() {
+      const quantity = this.toNumber(this.saveProductForm.quantity)
+      const price = this.toNumber(this.saveProductForm.price)
+      const subtotal = quantity * price
+      const discountRate = this.toNumber(this.saveProductForm.discountRate)
+      const discountAmount = this.rateToDiscountAmount(subtotal, discountRate)
+      const amount = subtotal - discountAmount
+      this.syncDiscountFields({
+        discountAmount,
+        amount
+      })
+    },
+    // 公式：折扣率 = 折扣额 / (数量 * 单价)；销售金额 = 小计 - 折扣额
+    calculateByDiscountAmount() {
+      const quantity = this.toNumber(this.saveProductForm.quantity)
+      const price = this.toNumber(this.saveProductForm.price)
+      const subtotal = quantity * price
+      const rawDiscountAmount = this.toNumber(this.saveProductForm.discountAmount)
+      const discountAmount = this.limitDiscountAmount(subtotal, rawDiscountAmount)
+      const discountRate = this.discountAmountToRate(subtotal, discountAmount, this.saveProductForm.discountRate)
+      const amount = subtotal - discountAmount
+      this.syncDiscountFields({
+        discountRate,
+        discountAmount,
+        amount
+      })
+    },
+    syncDiscountFields({ discountRate, discountAmount, amount }) {
+      this.isDiscountSyncing = true
+      if (discountRate !== undefined) {
+        this.saveProductForm.discountRate = this.toFixedNumber(discountRate)
+      }
+      if (discountAmount !== undefined) {
+        this.saveProductForm.discountAmount = this.toFixedNumber(discountAmount)
+      }
+      if (amount !== undefined) {
+        this.saveProductForm.amount = this.toFixedNumber(amount > 0 ? amount : 0)
+      }
+      this.$nextTick(() => {
+        this.isDiscountSyncing = false
+      })
+    },
+    // 折扣率兼容两种输入：0~1（小数）和 0~100（百分比）
+    rateToDiscountAmount(subtotal, discountRate) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      const normalizedRate = this.toNumber(discountRate)
+      if (normalizedRate <= 0) {
+        return 0
+      }
+      return normalizedRate <= 1 ? subtotal * normalizedRate : subtotal * (normalizedRate / 100)
+    },
+    discountAmountToRate(subtotal, discountAmount, currentRate) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      const rateByRatio = discountAmount / subtotal
+      // 保持当前折扣率输入习惯：若此前按百分比输入，则继续输出百分比
+      return this.toNumber(currentRate) > 1 ? rateByRatio * 100 : rateByRatio
+    },
+    // 折扣额限制在 [0, 小计]，防止出现负金额
+    limitDiscountAmount(subtotal, discountAmount) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      if (discountAmount <= 0) {
+        return 0
+      }
+      return discountAmount > subtotal ? subtotal : discountAmount
+    },
+    onPreferentialRateInput() {
+      this.settlementCalcMode = 'rate'
+    },
+    onPreferentialAmountInput() {
+      this.settlementCalcMode = 'amount'
+    },
+    onPreferredAmountInput() {
+      this.settlementCalcMode = 'preferred'
+    },
+    onCurrentAmountInput() {
+      this.paymentCalcMode = 'current'
+    },
+    onDebtAmountInput() {
+      this.paymentCalcMode = 'debt'
+    },
+    onCustomerFeeInput() {
+      this.recalculatePaymentByMode()
+    },
+    handleSaleProductListChanged() {
+      this.recalculateSettlementByMode()
+    },
+    handlePreferentialRateChanged() {
+      if (this.isSettlementSyncing || this.settlementCalcMode !== 'rate') {
+        return
+      }
+      this.calculateSettlementByRate()
+    },
+    handlePreferentialAmountChanged() {
+      if (this.isSettlementSyncing || this.settlementCalcMode !== 'amount') {
+        return
+      }
+      this.calculateSettlementByAmount()
+    },
+    handlePreferredAmountChanged() {
+      if (!this.isPaymentSyncing) {
+        this.recalculatePaymentByMode()
+      }
+      if (this.isSettlementSyncing || this.settlementCalcMode !== 'preferred') {
+        return
+      }
+      this.calculateSettlementByPreferredAmount()
+    },
+    handleCurrentAmountChanged() {
+      if (this.isPaymentSyncing || this.paymentCalcMode !== 'current') {
+        return
+      }
+      this.calculateByCurrentAmount()
+    },
+    handleDebtAmountChanged() {
+      if (this.isPaymentSyncing || this.paymentCalcMode !== 'debt') {
+        return
+      }
+      this.calculateByDebtAmount()
+    },
+    handleCustomerFeeChanged() {
+      if (!this.isPaymentSyncing) {
+        this.recalculatePaymentByMode()
+      }
+    },
+    recalculateSettlementByMode() {
+      if (this.settlementCalcMode === 'amount') {
+        this.calculateSettlementByAmount()
+      } else if (this.settlementCalcMode === 'preferred') {
+        this.calculateSettlementByPreferredAmount()
+      } else {
+        this.calculateSettlementByRate()
+      }
+    },
+    recalculatePaymentByMode() {
+      if (this.paymentCalcMode === 'debt') {
+        this.calculateByDebtAmount()
+      } else {
+        this.calculateByCurrentAmount()
+      }
+    },
+    // 公式：优惠金额 = 商品销售总金额 * 优惠率；优惠后金额 = 商品销售总金额 - 优惠金额
+    calculateSettlementByRate() {
+      const totalAmount = this.getSaleProductTotalAmount()
+      const preferentialRate = this.toNumber(this.saveForm.preferentialRate)
+      const preferentialAmount = this.rateToDiscountAmount(totalAmount, preferentialRate)
+      const preferredAmount = totalAmount - preferentialAmount
+      this.syncSettlementFields({
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    // 公式：优惠率 = 优惠金额 / 商品销售总金额；优惠后金额 = 商品销售总金额 - 优惠金额
+    calculateSettlementByAmount() {
+      const totalAmount = this.getSaleProductTotalAmount()
+      const rawPreferentialAmount = this.toNumber(this.saveForm.preferentialAmount)
+      const preferentialAmount = this.limitDiscountAmount(totalAmount, rawPreferentialAmount)
+      const preferentialRate = this.discountAmountToRate(totalAmount, preferentialAmount, this.saveForm.preferentialRate)
+      const preferredAmount = totalAmount - preferentialAmount
+      this.syncSettlementFields({
+        preferentialRate,
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    // 公式：优惠金额 = 商品销售总金额 - 优惠后金额；优惠率 = 优惠金额 / 商品销售总金额
+    calculateSettlementByPreferredAmount() {
+      const totalAmount = this.getSaleProductTotalAmount()
+      const rawPreferredAmount = this.toNumber(this.saveForm.preferredAmount)
+      const preferredAmount = this.limitDiscountAmount(totalAmount, rawPreferredAmount)
+      const preferentialAmount = totalAmount - preferredAmount
+      const preferentialRate = this.discountAmountToRate(totalAmount, preferentialAmount, this.saveForm.preferentialRate)
+      this.syncSettlementFields({
+        preferentialRate,
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    syncSettlementFields({ preferentialRate, preferentialAmount, preferredAmount }) {
+      this.isSettlementSyncing = true
+      if (preferentialRate !== undefined) {
+        this.saveForm.preferentialRate = this.toFixedNumber(preferentialRate)
+      }
+      if (preferentialAmount !== undefined) {
+        this.saveForm.preferentialAmount = this.toFixedNumber(preferentialAmount)
+      }
+      if (preferredAmount !== undefined) {
+        this.saveForm.preferredAmount = this.toFixedNumber(preferredAmount)
+      }
+      this.$nextTick(() => {
+        this.isSettlementSyncing = false
+        this.recalculatePaymentByMode()
+      })
+    },
+    // 公式：本次欠款 = 优惠后金额 + 客户承担费用 - 本次退款
+    calculateByCurrentAmount() {
+      const receivableTotal = this.toNumber(this.saveForm.preferredAmount) + this.toNumber(this.saveForm.customerFee)
+      const currentAmount = this.limitDiscountAmount(receivableTotal, this.saveForm.currentAmount)
+      const debtAmount = receivableTotal - currentAmount
+      this.syncPaymentFields({
+        currentAmount,
+        debtAmount
+      })
+    },
+    // 公式：本次退款 = 优惠后金额 + 客户承担费用 - 本次欠款
+    calculateByDebtAmount() {
+      const receivableTotal = this.toNumber(this.saveForm.preferredAmount) + this.toNumber(this.saveForm.customerFee)
+      const debtAmount = this.limitDiscountAmount(receivableTotal, this.saveForm.debtAmount)
+      const currentAmount = receivableTotal - debtAmount
+      this.syncPaymentFields({
+        currentAmount,
+        debtAmount
+      })
+    },
+    syncPaymentFields({ currentAmount, debtAmount }) {
+      this.isPaymentSyncing = true
+      if (currentAmount !== undefined) {
+        this.saveForm.currentAmount = this.toFixedNumber(currentAmount)
+      }
+      if (debtAmount !== undefined) {
+        this.saveForm.debtAmount = this.toFixedNumber(debtAmount)
+      }
+      this.$nextTick(() => {
+        this.isPaymentSyncing = false
+      })
+    },
+    getSaleProductTotalAmount() {
+      return this.toFixedNumber(
+        this.saveForm.productList.reduce(
+          (sum, product) => sum + this.toNumber(product.amount),
+          0
+        )
+      )
+    },
+    toNumber(value) {
+      const numberValue = Number(value)
+      if (Number.isNaN(numberValue)) {
+        return 0
+      }
+      return numberValue
+    },
+    toFixedNumber(value) {
+      return Number(this.toNumber(value).toFixed(2))
     },
     // 获取仓库列表
     async getWarehouseList() {
