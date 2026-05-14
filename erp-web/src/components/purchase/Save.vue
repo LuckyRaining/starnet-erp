@@ -113,7 +113,8 @@
           <el-col :span="5">
             <el-form-item label="优惠率"
                           prop="preferentialRate">
-              <el-input v-model.number="saveForm.preferentialRate">
+              <el-input v-model.number="saveForm.preferentialRate"
+                        @input="onPreferentialRateInput">
                 <template slot="append">%</template>
               </el-input>
             </el-form-item>
@@ -121,19 +122,22 @@
           <el-col :span="5">
             <el-form-item label="优惠金额"
                           prop="preferentialAmount">
-              <el-input v-model="saveForm.preferentialAmount"></el-input>
+              <el-input v-model="saveForm.preferentialAmount"
+                        @input="onPreferentialAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="5">
             <el-form-item label="优惠后金额"
                           prop="preferredAmount">
-              <el-input v-model="saveForm.preferredAmount"></el-input>
+              <el-input v-model="saveForm.preferredAmount"
+                        @input="onPreferredAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="5">
             <el-form-item label="本次付款"
                           prop="currentAmount">
-              <el-input v-model="saveForm.currentAmount"></el-input>
+              <el-input v-model="saveForm.currentAmount"
+                        @input="onCurrentAmountInput"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -155,7 +159,8 @@
           <el-col :span="5">
             <el-form-item label="本次欠款"
                           prop="debtAmount">
-              <el-input v-model="saveForm.debtAmount"></el-input>
+              <el-input v-model="saveForm.debtAmount"
+                        @input="onDebtAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="5">
@@ -312,7 +317,17 @@ export default {
     'saveProductForm.price': 'handleQuantityOrPriceChanged',
     // 折扣率和折扣额是双向联动，分别走不同计算分支
     'saveProductForm.discountRate': 'handleDiscountRateChanged',
-    'saveProductForm.discountAmount': 'handleDiscountAmountChanged'
+    'saveProductForm.discountAmount': 'handleDiscountAmountChanged',
+    // 结算信息联动：优惠三字段双向换算 + 付款/欠款双向换算
+    'saveForm.preferentialRate': 'handlePreferentialRateChanged',
+    'saveForm.preferentialAmount': 'handlePreferentialAmountChanged',
+    'saveForm.preferredAmount': 'handlePreferredAmountChanged',
+    'saveForm.currentAmount': 'handleCurrentAmountChanged',
+    'saveForm.debtAmount': 'handleDebtAmountChanged',
+    'saveForm.productList': {
+      handler: 'handleProductListChanged',
+      deep: true
+    }
   },
   data() {
     return {
@@ -359,7 +374,13 @@ export default {
       // rate: 以折扣率为主输入；amount: 以折扣额为主输入
       discountCalcMode: 'rate',
       // 同步联动字段时的保护锁，避免 watcher 循环触发
-      isDiscountSyncing: false
+      isDiscountSyncing: false,
+      // rate: 以优惠率为主输入；amount: 以优惠金额为主输入；preferred: 以优惠后金额为主输入
+      settlementDiscountCalcMode: 'rate',
+      // current: 以本次付款为主输入；debt: 以本次欠款为主输入
+      paymentCalcMode: 'current',
+      isSettlementSyncing: false,
+      isPaymentSyncing: false
     }
   },
   created() {
@@ -406,6 +427,7 @@ export default {
       console.log(result.data.code)
       this.purchaseCode = result.data.code
       this.saveForm.code = this.purchaseCode
+      this.recalculateSettlementByMode()
     },
     // 获取结算账户列表
     async getAccountList() {
@@ -423,6 +445,7 @@ export default {
 
       console.log(result.data)
       this.saveForm = result.data.purchase
+      this.recalculateSettlementByMode()
     },
     // 选择了结算账户
     selectAccountChanged(accountId) {
@@ -501,6 +524,7 @@ export default {
           this.saveForm.productList.push(product)
           this.$message.success('添加商品成功！')
         }
+        this.recalculateSettlementByMode()
 
         // 隐藏添加商品的对话框
         this.saveProductDialogVisible = false
@@ -525,6 +549,7 @@ export default {
         this.saveForm.productList.findIndex((existedProduct) => existedProduct === product),
         1
       )
+      this.recalculateSettlementByMode()
 
       this.$message.success('删除商品成功！')
     },
@@ -653,6 +678,188 @@ export default {
     },
     getProductDiscountRate(product) {
       return this.toFixedNumber(this.toNumber(product.discountRate1 || product.discountRate2 || product.discountRate))
+    },
+    onPreferentialRateInput() {
+      this.settlementDiscountCalcMode = 'rate'
+    },
+    onPreferentialAmountInput() {
+      this.settlementDiscountCalcMode = 'amount'
+    },
+    onPreferredAmountInput() {
+      this.settlementDiscountCalcMode = 'preferred'
+    },
+    onCurrentAmountInput() {
+      this.paymentCalcMode = 'current'
+    },
+    onDebtAmountInput() {
+      this.paymentCalcMode = 'debt'
+    },
+    handleProductListChanged() {
+      this.recalculateSettlementByMode()
+    },
+    handlePreferentialRateChanged() {
+      if (this.isSettlementSyncing || this.settlementDiscountCalcMode !== 'rate') {
+        return
+      }
+      this.calculateSettlementByRate()
+    },
+    handlePreferentialAmountChanged() {
+      if (this.isSettlementSyncing || this.settlementDiscountCalcMode !== 'amount') {
+        return
+      }
+      this.calculateSettlementByAmount()
+    },
+    handlePreferredAmountChanged() {
+      if (!this.isPaymentSyncing) {
+        this.recalculatePaymentByMode()
+      }
+      if (this.isSettlementSyncing || this.settlementDiscountCalcMode !== 'preferred') {
+        return
+      }
+      this.calculateSettlementByPreferredAmount()
+    },
+    handleCurrentAmountChanged() {
+      if (this.isPaymentSyncing || this.paymentCalcMode !== 'current') {
+        return
+      }
+      this.calculateByCurrentAmount()
+    },
+    handleDebtAmountChanged() {
+      if (this.isPaymentSyncing || this.paymentCalcMode !== 'debt') {
+        return
+      }
+      this.calculateByDebtAmount()
+    },
+    recalculateSettlementByMode() {
+      if (this.settlementDiscountCalcMode === 'amount') {
+        this.calculateSettlementByAmount()
+      } else if (this.settlementDiscountCalcMode === 'preferred') {
+        this.calculateSettlementByPreferredAmount()
+      } else {
+        this.calculateSettlementByRate()
+      }
+    },
+    recalculatePaymentByMode() {
+      if (this.paymentCalcMode === 'debt') {
+        this.calculateByDebtAmount()
+      } else {
+        this.calculateByCurrentAmount()
+      }
+    },
+    // 公式：优惠金额 = 商品总金额 * 优惠率；优惠后金额 = 商品总金额 - 优惠金额
+    calculateSettlementByRate() {
+      const totalAmount = this.getProductTotalAmount()
+      const preferentialRate = this.toNumber(this.saveForm.preferentialRate)
+      const preferentialAmount = this.rateToDiscountAmount(totalAmount, preferentialRate)
+      const preferredAmount = totalAmount - preferentialAmount
+      this.syncSettlementFields({
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    // 公式：优惠率 = 优惠金额 / 商品总金额；优惠后金额 = 商品总金额 - 优惠金额
+    calculateSettlementByAmount() {
+      const totalAmount = this.getProductTotalAmount()
+      const rawPreferentialAmount = this.toNumber(this.saveForm.preferentialAmount)
+      const preferentialAmount = this.limitDiscountAmount(totalAmount, rawPreferentialAmount)
+      const preferentialRate = this.discountAmountToRate(
+        totalAmount,
+        preferentialAmount,
+        this.saveForm.preferentialRate
+      )
+      const preferredAmount = totalAmount - preferentialAmount
+      this.syncSettlementFields({
+        preferentialRate,
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    // 公式：优惠金额 = 商品总金额 - 优惠后金额；优惠率 = 优惠金额 / 商品总金额
+    calculateSettlementByPreferredAmount() {
+      const totalAmount = this.getProductTotalAmount()
+      const rawPreferredAmount = this.toNumber(this.saveForm.preferredAmount)
+      const preferredAmount = this.limitPreferredAmount(totalAmount, rawPreferredAmount)
+      const preferentialAmount = totalAmount - preferredAmount
+      const preferentialRate = this.discountAmountToRate(
+        totalAmount,
+        preferentialAmount,
+        this.saveForm.preferentialRate
+      )
+      this.syncSettlementFields({
+        preferentialRate,
+        preferentialAmount,
+        preferredAmount
+      })
+    },
+    syncSettlementFields({ preferentialRate, preferentialAmount, preferredAmount }) {
+      this.isSettlementSyncing = true
+      if (preferentialRate !== undefined) {
+        this.saveForm.preferentialRate = this.toFixedNumber(preferentialRate)
+      }
+      if (preferentialAmount !== undefined) {
+        this.saveForm.preferentialAmount = this.toFixedNumber(preferentialAmount)
+      }
+      if (preferredAmount !== undefined) {
+        this.saveForm.preferredAmount = this.toFixedNumber(preferredAmount)
+      }
+      this.$nextTick(() => {
+        this.isSettlementSyncing = false
+        this.recalculatePaymentByMode()
+      })
+    },
+    // 公式：本次欠款 = 优惠后金额 - 本次付款
+    calculateByCurrentAmount() {
+      const preferredAmount = this.toNumber(this.saveForm.preferredAmount)
+      const currentAmount = this.limitAmountByTotal(preferredAmount, this.saveForm.currentAmount)
+      const debtAmount = preferredAmount - currentAmount
+      this.syncPaymentFields({
+        currentAmount,
+        debtAmount
+      })
+    },
+    // 公式：本次付款 = 优惠后金额 - 本次欠款
+    calculateByDebtAmount() {
+      const preferredAmount = this.toNumber(this.saveForm.preferredAmount)
+      const debtAmount = this.limitAmountByTotal(preferredAmount, this.saveForm.debtAmount)
+      const currentAmount = preferredAmount - debtAmount
+      this.syncPaymentFields({
+        currentAmount,
+        debtAmount
+      })
+    },
+    syncPaymentFields({ currentAmount, debtAmount }) {
+      this.isPaymentSyncing = true
+      if (currentAmount !== undefined) {
+        this.saveForm.currentAmount = this.toFixedNumber(currentAmount)
+      }
+      if (debtAmount !== undefined) {
+        this.saveForm.debtAmount = this.toFixedNumber(debtAmount)
+      }
+      this.$nextTick(() => {
+        this.isPaymentSyncing = false
+      })
+    },
+    getProductTotalAmount() {
+      return this.toFixedNumber(
+        this.saveForm.productList.reduce(
+          (sum, product) => sum + this.toNumber(product.amount),
+          0
+        )
+      )
+    },
+    limitPreferredAmount(totalAmount, preferredAmount) {
+      return this.limitAmountByTotal(totalAmount, preferredAmount)
+    },
+    limitAmountByTotal(totalAmount, targetAmount) {
+      const normalizedTotal = this.toNumber(totalAmount)
+      const normalizedTarget = this.toNumber(targetAmount)
+      if (normalizedTotal <= 0) {
+        return 0
+      }
+      if (normalizedTarget <= 0) {
+        return 0
+      }
+      return normalizedTarget > normalizedTotal ? normalizedTotal : normalizedTarget
     },
     toNumber(value) {
       const numberValue = Number(value)
