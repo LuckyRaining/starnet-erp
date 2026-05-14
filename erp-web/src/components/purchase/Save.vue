@@ -246,7 +246,8 @@
           <el-col :span="8">
             <el-form-item label="折扣率(%)"
                           prop="discountRate">
-              <el-input v-model="saveProductForm.discountRate"></el-input>
+              <el-input v-model="saveProductForm.discountRate"
+                        @input="onDiscountRateInput"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -254,13 +255,15 @@
           <el-col :span="8">
             <el-form-item label="折扣额"
                           prop="discountAmount">
-              <el-input v-model="saveProductForm.discountAmount"></el-input>
+              <el-input v-model="saveProductForm.discountAmount"
+                        @input="onDiscountAmountInput"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="购货金额"
                           prop="amount">
-              <el-input v-model="saveProductForm.amount"></el-input>
+              <el-input v-model="saveProductForm.amount"
+                        disabled></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -303,6 +306,14 @@ import SelectProductDialog from '../common/SelectProductDialog'
 Vue.component('select-product-dialog', SelectProductDialog)
 
 export default {
+  watch: {
+    // 数量/单价变更时，按当前编辑模式自动重算
+    'saveProductForm.quantity': 'handleQuantityOrPriceChanged',
+    'saveProductForm.price': 'handleQuantityOrPriceChanged',
+    // 折扣率和折扣额是双向联动，分别走不同计算分支
+    'saveProductForm.discountRate': 'handleDiscountRateChanged',
+    'saveProductForm.discountAmount': 'handleDiscountAmountChanged'
+  },
   data() {
     return {
       // 供应商
@@ -344,7 +355,11 @@ export default {
         current: 1,
         size: 5
       },
-      warehouseList: []
+      warehouseList: [],
+      // rate: 以折扣率为主输入；amount: 以折扣额为主输入
+      discountCalcMode: 'rate',
+      // 同步联动字段时的保护锁，避免 watcher 循环触发
+      isDiscountSyncing: false
     }
   },
   created() {
@@ -444,6 +459,7 @@ export default {
     // 显示保存商品对话框
     showProductAddDialog() {
       this.isProductAdd = true
+      this.discountCalcMode = 'rate'
       this.saveProductForm = {
         quantity: 1.0,
         price: 0.0,
@@ -456,6 +472,7 @@ export default {
     // 显示修改商品对话框
     showProductEditDialog(contact, index) {
       this.isProductAdd = false
+      this.discountCalcMode = 'rate'
       this.saveProductForm = this.$_.cloneDeep(contact)
       this.modifyProductIndex = index
       this.saveProductDialogVisible = true
@@ -521,7 +538,131 @@ export default {
         this.saveProductForm.productName = product.name
         this.saveProductForm.productId = product.id
         this.saveProductForm.unitName = product.unitName
+        this.saveProductForm.price = this.getProductPrice(product)
+        this.saveProductForm.discountRate = this.getProductDiscountRate(product)
+        this.discountCalcMode = 'rate'
+        this.calculateByDiscountRate()
       }
+    },
+    onDiscountRateInput() {
+      // 用户正在改折扣率，后续计算优先由折扣率驱动
+      this.discountCalcMode = 'rate'
+    },
+    onDiscountAmountInput() {
+      // 用户正在改折扣额，后续计算优先由折扣额驱动
+      this.discountCalcMode = 'amount'
+    },
+    handleQuantityOrPriceChanged() {
+      this.recalculateByMode()
+    },
+    handleDiscountRateChanged() {
+      if (this.isDiscountSyncing || this.discountCalcMode !== 'rate') {
+        return
+      }
+      this.calculateByDiscountRate()
+    },
+    handleDiscountAmountChanged() {
+      if (this.isDiscountSyncing || this.discountCalcMode !== 'amount') {
+        return
+      }
+      this.calculateByDiscountAmount()
+    },
+    recalculateByMode() {
+      if (this.discountCalcMode === 'amount') {
+        this.calculateByDiscountAmount()
+      } else {
+        this.calculateByDiscountRate()
+      }
+    },
+    // 公式：折扣额 = 数量 * 单价 * 折扣率；购货金额 = 小计 - 折扣额
+    calculateByDiscountRate() {
+      const quantity = this.toNumber(this.saveProductForm.quantity)
+      const price = this.toNumber(this.saveProductForm.price)
+      const subtotal = quantity * price
+      const discountRate = this.toNumber(this.saveProductForm.discountRate)
+      const discountAmount = this.rateToDiscountAmount(subtotal, discountRate)
+      const amount = subtotal - discountAmount
+      this.syncDiscountFields({
+        discountAmount,
+        amount
+      })
+    },
+    // 公式：折扣率 = 折扣额 / (数量 * 单价)；购货金额 = 小计 - 折扣额
+    calculateByDiscountAmount() {
+      const quantity = this.toNumber(this.saveProductForm.quantity)
+      const price = this.toNumber(this.saveProductForm.price)
+      const subtotal = quantity * price
+      const rawDiscountAmount = this.toNumber(this.saveProductForm.discountAmount)
+      const discountAmount = this.limitDiscountAmount(subtotal, rawDiscountAmount)
+      const discountRate = this.discountAmountToRate(subtotal, discountAmount, this.saveProductForm.discountRate)
+      const amount = subtotal - discountAmount
+      this.syncDiscountFields({
+        discountRate,
+        discountAmount,
+        amount
+      })
+    },
+    syncDiscountFields({ discountRate, discountAmount, amount }) {
+      this.isDiscountSyncing = true
+      if (discountRate !== undefined) {
+        this.saveProductForm.discountRate = this.toFixedNumber(discountRate)
+      }
+      if (discountAmount !== undefined) {
+        this.saveProductForm.discountAmount = this.toFixedNumber(discountAmount)
+      }
+      if (amount !== undefined) {
+        this.saveProductForm.amount = this.toFixedNumber(amount > 0 ? amount : 0)
+      }
+      this.$nextTick(() => {
+        this.isDiscountSyncing = false
+      })
+    },
+    // 折扣率兼容两种输入：0~1（小数）和 0~100（百分比）
+    rateToDiscountAmount(subtotal, discountRate) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      const normalizedRate = this.toNumber(discountRate)
+      if (normalizedRate <= 0) {
+        return 0
+      }
+      return normalizedRate <= 1 ? subtotal * normalizedRate : subtotal * (normalizedRate / 100)
+    },
+    discountAmountToRate(subtotal, discountAmount, currentRate) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      const rateByRatio = discountAmount / subtotal
+      // 保持当前折扣率输入习惯：若此前按百分比输入，则继续输出百分比
+      return this.toNumber(currentRate) > 1 ? rateByRatio * 100 : rateByRatio
+    },
+    // 折扣额限制在 [0, 小计]，防止出现负金额
+    limitDiscountAmount(subtotal, discountAmount) {
+      if (subtotal <= 0) {
+        return 0
+      }
+      if (discountAmount <= 0) {
+        return 0
+      }
+      return discountAmount > subtotal ? subtotal : discountAmount
+    },
+    getProductPrice(product) {
+      return this.toFixedNumber(
+        this.toNumber(product.estimatedPurchasePrice || product.wholesalePrice || product.price)
+      )
+    },
+    getProductDiscountRate(product) {
+      return this.toFixedNumber(this.toNumber(product.discountRate1 || product.discountRate2 || product.discountRate))
+    },
+    toNumber(value) {
+      const numberValue = Number(value)
+      if (Number.isNaN(numberValue)) {
+        return 0
+      }
+      return numberValue
+    },
+    toFixedNumber(value) {
+      return Number(this.toNumber(value).toFixed(2))
     },
     // 获取仓库列表
     async getWarehouseList() {
