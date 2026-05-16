@@ -51,7 +51,13 @@
 
 ## 摘 要
 
-针对传统零售收银系统操作繁琐、数据孤岛及高峰期效率低下等问题，本文设计并实现了“星络”智能收银系统。系统采用前后端分离架构：后端基于SpringBoot框架构建RESTful API，负责业务逻辑、数据持久化及安全控制；前端Web端采用Vue.js配合Element UI组件库构建响应式管理界面；移动端基于Uni-App框架开发微信小程序，调用uni.scanCode() API实现条码/二维码扫描功能，支持实时查询商品信息；数据库选用MySQL完成37张核心数据表的规范化设计与索引优化。系统实现六大核心模块：基础资料管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款跟踪）、仓库管理（多仓库调拨、库存预警、出入库流水追溯）、资金管理（收付款核销、应收应付自动化跟踪、账户流水记录）和统计分析（多维度报表分析）。测试结果表明：系统运行稳定，核心接口响应时间控制在200ms以内，扫码识别成功率在标准光照环境下达95%以上，验证了基于SpringBoot和Vue的前后端分离架构在构建轻量级收银系统中的可行性与有效性。
+【目的】针对传统零售收银系统操作繁琐、数据孤岛及高峰期效率低下等问题，设计并实现"星络"智能收银系统，为中小型零售商户提供高效、便捷、智能的企业资源管理一体化平台。
+
+【方法】系统采用前后端分离架构：后端基于SpringBoot框架构建RESTful API，负责业务逻辑、数据持久化及安全控制；前端Web端采用Vue.js配合Element UI组件库构建响应式管理界面；移动端基于Uni-App框架开发微信小程序，调用uni.scanCode() API实现条码扫描功能；数据库选用MySQL完成37张核心数据表的规范化设计与索引优化。系统实现六大核心模块：基础资料管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款跟踪）、仓库管理（多仓库调拨、出入库流水追溯）、资金管理（收付款核销、应收应付自动化跟踪）和统计分析（多维度报表分析）。
+
+【结果】测试结果表明：系统运行稳定，核心接口响应时间控制在200ms以内，扫码识别成功率在标准光照环境下达95%以上，各业务模块功能完整，单据审核机制完善，应收应付账款自动跟踪准确，能够满足中小型零售企业的日常管理需求。
+
+【结论】本系统验证了基于SpringBoot和Vue的前后端分离架构在构建轻量级收银系统中的可行性与有效性，为中小型零售企业的数字化转型提供了可参考的技术方案和实践案例。
 
 **关键词：** 收银系统; SpringBoot; MySQL数据库; 条码识别
 
@@ -59,11 +65,13 @@
 
 ## ABSTRACT
 
-To address the problems of cumbersome operations, data silos, and low efficiency during peak hours in traditional retail cashier systems, this thesis designs and implements the "StarNet" intelligent cashier system. The system adopts a front-end and back-end separation architecture: the back-end builds RESTful APIs based on the SpringBoot framework, responsible for business logic, data persistence, and security control; the front-end Web interface is built with Vue.js and Element UI component library to create a responsive management interface; the mobile end develops WeChat mini-program based on Uni-App framework, calling uni.scanCode() API to realize barcode/QR code scanning function, supporting real-time product information query; MySQL database is selected to complete the standardized design and index optimization of 37 core data tables.
+[Purpose] To address the problems of cumbersome operations, data silos, and low efficiency during peak hours in traditional retail cashier systems, this thesis designs and implements the "StarNet" intelligent cashier system, providing an efficient, convenient, and intelligent integrated enterprise resource management platform for small and medium-sized retail merchants.
 
-The system implements six core modules: basic data management (customers, suppliers, products, warehouses, etc.), purchase management (purchase order audit, warehousing, automatic generation of accounts payable), sales management (sales order audit, outbound, accounts receivable tracking), warehouse management (multi-warehouse transfer, inventory warning, inbound/outbound flow tracing), fund management (payment/receipt verification, automatic tracking of receivables/payables, account flow records), and statistical analysis (multi-dimensional report analysis). 
+[Methods] The system adopts a front-end and back-end separation architecture: the back-end builds RESTful APIs based on SpringBoot framework, responsible for business logic, data persistence, and security control; the front-end Web interface is built with Vue.js and Element UI component library; the mobile end develops WeChat mini-program based on Uni-App framework, calling uni.scanCode() API to realize barcode scanning function; MySQL database completes the standardized design and index optimization of 37 core data tables. The system implements six core modules: basic data management (customers, suppliers, products, warehouses, etc.), purchase management (purchase order audit, warehousing, automatic generation of accounts payable), sales management (sales order audit, outbound, accounts receivable tracking), warehouse management (multi-warehouse transfer, inbound/outbound flow tracing), fund management (payment/receipt verification, automatic tracking of receivables/payables), and statistical analysis (multi-dimensional report analysis).
 
-Test results show that the system operates stably, with core interface response time controlled within 200ms, and scanning recognition success rate reaching over 95% under standard lighting conditions, verifying the feasibility and effectiveness of the front-end and back-end separation architecture based on SpringBoot and Vue in building a lightweight cashier system.
+[Results] Test results show that the system operates stably, with core interface response time controlled within 200ms, scanning recognition success rate reaching over 95% under standard lighting conditions, all business modules functioning completely, document audit mechanism perfected, and automatic tracking of accounts receivable and payable accurately, meeting the daily management needs of small and medium-sized retail enterprises.
+
+[Conclusion] This system verifies the feasibility and effectiveness of the front-end and back-end separation architecture based on SpringBoot and Vue in building lightweight cashier systems, providing a reference technical solution and practical case for the digital transformation of small and medium-sized retail enterprises.
 
 **Key words:** Cashier System; SpringBoot; MySQL database; Barcode Recognition
 
@@ -79,15 +87,15 @@ Test results show that the system operates stably, with core interface response 
 
 ### 1 绪论
 
-在数字化浪潮席卷各行各业的当下，信息化和科学化管理、互联网技术与传统商业模式的深度融合已成为不可阻挡的趋势。零售行业作为国民经济的重要组成部分，正面临着消费市场升级与消费者需求多样化的双重挑战。传统零售店铺受限于管理方式、技术手段等因素，难以充分满足现代消费者对高效、便捷购物体验的需求，收银系统的智能化升级成为零售行业转型升级的关键方向[1]。
+在数字化浪潮席卷各行各业的当下，信息化和科学化管理、互联网技术与传统商业模式的深度融合已成为不可阻挡的趋势。零售行业作为国民经济的重要组成部分，正面临着消费市场升级与消费者需求多样化的双重挑战。传统零售店铺受限于管理方式、技术手段等因素，难以充分满足现代消费者对高效、便捷购物体验的需求，收银系统的智能化升级成为零售行业转型升级的关键方向。
 
 ### 1.1 开发背景
 
-随着社会经济的快速发展和大众对生活质量要求的提高，零售行业的信息化建设日益受到重视。零售信息化的历程经历了从简单的收银设备到集成化软件系统的持续演进。然而，传统收银方式及部分现有系统仍面临诸多瓶颈。一方面，操作流程繁琐，高峰时段顾客排队严重，人工录入商品信息不仅效率低下，而且容易出现错误，导致库存数据不准确和财务对账困难。另一方面，现金、刷卡、移动支付等多种支付方式无法统一处理，增加了收银员的培训成本和操作复杂度。更为关键的是，销售数据难以实时汇总分析，各门店或终端形成数据孤岛，无法为经营决策提供及时有效的数据支持。这些痛点表明，传统收银系统已难以满足现代零售对敏捷运营和数据驱动决策的需求，市场亟需一款操作便捷、功能集成、数据可视化的智能收银解决方案[2]。
+随着社会经济的快速发展和大众对生活质量要求的提高，零售行业的信息化建设日益受到重视。零售信息化的历程经历了从简单的收银设备到集成化软件系统的持续演进。然而，传统收银方式及部分现有系统仍面临诸多瓶颈。一方面，操作流程繁琐，高峰时段顾客排队严重，人工录入商品信息不仅效率低下，而且容易出现错误，导致库存数据不准确和财务对账困难。另一方面，现金、刷卡、移动支付等多种支付方式无法统一处理，增加了收银员的培训成本和操作复杂度。更为关键的是，销售数据难以实时汇总分析，各门店或终端形成数据孤岛，无法为经营决策提供及时有效的数据支持。这些痛点表明，传统收银系统已难以满足现代零售对敏捷运营和数据驱动决策的需求，市场亟需一款操作便捷、功能集成、数据可视化的智能收银解决方案。
 
-目前国内基于SpringBoot和Vue的收银管理系统研究已取得一定进展。在技术实现上，多数研究采用Java语言搭配SpringBoot框架构建后端服务，利用其自动配置与快速开发特性简化开发流程；前端则多选用Vue框架，凭借组件化开发模式与响应式数据绑定能力，打造交互性强、界面美观的用户界面。数据库方面，MySQL凭借高性能与易用性成为存储商品信息、订单数据等的主流选择[3]。
+目前国内基于SpringBoot和Vue的收银管理系统研究已取得一定进展。在技术实现上，多数研究采用Java语言搭配SpringBoot框架构建后端服务，利用其自动配置与快速开发特性简化开发流程；前端则多选用Vue框架，凭借组件化开发模式与响应式数据绑定能力，打造交互性强、界面美观的用户界面。数据库方面，MySQL凭借高性能与易用性成为存储商品信息、订单数据等的主流选择[1]。
 
-国外零售信息化起步较早，大型商超的收银系统已深度整合了供应链管理、客户关系管理及高级商业智能分析，形成了完整的数字化生态。在技术架构层面，以微服务理念对复杂系统进行解耦，通过独立的服务协同工作，已成为提升系统弹性与可扩展性的重要趋势[4]。同时，为追求极致效率与体验，探索物联网智能购物车、基于计算机视觉的自动商品识别等“无人化”收银方案也是前沿方向之一[5]。这些探索体现了技术赋能下，收银环节从“交易执行终端”向“智能数据采集与服务中心”演进的趋势。
+国外零售信息化起步较早，大型商超的收银系统已深度整合了供应链管理、客户关系管理及高级商业智能分析，形成了完整的数字化生态。在技术架构层面，以微服务理念对复杂系统进行解耦，通过独立的服务协同工作，已成为提升系统弹性与可扩展性的重要趋势[2]。同时，为追求极致效率与体验，探索物联网智能购物车、基于计算机视觉的自动商品识别等“无人化”收银方案也是前沿方向之一[3]。这些探索体现了技术赋能下，收银环节从“交易执行终端”向“智能数据采集与服务中心”演进的趋势。
 
 综上，国内外学者与开发者针对收银系统项目进行了多元且深入的研究，为我们进一步了解收银系统的发展现状、技术开发等问题提供了坚实的理论支撑，也为我们后续的研究指明了清晰的方向。
 
@@ -97,11 +105,11 @@ Test results show that the system operates stably, with core interface response 
 
 第一，针对传统零售企业管理分散、数据孤岛的痛点，设计一个以SpringBoot与Vue.js前后端分离架构为基础的一体化收银系统。该系统涵盖客户管理、供应商管理、商品管理、仓库管理、职员管理等基础资料模块，以及购货、销货、出入库、收付款等业务流程，通过统一的业务数据模型和流程引擎，实现采购、销售、库存、财务等业务环节的无缝衔接，显著提升企业运营效率和数据准确性。
 
-第二，针对资金管理复杂、账务核对困难的现实问题，构建完善的资金管理体系。系统实现了应收账款、应付账款的自动化跟踪，支持收款单、付款单的核销功能，提供现金银行报表、往来对账单等多维度财务报表，将零散的交易信息转化为结构化的财务数据，为企业的资金管控和经营决策提供即时、准确的数据支持[6]。
+第二，针对资金管理复杂、账务核对困难的现实问题，构建完善的资金管理体系。系统实现了应收账款、应付账款的自动化跟踪，支持收款单、付款单的核销功能，提供现金银行报表、往来对账单等多维度财务报表，将零散的交易信息转化为结构化的财务数据，为企业的资金管控和经营决策提供即时、准确的数据支持[4]。
 
-第三，针对库存管理混乱、盘点效率低下的挑战，设计智能化的仓库管理模块。系统支持多仓库管理、库存调拨、其他出入库、盘点盈亏等功能，实时跟踪商品库存变化，结合最低/最高库存预警机制，帮助企业优化库存结构，降低库存成本，提升供应链管理水平[7]。
+第三，针对库存管理混乱、盘点效率低下的挑战，设计智能化的仓库管理模块。系统支持多仓库管理、库存调拨、其他出入库、盘点盈亏等功能，实时跟踪商品库存变化，结合最低/最高库存预警机制，帮助企业优化库存结构，降低库存成本，提升供应链管理水平[5]。
 
-第四，通过本项目的完整实践，深入掌握从需求分析、系统设计、模块编码到测试部署的全栈开发流程，探索“前后端分离+多端适配”这一现代Web架构在解决企业级收银实际问题中的有效性与技术实现细节，为中小型零售企业的数字化转型提供可参考的技术方案和实践案例[8]。
+第四，通过本项目的完整实践，深入掌握从需求分析、系统设计、模块编码到测试部署的全栈开发流程，探索“前后端分离+多端适配”这一现代Web架构在解决企业级收银实际问题中的有效性与技术实现细节，为中小型零售企业的数字化转型提供可参考的技术方案和实践案例[6]。
 
 此外，本系统的开发有助于提升中小商户的整体运营效率和管理水平，降低人工成本与差错率，优化客户和供应商的合作体验。通过精准的业务数据统计与分析，商户能够更好地把握采购动态、销售趋势和库存状况，实现精细化运营，提升市场竞争力。因此，开展基于SpringBoot和Vue的星络收银系统研究具有重要的现实意义和应用价值。
 
@@ -144,7 +152,7 @@ Test results show that the system operates stably, with core interface response 
 
 (7)数据统计与分析
 
-实现采购、销售、库存、资金等多维度的聚合分析。提供采购明细表、销售汇总表、商品库存余额表、商品收发明细表、应付/应收账款明细表等标准报表。通过表格和图表相结合的方式直观呈现业务数据，为经营决策提供数据支持[9]。
+实现采购、销售、库存、资金等多维度的聚合分析。提供采购明细表、销售汇总表、商品库存余额表、商品收发明细表、应付/应收账款明细表等标准报表。通过表格和图表相结合的方式直观呈现业务数据，为经营决策提供数据支持。
 
 ### 1.4 可行性分析
 
@@ -152,25 +160,25 @@ Test results show that the system operates stably, with core interface response 
 
 SpringBoot框架，作为Spring生态中的一员，以其自动配置、Actuator监控以及与Spring全家桶的无缝集成等特性，极大地简化了开发流程，大大提高了开发效率。它可以迅速地创建一个单独的Spring应用程序，并且可以将其直接嵌入到诸如Tomcat之类的服务器中。提供生产就绪功能，特别适合于企业级应用的快速开发。在本系统中，SpringBoot负责构建RESTful API接口，处理业务逻辑、数据持久化和安全控制，通过MyBatis Plus实现与MySQL数据库的高效交互，支持复杂的业务查询和事务管理。
 
-Vue框架，作为一个渐进式的用户界面构建框架，拥有响应式数据绑定、组件化开发、丰富的指令和模板语法等显著优势。其核心库的轻量级特性，让Vue能够很好地创建大型的应用程序。Vue的渐进式特性还允许开发者根据项目的具体需求灵活选择功能模块，从而易于上手和集成[10]。在本系统中，Vue用于构建Web端(erp-web)的管理界面，采用Element UI组件库打造专业的企业级操作界面，同时通过Uni-App框架实现移动端小程序(erp-app)，一套代码多端运行，提升开发效率[8]。
+Vue框架，作为一个渐进式的用户界面构建框架，拥有响应式数据绑定、组件化开发、丰富的指令和模板语法等显著优势。其核心库的轻量级特性，让Vue能够很好地创建大型的应用程序。Vue的渐进式特性还允许开发者根据项目的具体需求灵活选择功能模块，从而易于上手和集成[7]。在本系统中，Vue用于构建Web端(erp-web)的管理界面，采用Element UI组件库打造专业的企业级操作界面，同时通过Uni-App框架实现移动端小程序(erp-app)，一套代码多端运行，提升开发效率[6]。
 
-MySQL是一种开放源码的关系型数据库，它具有性能好，可靠性高，使用方便，灵活等特点。该系统提供了多个不同的存储引擎供开发人员选择。MySQL拥有丰富的SQL语句，并具有可视化的管理功能，为用户提供了方便快捷的数据处理方法。在长期的发展和广泛应用中，MySQL也证明了其卓越的稳定性和安全性[3]。本系统设计了37张数据表，涵盖基础资料、业务流程、财务资金、库存管理等各个方面，通过规范化的数据库设计和合理的索引优化，确保数据存储的完整性和查询效率。
+MySQL是一种开放源码的关系型数据库，它具有性能好，可靠性高，使用方便，灵活等特点。该系统提供了多个不同的存储引擎供开发人员选择。MySQL拥有丰富的SQL语句，并具有可视化的管理功能，为用户提供了方便快捷的数据处理方法。在长期的发展和广泛应用中，MySQL也证明了其卓越的稳定性和安全性[1]。本系统设计了37张数据表，涵盖基础资料、业务流程、财务资金、库存管理等各个方面，通过规范化的数据库设计和合理的索引优化，确保数据存储的完整性和查询效率。
 
-将SpringBoot框架、Vue框架和MySQL数据库相结合，不仅在技术上是完全可行的，而且能够满足各种复杂业务需求。这一技术栈提供了一套强大的工具链，从后端服务的开发到前端界面的构建，再到数据的存储和管理，都能得到全面而有效的支持[11]。因此，这一组合是实现高效、可靠、灵活的系统开发的理想选择，尤其适合于需要快速迭代和扩展的企业级应用。
+将SpringBoot框架、Vue框架和MySQL数据库相结合，不仅在技术上是完全可行的，而且能够满足各种复杂业务需求。这一技术栈提供了一套强大的工具链，从后端服务的开发到前端界面的构建，再到数据的存储和管理，都能得到全面而有效的支持[8]。因此，这一组合是实现高效、可靠、灵活的系统开发的理想选择，尤其适合于需要快速迭代和扩展的企业级应用。
 
 #### 1.4.2 操作可行性
 
-SpringBoot框架凭借其自动配置和快速启动的特性，显著简化了后端开发的复杂性。这个功能使开发人员可以专注于实现业务逻辑，而不需要花费太多的时间在复杂的配置工作上。通过这种方式，开发过程的难度得以降低，开发效率得到显著提升，从而使得系统能够迅速适应需求的变化[11]。与此同时，Vue框架的组件化开发模式和响应式数据绑定机制极大地提升了前端开发的灵活性和效率。开发人员可以将一个复杂的界面分割成具有自身状态与逻辑的多个独立的构件，这样既可以提高代码的可维护性，又可以增加代码的重用性。Vue框架同样提供了丰富的指令和模板语法，这些工具进一步简化了对DOM的操作，降低了前端开发的学习难度[10]。
+SpringBoot框架凭借其自动配置和快速启动的特性，显著简化了后端开发的复杂性。这个功能使开发人员可以专注于实现业务逻辑，而不需要花费太多的时间在复杂的配置工作上。通过这种方式，开发过程的难度得以降低，开发效率得到显著提升，从而使得系统能够迅速适应需求的变化[8]。与此同时，Vue框架的组件化开发模式和响应式数据绑定机制极大地提升了前端开发的灵活性和效率。开发人员可以将一个复杂的界面分割成具有自身状态与逻辑的多个独立的构件，这样既可以提高代码的可维护性，又可以增加代码的重用性。Vue框架同样提供了丰富的指令和模板语法，这些工具进一步简化了对DOM的操作，降低了前端开发的学习难度[7]。
 
-在用户体验方面，系统采用直观的图形化界面设计，左侧导航菜单清晰展示各功能模块，右侧内容区以表格、表单等形式呈现业务数据，操作流程符合企业管理习惯。系统支持单据审核机制，确保业务操作的规范性和数据的准确性。多端适配的设计(Web端+移动端)让用户可以在不同场景下便捷地使用系统，提升了系统的易用性和实用性[8]。
+在用户体验方面，系统采用直观的图形化界面设计，左侧导航菜单清晰展示各功能模块，右侧内容区以表格、表单等形式呈现业务数据，操作流程符合企业管理习惯。系统支持单据审核机制，确保业务操作的规范性和数据的准确性。多端适配的设计(Web端+移动端)让用户可以在不同场景下便捷地使用系统，提升了系统的易用性和实用性[6]。
 
-此外，Spring Boot、Vue和MySQL都拥有庞大的社区支持和详尽的文档资源，为开发者提供了丰富的学习资料和问题解决方案。这不仅加快了问题解决的速度，也降低了操作的难度和风险[11]。
+此外，Spring Boot、Vue和MySQL都拥有庞大的社区支持和详尽的文档资源，为开发者提供了丰富的学习资料和问题解决方案。这不仅加快了问题解决的速度，也降低了操作的难度和风险[8]。
 
 #### 1.4.3 经济可行性
 
-选用SpringBoot框架、Vue框架以及MySQL数据库作为技术栈的基石，为开发者带来了显著的经济效益。这些技术栈的开源特性意味着开发者可以免费访问和利用它们的源代码，从而避免了昂贵的商业软件许可费用。开源社区的活跃贡献，提供了详尽的文档、实用的教程和丰富的插件资源，极大地降低了学习曲线和应用难度，使得开发者能够以更高的效率完成开发任务[11]。此外，SpringBoot和Vue框架的广泛使用和成熟度，确保了市场上存在大量具备相关技能的开发者和专业人才。这种人才的丰富性不仅降低了招聘和培训新员工的成本，而且提高了项目开发和维护的灵活性。企业能够更轻松地组建或找到经验丰富的开发团队，从而缩短项目开发周期并提升开发效率。
+选用SpringBoot框架、Vue框架以及MySQL数据库作为技术栈的基石，为开发者带来了显著的经济效益。这些技术栈的开源特性意味着开发者可以免费访问和利用它们的源代码，从而避免了昂贵的商业软件许可费用。开源社区的活跃贡献，提供了详尽的文档、实用的教程和丰富的插件资源，极大地降低了学习曲线和应用难度，使得开发者能够以更高的效率完成开发任务[8]。此外，SpringBoot和Vue框架的广泛使用和成熟度，确保了市场上存在大量具备相关技能的开发者和专业人才。这种人才的丰富性不仅降低了招聘和培训新员工的成本，而且提高了项目开发和维护的灵活性。企业能够更轻松地组建或找到经验丰富的开发团队，从而缩短项目开发周期并提升开发效率。
 
-MySQL数据库具有高效率、高稳定的特点，能够很好地处理海量数据以及复杂的查询。与其他商用数据库比较，MySQL在部署和维护方面的成本更低，且易于扩展和集成。MySQL社区版提供的功能足以满足大多数中小企业的业务需求，无需额外购买昂贵的附加服务。综合来看，利用SpringBoot、Vue和MySQL开发系统，这不但可以直接减少软件的开发与维护费用，而且还可以提高开发效率和缩短项目周期来间接节省开支。这些经济上的优势使得这一技术组合成为众多企业和开发团队的首选方案，为他们提供了强大的竞争力和灵活性[3]。
+MySQL数据库具有高效率、高稳定的特点，能够很好地处理海量数据以及复杂的查询。与其他商用数据库比较，MySQL在部署和维护方面的成本更低，且易于扩展和集成。MySQL社区版提供的功能足以满足大多数中小企业的业务需求，无需额外购买昂贵的附加服务。综合来看，利用SpringBoot、Vue和MySQL开发系统，这不但可以直接减少软件的开发与维护费用，而且还可以提高开发效率和缩短项目周期来间接节省开支。这些经济上的优势使得这一技术组合成为众多企业和开发团队的首选方案，为他们提供了强大的竞争力和灵活性[1]。
 
 ---
 
@@ -185,7 +193,7 @@ MySQL数据库具有高效率、高稳定的特点，能够很好地处理海量
 
 ### 2.2 系统主要功能
 
-本星络收银系统采用模块化设计，涵盖企业资源管理的各个核心环节。系统包含基础资料管理、采购管理、销售管理、仓库管理、资金管理和统计分析六大功能模块，通过前后端分离架构（Web端erp-web+移动端erp-app+后端服务erp-api）实现多端协同工作[12]。系统功能结构图见图1。
+本星络收银系统采用模块化设计，涵盖企业资源管理的各个核心环节。系统包含基础资料管理、采购管理、销售管理、仓库管理、资金管理和统计分析六大功能模块，通过前后端分离架构（Web端erp-web+移动端erp-app+后端服务erp-api）实现多端协同工作[9]。系统功能结构图见图1。
 
 *图1 系统功能结构图*
 
@@ -858,19 +866,19 @@ graph TB
 
 **（1）Java语言**
 
-Java语言以其跨平台的特性而闻名，秉承“一次编写，到处运行”的理念，极大地简化了开发流程。Java虚拟机（JVM）作为桥梁，保证了代码在各种环境下的统一性和稳定性[3]。Java不仅拥有一个庞大的标准库集合，还支持丰富的第三方库，这些库几乎覆盖了软件开发的各个方面，包括网络通信、数据库操作、图形用户界面以及Web开发等。安全性是Java设计中的一个核心要素，从类加载器到安全管理器，再到字节码校验，Java内置了多重安全机制，有效抵御了恶意代码的攻击。
+Java语言以其跨平台的特性而闻名，秉承“一次编写，到处运行”的理念，极大地简化了开发流程。Java虚拟机（JVM）作为桥梁，保证了代码在各种环境下的统一性和稳定性[1]。Java不仅拥有一个庞大的标准库集合，还支持丰富的第三方库，这些库几乎覆盖了软件开发的各个方面，包括网络通信、数据库操作、图形用户界面以及Web开发等。安全性是Java设计中的一个核心要素，从类加载器到安全管理器，再到字节码校验，Java内置了多重安全机制，有效抵御了恶意代码的攻击。
 
 **（2）Spring Boot框架**
 
-通过使用SpringBoot框架，可以在很大程度上提升软件的开发效率。SpringBoot的自动化配置能力使Spring程序的最初构建和开发过程变得更加简单[11]。SpringBoot整合了很多常见的第三方类库，比如数据库连接池、缓存方案、消息队列等，为开发者提供了即插即用的功能。这些集成不仅简化了配置流程，还确保了组件之间的兼容性和稳定性。此外，框架还提供了丰富的插件和工具，如SpringBoot CLI、Spring Initializr等，进一步提升了开发效率。
+通过使用SpringBoot框架，可以在很大程度上提升软件的开发效率。SpringBoot的自动化配置能力使Spring程序的最初构建和开发过程变得更加简单[8]。SpringBoot整合了很多常见的第三方类库，比如数据库连接池、缓存方案、消息队列等，为开发者提供了即插即用的功能。这些集成不仅简化了配置流程，还确保了组件之间的兼容性和稳定性。此外，框架还提供了丰富的插件和工具，如SpringBoot CLI、Spring Initializr等，进一步提升了开发效率。
 
 **（3）Vue框架**
 
-Vue.js凭借其轻量级和渐进式的特性，为前端开发领域带来了高效和灵活的解决方案。它的核心库专注于视图层的构建，设计上易于上手，允许开发者根据需要逐步集成进其生态系统中的其他工具[10]。Vue的双向数据绑定机制极大地简化了数据与视图之间的同步工作，开发者只需专注于数据的更新，Vue会自动处理DOM的更新。Vue的组件化设计思想进一步促进了代码的复用，使得开发者能够通过组合独立且可复用的组件来构建出结构清晰、易于维护的应用程序。
+Vue.js凭借其轻量级和渐进式的特性，为前端开发领域带来了高效和灵活的解决方案。它的核心库专注于视图层的构建，设计上易于上手，允许开发者根据需要逐步集成进其生态系统中的其他工具[7]。Vue的双向数据绑定机制极大地简化了数据与视图之间的同步工作，开发者只需专注于数据的更新，Vue会自动处理DOM的更新。Vue的组件化设计思想进一步促进了代码的复用，使得开发者能够通过组合独立且可复用的组件来构建出结构清晰、易于维护的应用程序。
 
 **（4）MyBatis框架**
 
-MyBatis是一款优秀的持久层框架，它支持自定义SQL、存储过程以及高级映射。MyBatis避免了几乎所有的JDBC代码和手动设置参数以及获取结果集的操作[3]。MyBatis可以通过简单的XML或注解来配置和映射原始类型、接口和Java POJO为数据库中的记录。在本系统中，MyBatis负责处理后端与MySQL数据库之间的数据交互，简化了数据库操作的开发工作量。
+MyBatis是一款优秀的持久层框架，它支持自定义SQL、存储过程以及高级映射。MyBatis避免了几乎所有的JDBC代码和手动设置参数以及获取结果集的操作[1]。MyBatis可以通过简单的XML或注解来配置和映射原始类型、接口和Java POJO为数据库中的记录。在本系统中，MyBatis负责处理后端与MySQL数据库之间的数据交互，简化了数据库操作的开发工作量。
 
 **（5）MySQL数据库**
 
@@ -878,7 +886,7 @@ MySQL是一种具有优异性能和稳定性的开放源码关系数据库管理
 
 **（6）B/S架构**
 
-在系统开发过程中，采用了B/S架构（Browser/Server，即浏览器/服务器架构），具备多方面的显著优势。B/S架构支持跨平台操作，使得用户无需安装专门的客户端软件，只需通过浏览器即可访问Web应用，降低了用户的使用门槛，提高了系统的可访问性和可维护性[13]。此外，基于B/S架构的系统展现了卓越的可扩展性和升级能力，随着业务需求的变化，系统可以实现无缝的功能扩展和性能提升。
+在系统开发过程中，采用了B/S架构（Browser/Server，即浏览器/服务器架构），具备多方面的显著优势。B/S架构支持跨平台操作，使得用户无需安装专门的客户端软件，只需通过浏览器即可访问Web应用，降低了用户的使用门槛，提高了系统的可访问性和可维护性[10]。此外，基于B/S架构的系统展现了卓越的可扩展性和升级能力，随着业务需求的变化，系统可以实现无缝的功能扩展和性能提升。
 
 ---
 
@@ -996,7 +1004,7 @@ graph TB
 
 数据库表的设计构成了构建数据库系统的基础，其核心在于依据业务需求和数据模型来精心规划表结构及其相互之间的关系。在确定了实体属性之后，定义表与表之间的关系是重要步骤。对表格进行标准化是保证数据质量的重要环节，标准化可以有效消除数据的重复，确保数据的完整与一致。通过遵守第一范式、第二范式、第三范式等标准化原理，可有效降低数据存储中的冗余信息，提升数据库的运行效率与可靠性。本系统主要数据表如下：
 
-(1) 客户的相关信息见表1。
+(1) 客户表用于存储企业客户的基本信息，支持客户分类、等级管理和期初应收款设置，是销售业务和应收账款管理的基础数据。客户表的具体字段信息见表1。
 
 **表1　客户表（uc_customer）**
 
@@ -1015,7 +1023,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(2) 客户联系人表相关信息见表2。
+(2) 客户联系人表用于记录客户的多个联系人信息，包括姓名、电话、职位等，便于业务沟通和对账联系。客户联系人表的具体字段信息见表2。
 
 **表2　客户联系人表（uc_customer_contact）**
 
@@ -1033,7 +1041,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(3) 供应商表相关信息见表3。
+(3) 供应商表用于存储供应商基本信息，支持供应商分类、增值税税率设置和期初应付款管理，是采购业务和应付账款管理的基础数据。供应商表的具体字段信息见表3。
 
 **表3　供应商表（uc_supplier）**
 
@@ -1052,7 +1060,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(4) 供应商联系人表相关信息见表4。
+(4) 供应商联系人表用于记录供应商的多个联系人信息，便于采购沟通和业务协调。供应商联系人表的具体字段信息见表4。
 
 **表4　供应商联系人表（uc_supplier_contact）**
 
@@ -1069,7 +1077,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(5) 商品表相关信息见表5。
+(5) 商品表是系统核心基础数据表，存储商品的编码、名称、条码、规格、分类等信息，支持多级价格策略（零售价、批发价、VIP价）和库存预警功能，贯穿采购、销售、库存全流程。商品表的具体字段信息见表5。
 
 **表5　商品表（uc_product）**
 
@@ -1096,7 +1104,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(6) 仓库表相关信息见表6。
+(6) 仓库表用于管理企业的多个仓库，支持多仓库库存管理和商品调拨操作。仓库表的具体字段信息见表6。
 
 **表6　仓库表（uc_warehouse）**
 
@@ -1109,7 +1117,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(7) 职员表相关信息见表7。
+(7) 职员表用于管理企业职员信息，在销售业务中作为销售员关联，在单据中作为制单人记录。职员表的具体字段信息见表7。
 
 **表7　职员表（uc_employee）**
 
@@ -1122,7 +1130,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(8) 结算账户表相关信息见表8。
+(8) 结算账户表用于管理企业的现金、银行账户等结算账户，记录期初余额和当前余额，所有资金变动均通过此表跟踪。结算账户表的具体字段信息见表8。
 
 **表8　结算账户表（uc_settlement_account）**
 
@@ -1138,7 +1146,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(9) 用户表相关信息见表9。
+(9) 用户表用于管理系统登录用户，存储用户名、加密密码、真实姓名等信息，采用BCrypt算法加密密码，确保系统安全。用户表的具体字段信息见表9。
 
 **表9　用户表（uc_user）**
 
@@ -1154,7 +1162,7 @@ graph TB
 | createdTime | TIMESTAMP | ✅ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ✅ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(10) 客户订单表相关信息见表10。
+(10) 客户订单表用于记录客户的订货和退货订单，支持订单审核机制，是销货单的前置业务流程。客户订单表的具体字段信息见表10。
 
 **表10　客户订单表（bc_order）**
 
@@ -1177,7 +1185,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(11) 购货单表相关信息见表11。
+(11) 购货单表是采购业务的核心单据，记录从供应商采购商品的详细信息，包括金额、折扣、欠款等，审核后自动生成入库单和应付账款。购货单表的具体字段信息见表11。
 
 **表11　购货单表（bc_purchase）**
 
@@ -1205,7 +1213,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(12) 销货单表相关信息见表12。
+(12) 销货单表是销售业务的核心单据，记录向客户销售商品的详细信息，包括联系人、地址、金额、收款状态等，审核后自动生成出库单和应收账款。销货单表的具体字段信息见表12。
 
 **表12　销货单表（bc_sale）**
 
@@ -1238,7 +1246,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(13) 收款单表相关信息见表13。
+(13) 收款单表用于记录向客户收款的业务，支持核销多张销货单的应收账款，记录收款金额、已核销金额、未核销金额等，实现精细化的收款管理。收款单表的具体字段信息见表13。
 
 **表13　收款单表（fc_collection）**
 
@@ -1260,7 +1268,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(14) 收款单据表相关信息见表14。
+(14) 收款单据表是收款单的明细表，记录每笔收款核销的具体销货单或退货单，实现一笔收款核销多张单据的功能。收款单据表的具体字段信息见表14。
 
 **表14　收款单据表（fc_collection_issue）**
 
@@ -1278,7 +1286,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(15) 付款单表相关信息见表15。
+(15) 付款单表用于记录向供应商付款的业务，支持核销多张购货单的应付账款，记录付款金额、已核销金额、未核销金额等，实现精细化的付款管理。付款单表的具体字段信息见表15。
 
 **表15　付款单表（fc_payment）**
 
@@ -1300,7 +1308,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(16) 付款单据表相关信息见表16。
+(16) 付款单据表是付款单的明细表，记录每笔付款核销的具体购货单或采购退货单，实现一笔付款核销多张单据的功能。付款单据表的具体字段信息见表16。
 
 **表16　付款单据表（fc_payment_issue）**
 
@@ -1318,7 +1326,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(17) 应收账款记录表相关信息见表17。
+(17) 应收账款记录表自动跟踪与客户的往来账务，记录销货增加的应收款和收款减少的应收款，生成客户对账单的基础数据。应收账款记录表的具体字段信息见表17。
 
 **表17　应收账款记录表（fc_receivable）**
 
@@ -1334,7 +1342,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(18) 应付账款记录表相关信息见表18。
+(18) 应付账款记录表自动跟踪与供应商的往来账务，记录购货增加的应付款和付款减少的应付款，生成供应商对账单的基础数据。应付账款记录表的具体字段信息见表18。
 
 **表18　应付账款记录表（fc_payable）**
 
@@ -1350,7 +1358,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(19) 收入单表相关信息见表19。
+(19) 收入单表用于记录除销售外的其他收入业务，如服务费、利息收入等，支持关联客户和记录收款金额。收入单表的具体字段信息见表19。
 
 **表19　收入单表（fc_income）**
 
@@ -1367,7 +1375,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(20) 支出单表相关信息见表20。
+(20) 支出单表用于记录除采购外的其他支出业务，如办公费、水电费等，支持关联供应商和记录付款金额。支出单表的具体字段信息见表20。
 
 **表20　支出单表（fc_expense）**
 
@@ -1384,7 +1392,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(21) 收支记录表相关信息见表21。
+(21) 收支记录表统一记录所有收入和支出业务的流水，按类别（如办公费、差旅费等）分类统计，生成收支明细报表。收支记录表的具体字段信息见表21。
 
 **表21　收支记录表（fc_flow_record）**
 
@@ -1400,7 +1408,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(22) 账户流水表相关信息见表22。
+(22) 账户流水表详细记录每个结算账户的资金变动情况，包括业务类型、结算方式、结算号、操作后余额等，确保财务数据的可追溯性。账户流水表的具体字段信息见表22。
 
 **表22　账户流水表（fc_account_record）**
 
@@ -1420,7 +1428,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | NULL | 更新时间 |
 
-(23) 单据商品表相关信息见表23。
+(23) 单据商品表是各类业务单据的商品明细表，统一存储购货单、销货单、出入库单等单据中的商品信息，包括数量、单价、折扣、金额等，是库存变动的直接依据。单据商品表的具体字段信息见表23。
 
 **表23　单据商品表（wc_issue_product）**
 
@@ -1442,7 +1450,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(24) 库存商品表相关信息见表24。
+(24) 库存商品表实时记录每个商品在每个仓库的库存数量和成本，是库存查询和预警的核心数据表，通过quantity字段反映当前库存水平。库存商品表的具体字段信息见表24。
 
 **表24　库存商品表（wc_stock）**
 
@@ -1457,7 +1465,7 @@ graph TB
 | createdTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 创建时间 |
 | updatedTime | TIMESTAMP | ❌ | CURRENT_TIMESTAMP | 更新时间（自动更新） |
 
-(25) 出入库记录表相关信息见表25。
+(25) 出入库记录表完整记录所有库存变动历史，包括入库、出库、调拨等业务，通过正负数量区分出入库方向，提供库存流水追溯功能。出入库记录表的具体字段信息见表25。
 
 **表25　出入库记录表（wc_stock_record）**
 
@@ -1481,7 +1489,7 @@ graph TB
 
 #### 4.2.1 登录页面
 
-用户进入系统后，首先看到的是登录页面。登录页面提供了系统身份验证的核心功能，用户需输入用户名和密码。系统采用BCrypt算法对密码进行加密存储和验证，确保用户信息安全。验证通过后，后端生成JWT Token并返回给前端，前端将Token存储在sessionStorage中，后续请求携带Token进行身份认证。登录页面采用简洁的设计风格，突出核心功能，提升用户体验。登录页面如图15所示。
+用户进入系统后，首先看到的是登录页面。登录页面提供了系统身份验证的核心功能，用户需输入用户名和密码。系统采用BCrypt算法对密码进行加密存储和验证，确保用户信息安全。验证通过后，后端生成JWT Token并返回给前端，前端将Token存储在sessionStorage中，后续请求携带Token进行身份认证。登录页面采用简洁的设计风格，突出核心功能，提升用户体验。该认证流程与基于SpringBoot的网上商城管理系统设计与实现实践路径具有一致性[11]。登录页面如图15所示。
 
 *图15 登录页面*
 
@@ -1583,7 +1591,7 @@ public class CUserLogin extends BaseCommand {
 
 仓库管理模块实现商品库存的全面管理。
 
-**调拨单管理**：提供调拨单的创建和编辑功能，选择调出仓库和调入仓库，添加调拨商品明细。审核后系统自动生成调拨出库和入库记录，更新两个仓库的库存。
+**调拨单管理**：提供调拨单的创建和编辑功能，选择调出仓库和调入仓库，添加调拨商品明细。审核后系统自动生成调拨出库和入库记录，更新两个仓库的库存。该机制可进一步通过异步消息与缓存刷新策略增强多端库存一致性[12]。
 
 // **其他入库/出库管理**：处理盘盈盘亏等特殊业务场景，创建入库单或出库单，审核后更新库存并生成出入库流水记录。
 
@@ -1591,7 +1599,7 @@ public class CUserLogin extends BaseCommand {
 
 #### 4.2.6 资金管理页面
 
-资金管理模块实现企业财务的全面管理。
+资金管理模块实现企业财务的全面管理，采用“业务单据+核销+流水”联动模式保障账务闭环，这与同类Spring Boot与Vue管理系统中的资金模块设计思路一致[13]。
 
 // **收款单管理**：创建收款单时，选择客户，设置收款金额、整单折扣、预收款等。支持核销功能，可以核销多张销货单的应收款，系统自动计算已核销金额和未核销金额。收款后自动生成账户流水记录和应收账款减少记录。
 
@@ -1619,7 +1627,7 @@ public class CUserLogin extends BaseCommand {
 
 #### 4.2.8 移动端小程序实现
 
-移动端小程序基于Uni-App框架开发，运行于微信平台，面向门店操作人员提供便捷的业务操作功能。
+移动端小程序基于Uni-App框架开发，运行于微信平台，面向门店操作人员提供便捷的业务操作功能。该多端协同实现方式与Spring Boot+VUE+Uni-app相关研究的技术路线相吻合[14]。
 
 // **商品浏览页面(category.vue)**：采用左右分栏布局，左侧展示商品分类列表，右侧展示对应分类下的商品网格。顶部设有搜索和扫码功能条，点击扫码按钮调用uni.scanCode() API，支持barCode和qrCode两种类型。扫码成功后自动调用后端/product/page接口查询商品信息，若匹配到商品则跳转到商品详情页面。
 
@@ -1672,7 +1680,7 @@ onScan()
 
 #### 4.3.2 测试方法
 
-本系统采用黑盒测试与白盒测试相结合的测试策略，以黑盒测试为主、白盒测试为辅，全面覆盖功能验证与代码质量检查。黑盒测试主要从用户视角出发，不关注内部代码实现，重点验证输入输出的正确性和业务流程的完整性。测试过程中设计了大量测试用例，涵盖正常场景、边界条件和异常情况，例如登录时输入错误密码、创建购货单时库存不足、扫码识别失败等异常处理逻辑。针对核心业务流程，采用场景法设计端到端测试用例，从单据创建、审核、生效到财务核销的完整链路进行验证，确保业务逻辑的正确性。白盒测试则深入代码层面，通过单元测试验证关键业务方法的逻辑正确性，如金额计算、库存更新、事务管理等核心算法。使用JUnit框架对Service层和Command层的关键方法进行单元测试，确保代码覆盖率满足要求。同时，通过Postman工具对RESTful API接口进行集成测试，验证接口的参数校验、返回值格式和异常处理机制。数据库层面，通过SQL查询验证数据的一致性和完整性，检查触发器和存储过程的正确性。性能测试方面，使用浏览器开发者工具监控前端页面加载时间和API响应时间，确保核心接口响应时间控制在200ms以内。移动端测试在微信开发者工具和真机环境下进行，验证uni.scanCode() API的兼容性和稳定性。通过多层次、多维度的测试方法，确保系统质量和稳定性。
+本系统采用黑盒测试与白盒测试相结合的测试策略，以黑盒测试为主、白盒测试为辅，全面覆盖功能验证与代码质量检查。黑盒测试主要从用户视角出发，不关注内部代码实现，重点验证输入输出的正确性和业务流程的完整性。测试过程中设计了大量测试用例，涵盖正常场景、边界条件和异常情况，例如登录时输入错误密码、创建购货单时库存不足、扫码识别失败等异常处理逻辑。针对核心业务流程，采用场景法设计端到端测试用例，从单据创建、审核、生效到财务核销的完整链路进行验证，确保业务逻辑的正确性。白盒测试则深入代码层面，通过单元测试验证关键业务方法的逻辑正确性，如金额计算、库存更新、事务管理等核心算法。使用JUnit框架对Service层和Command层的关键方法进行单元测试，确保代码覆盖率满足要求。同时，通过Postman工具对RESTful API接口进行集成测试，验证接口的参数校验、返回值格式和异常处理机制。数据库层面，通过SQL查询验证数据的一致性和完整性，检查触发器和存储过程的正确性。性能测试方面，使用浏览器开发者工具监控前端页面加载时间和API响应时间，确保核心接口响应时间控制在200ms以内。移动端测试在微信开发者工具和真机环境下进行，验证uni.scanCode() API的兼容性和稳定性。此外，测试报告、缺陷记录与版本变更均按阶段归档留痕，以支撑后续审计与运维追溯[15]。通过多层次、多维度的测试方法，确保系统质量和稳定性。
 
 #### 4.3.3 用例测试
 
@@ -1684,11 +1692,11 @@ onScan()
 
 ### 5.1 设计存在的问题
 
-系统采用单体架构导致模块耦合度高，支付流程仅模拟未对接真实第三方平台。同时，移动端功能覆盖不全，仅含一些关键功能，如支持搜索、扫码、加购。系统采用单体架构导致模块耦合度高，支付流程仅模拟未对接真实第三方平台。同时，移动端功能覆盖不全，仅含一些关键功能，如支持搜索、扫码、加购。
+系统采用单体架构导致模块耦合度高，支付流程仅模拟未对接真实第三方平台。同时，移动端功能覆盖不全，仅含一些关键功能，如支持搜索、扫码、加购。
 
 ### 5.2 进一步改进设想
 
-可以拆分为微服务架构降低模块耦合度。未来有能力的情况下，可以注册企业账号，以便集成微信和支付宝SDK实现真实支付功能以替代模拟支付。同时，扩展移动端功能，补充挂单、取单、退款等业务操作，完善移动端业务闭环。
+可以拆分为微服务架构降低模块耦合度。未来有能力的情况下，可以注册企业账号，以便集成微信和支付宝SDK实现真实支付功能以替代模拟支付。同时，界面设计方面也需要进一步改进，以提供更美观、友好、便捷的用户体验。系统的可操作性和简洁性也需要进一步提高，以方便商家们快速上手并高效地进行订单处理和商品管理。
 
 ### 5.3 经验与体会
 
@@ -1700,7 +1708,7 @@ onScan()
 
 认识到模块化设计和代码复用的价值，六大模块（uc/rc/bc/wc/fc/sc）职责清晰，后端采用Command模式（CPurchaseSave、CSaleSave）封装业务逻辑，结构清晰便于扩展和维护。体会到移动端开发的特殊性，Uni-App的生命周期管理、性能优化、用户体验都与Web端不同，uni.scanCode()调用微信原生能力比Web端ZXing库体验更好。
 
-培养了工程化思维和问题解决能力，从需求分析到设计先行，使用Git版本控制和分支策略，编写详细的API文档和数据库文档，通过JUnit单元测试和接口测试保障代码质量。遇到JWT过期处理、Vue组件通信、MySQL事务隔离等问题时，通过查阅官方文档、搜索技术社区、阅读Spring Security和MyBatis-Plus源码、使用断点调试和日志定位等方式独立解决，养成了持续学习的习惯。
+培养了工程化思维和问题解决能力，从需求分析到设计先行，使用Git版本控制和分支策略，编写详细的API文档和数据库文档，通过JUnit单元测试和接口测试保障代码质量。遇到JWT过期处理、Vue组件通信、MySQL事务隔离等问题时，通过查阅官方文档、搜索技术社区、阅读Spring Security和MyBatis-Plus源码、使用断点调试和日志定位等方式独立解决，养成了持续学习的习惯。同时，也认识到规范化文档沉淀与日志归档的重要性，应逐步形成可追溯的数字档案管理体系[15]。
 
 总体而言，本次毕业设计将理论知识与实践相结合，全面锻炼了系统设计、编码实现、性能优化和问题排查的能力，为今后从事企业级应用开发奠定了坚实基础。
 
@@ -1708,31 +1716,36 @@ onScan()
 
 ## 【参 考 文 献】
 
-[1]杨超,贾婷,王汉卿,等.条码识别超市收银系统的设计[J].数码世界,2018,(04):311.
+[1]张静,胡宁玉,冯丽萍.基于Java的超市进销存管理系统的设计与实现[J].信息与电脑(理论版),2022,34(18):124-127+131.
 
-[2]贺亚超.基于Android的小微商户移动收银系统设计与实现[D].中南民族大学,2018.
+[2]Yiran N ,Nan X ,Yingying H , et al.Development of Distributed E-commerce System Based on Dubbo[J].Journal of Physics: Conference Series,2021,1881(3):2-6.
 
-[3]张静,胡宁玉,冯丽萍.基于Java的超市进销存管理系统的设计与实现[J].信息与电脑(理论版),2022,34(18):124-127+131.
+[3]Santoso A A G ,Julio E A ,Widodo B , et al.Item Verification on the Smart Trolley System using Object Recognition based on the Structural Similarity Index[J].Procedia Computer Science,2023,227:147-158.
 
-[4]Yiran N ,Nan X ,Yingying H , et al.Development of Distributed E-commerce System Based on Dubbo[J].Journal of Physics: Conference Series,2021,1881(3):DOI:10.1088/1742-6596/1881/3/032066.
+[4]文丹妮,朱忠君,梁亚钦,等.同济医院“业财管税档”一体化下物资进销存业务智慧化管理实践[J].财务与会计,2023,(13):26-28.
 
-[5]Santoso A A G ,Julio E A ,Widodo B , et al.Item Verification on the Smart Trolley System using Object Recognition based on the Structural Similarity Index[J].Procedia Computer Science,2023,227147-158.DOI:10.1016/J.PROCS.2023.10.512.
+[5]Mat T Z T ,Hashim M ,Saad S , et al.Inventory Management Practices among Small and Micro Businesses during COVID-19 Pandemic[J].Accounting and Finance Research,2023,12(4):95-96.
 
-[6]文丹妮,朱忠君,梁亚钦,等.同济医院“业财管税档”一体化下物资进销存业务智慧化管理实践[J].财务与会计,2023,(13):26-28.
+[6]吴迁.基于uni-app与Spring Boot框架的Web应用开发平台的设计与实现[D].陕西:西安石油大学,2025.
 
-[7]Mat T Z T ,Hashim M ,Saad S , et al.Inventory Management Practices among Small and Micro Businesses during COVID-19 Pandemic[J].Accounting and Finance Research,2023,12(4):DOI:10.5430/AFR.V12N4P86.
+[7]王思辰,李林.基于Vue.js的电商管理平台的设计与实现[J].现代信息科技,2021,5(14):13-15+20.
 
-[8]吴迁.基于uni-app与Spring Boot框架的Web应用开发平台的设计与实现[D].西安石油大学,2025.DOI:10.27400/d.cnki.gxasc.2025.001042.
+[8]贾文强,刘新,傅鹏.基于Spring Boot+Vue框架的企业记录管理系统设计与实现[J].工业控制计算机,2024,37(10):151-152.
 
-[9]范国婷,曹飞虎,王秀友,等.基于Java Web的进销存管理系统设计[J].廊坊师范学院学报(自然科学版),2018,18(04):43-46.
+[9]周筱龙,郭淼川.基于前后端分离的供应商管理系统的升级与应用[J].电脑知识与技术,2025,21(34):65-68.
 
-[10]王思辰,李林.基于Vue.js的电商管理平台的设计与实现[J].现代信息科技,2021,5(14):13-15+20.DOI:10.19850/j.cnki.2096-4706.2021.14.004.
+[10]范路桥,段班祥,周文琼.基于B/S的进销存管理系统设计与实现[J].电脑编程技巧与维护,2021,(01):100-102.
 
-[11]贾文强,刘新,傅鹏.基于Spring Boot+Vue框架的企业记录管理系统设计与实现[J].工业控制计算机,2024,37(10):151-152.
+[11]王培培.基于SpringBoot的网上商城管理系统设计与实现[J].现代计算机,2024,30(07):117-120.
 
-[12]周筱龙,郭淼川.基于前后端分离的供应商管理系统的升级与应用[J].电脑知识与技术,2025,21(34):65-68.DOI:10.14004/j.cnki.ckt.2025.1730.
+[12]陈驰.电商平台库存管理系统的软件开发与实时同步实现[J].中国电子商情,2026,32(08):136-138.
 
-[13]范路桥,段班祥,周文琼.基于B/S的进销存管理系统设计与实现[J].电脑编程技巧与维护,2021,(01):100-102.DOI:10.16184/j.cnki.comprg.2021.01.035.
+[13]杨玉,刘杰举.基于Spring Boot与Vue的物业管理系统设计与实现[J].鞋类工艺与设计,2025,5(14):114-116.
+
+[14]赵叶平,陈圣,马军,等.基于Spring Boot+VUE+Uni-app框架的文明城市智慧管理系统设计与实现[J].工业控制计算机,2025,38(04):139-140+153.
+
+[15]丁德胜.构建数字档案管理新体系——信息系统[J].中国档案,2024,(04):56-57.
+
 
 ---
 
