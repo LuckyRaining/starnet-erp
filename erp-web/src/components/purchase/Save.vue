@@ -175,7 +175,7 @@
           <el-col :span="5">
             <el-form-item label="制单人"
                           prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+              <el-input v-model="saveForm.listerName"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -397,7 +397,10 @@ export default {
     this.getWarehouseList()
   },
   methods: {
-    // 获取供应商列表
+    /**
+     * 获取供应商列表
+     * 从后端API获取所有供应商信息，用于购货单中的供应商选择下拉框
+     */
     async getSupplierList() {
       const { data: result } = await this.$http.post('/supplier/page', {
         current: 1,
@@ -407,7 +410,10 @@ export default {
 
       this.supplierList = result.data.supplierPage.records
     },
-    // 获取单据编号
+    /**
+     * 获取购货单单据编号
+     * 调用后端API生成新的购货单编号，并重置表单数据为初始状态
+     */
     async getPurchaseCode() {
       const { data: result } = await this.$http.post('/purchase/createCode')
       if (!result.success) return this.$message.error(result.message)
@@ -429,14 +435,21 @@ export default {
       this.saveForm.code = this.purchaseCode
       this.recalculateSettlementByMode()
     },
-    // 获取结算账户列表
+    /**
+     * 获取结算账户列表
+     * 从后端API获取所有可用的结算账户，用于购货单中的结算账户选择
+     */
     async getAccountList() {
       const { data: result } = await this.$http.post('/settlementAccount/list')
       if (!result.success) return this.$message.error(result.message)
 
       this.accountList = result.data.accountList
     },
-    // 获取详情
+    /**
+     * 获取购货单详情
+     * 根据购货单ID从后端获取详细信息，用于编辑已有购货单
+     * @param {string} purchaseId - 购货单ID
+     */
     async getPurchaseDetail(purchaseId) {
       const { data: result } = await this.$http.post('/purchase/detail', {
         purchaseId
@@ -447,7 +460,11 @@ export default {
       this.saveForm = result.data.purchase
       this.recalculateSettlementByMode()
     },
-    // 选择了结算账户
+    /**
+     * 结算账户变更处理
+     * 当用户选择结算账户时，将选中的账户ID添加到购货单的账户列表中
+     * @param {string} accountId - 选中的结算账户ID
+     */
     selectAccountChanged(accountId) {
       this.saveForm.accountList = []
       var account = {
@@ -455,7 +472,10 @@ export default {
       }
       this.saveForm.accountList.push(account)
     },
-    // 点击按钮，保存购货单
+    /**
+     * 保存购货单
+     * 验证表单后，将购货单数据提交到后端进行保存
+     */
     async savePurchase() {
       this.$refs.saveFormRef.validate(async (valid) => {
         if (!valid) return
@@ -474,12 +494,18 @@ export default {
         this.saveForm.id = result.data.purchase.id
       })
     },
-    // 保存并新增
+    /**
+     * 保存购货单并创建新单
+     * 先保存当前购货单，然后生成新的单据编号，准备创建下一个购货单
+     */
     async savePurchaseThenNew() {
       this.savePurchase()
       this.getPurchaseCode()
     },
-    // 显示保存商品对话框
+    /**
+     * 显示新增商品对话框
+     * 初始化商品表单为默认值，设置模式为新增，打开商品编辑对话框
+     */
     showProductAddDialog() {
       this.isProductAdd = true
       this.discountCalcMode = 'rate'
@@ -492,7 +518,12 @@ export default {
       }
       this.saveProductDialogVisible = true
     },
-    // 显示修改商品对话框
+    /**
+     * 显示修改商品对话框
+     * 加载指定商品的详细信息到编辑表单，设置模式为修改，打开商品编辑对话框
+     * @param {object} contact - 要修改的商品对象
+     * @param {number} index - 商品在列表中的索引位置
+     */
     showProductEditDialog(contact, index) {
       this.isProductAdd = false
       this.discountCalcMode = 'rate'
@@ -501,13 +532,19 @@ export default {
       this.saveProductDialogVisible = true
     },
 
-    // 监听新增商品对话框的关闭事件
+    /**
+     * 商品对话框关闭后的清理工作
+     * 如果是新增模式，重置表单字段；修改模式不需要重置
+     */
     saveProductDialogClosed() {
       if (this.isProductAdd) {
         this.$refs.saveProductFormRef.resetFields()
       }
     },
-    // 点击按钮，添加商品
+    /**
+     * 保存商品信息
+     * 验证商品表单后，根据模式执行新增或修改操作，并重新计算结算信息
+     */
     saveProduct() {
       this.$refs.saveProductFormRef.validate(async (valid) => {
         if (!valid) return
@@ -530,7 +567,11 @@ export default {
         this.saveProductDialogVisible = false
       })
     },
-    // 删除商品
+    /**
+     * 删除商品
+     * 弹出确认对话框，用户确认后从商品列表中移除指定商品，并重新计算结算信息
+     * @param {object} product - 要删除的商品对象
+     */
     async deleteProduct(product) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm('删除该商品，是否继续?', '提示', {
@@ -553,11 +594,18 @@ export default {
 
       this.$message.success('删除商品成功！')
     },
-    // 显示选择商品对话框
+    /**
+     * 显示选择商品对话框
+     * 打开商品选择器对话框，让用户从商品库中选择商品
+     */
     showSelectProductDialog() {
       this.selectProductDialogVisible = true
     },
-    // 选择好商品
+    /**
+     * 处理商品选择结果
+     * 当用户在商品选择器中选定商品后，填充商品基本信息到编辑表单
+     * @param {object} product - 用户选择的商品对象
+     */
     handleSelectProduct(product) {
       if (product != null) {
         this.saveProductForm.productName = product.name
@@ -569,29 +617,53 @@ export default {
         this.calculateByDiscountRate()
       }
     },
+    /**
+     * 折扣率输入处理
+     * 标记当前计算模式为按折扣率计算，用于后续自动计算逻辑判断
+     */
     onDiscountRateInput() {
       // 用户正在改折扣率，后续计算优先由折扣率驱动
       this.discountCalcMode = 'rate'
     },
+    /**
+     * 折扣额输入处理
+     * 标记当前计算模式为按折扣额计算，用于后续自动计算逻辑判断
+     */
     onDiscountAmountInput() {
       // 用户正在改折扣额，后续计算优先由折扣额驱动
       this.discountCalcMode = 'amount'
     },
+    /**
+     * 数量或单价变更处理
+     * 当商品数量或单价发生变化时，根据当前计算模式重新计算折扣和金额
+     */
     handleQuantityOrPriceChanged() {
       this.recalculateByMode()
     },
+    /**
+     * 折扣率变更处理
+     * 当折扣率发生变化且处于同步保护状态外时，按折扣率重新计算相关字段
+     */
     handleDiscountRateChanged() {
       if (this.isDiscountSyncing || this.discountCalcMode !== 'rate') {
         return
       }
       this.calculateByDiscountRate()
     },
+    /**
+     * 折扣额变更处理
+     * 当折扣额发生变化且处于同步保护状态外时，按折扣额重新计算相关字段
+     */
     handleDiscountAmountChanged() {
       if (this.isDiscountSyncing || this.discountCalcMode !== 'amount') {
         return
       }
       this.calculateByDiscountAmount()
     },
+    /**
+     * 根据当前模式重新计算商品折扣和金额
+     * 根据discountCalcMode决定是按折扣率还是折扣额进行计算
+     */
     recalculateByMode() {
       if (this.discountCalcMode === 'amount') {
         this.calculateByDiscountAmount()
@@ -599,7 +671,10 @@ export default {
         this.calculateByDiscountRate()
       }
     },
-    // 公式：折扣额 = 数量 * 单价 * 折扣率；购货金额 = 小计 - 折扣额
+    /**
+     * 按折扣率计算商品金额
+     * 公式：折扣额 = 数量 × 单价 × 折扣率；购货金额 = 小计 - 折扣额
+     */
     calculateByDiscountRate() {
       const quantity = this.toNumber(this.saveProductForm.quantity)
       const price = this.toNumber(this.saveProductForm.price)
@@ -612,7 +687,10 @@ export default {
         amount
       })
     },
-    // 公式：折扣率 = 折扣额 / (数量 * 单价)；购货金额 = 小计 - 折扣额
+    /**
+     * 按折扣额计算商品金额和折扣率
+     * 公式：折扣率 = 折扣额 / (数量 × 单价)；购货金额 = 小计 - 折扣额
+     */
     calculateByDiscountAmount() {
       const quantity = this.toNumber(this.saveProductForm.quantity)
       const price = this.toNumber(this.saveProductForm.price)
@@ -627,6 +705,11 @@ export default {
         amount
       })
     },
+    /**
+     * 同步折扣相关字段
+     * 更新折扣率、折扣额和购货金额，使用同步锁防止watcher循环触发
+     * @param {object} params - 包含discountRate、discountAmount、amount的对象
+     */
     syncDiscountFields({ discountRate, discountAmount, amount }) {
       this.isDiscountSyncing = true
       if (discountRate !== undefined) {
@@ -642,7 +725,13 @@ export default {
         this.isDiscountSyncing = false
       })
     },
-    // 折扣率兼容两种输入：0~1（小数）和 0~100（百分比）
+    /**
+     * 将折扣率转换为折扣额
+     * 支持两种输入格式：0~1的小数形式和0~100的百分比形式
+     * @param {number} subtotal - 小计金额
+     * @param {number} discountRate - 折扣率
+     * @returns {number} 折扣额
+     */
     rateToDiscountAmount(subtotal, discountRate) {
       if (subtotal <= 0) {
         return 0
@@ -653,6 +742,14 @@ export default {
       }
       return normalizedRate <= 1 ? subtotal * normalizedRate : subtotal * (normalizedRate / 100)
     },
+    /**
+     * 将折扣额转换为折扣率
+     * 根据当前折扣率的输入习惯保持输出格式一致性
+     * @param {number} subtotal - 小计金额
+     * @param {number} discountAmount - 折扣额
+     * @param {number} currentRate - 当前折扣率值
+     * @returns {number} 折扣率
+     */
     discountAmountToRate(subtotal, discountAmount, currentRate) {
       if (subtotal <= 0) {
         return 0
@@ -661,7 +758,13 @@ export default {
       // 保持当前折扣率输入习惯：若此前按百分比输入，则继续输出百分比
       return this.toNumber(currentRate) > 1 ? rateByRatio * 100 : rateByRatio
     },
-    // 折扣额限制在 [0, 小计]，防止出现负金额
+    /**
+     * 限制折扣额范围
+     * 确保折扣额在[0, 小计]范围内，防止出现负金额
+     * @param {number} subtotal - 小计金额
+     * @param {number} discountAmount - 原始折扣额
+     * @returns {number} 限制后的折扣额
+     */
     limitDiscountAmount(subtotal, discountAmount) {
       if (subtotal <= 0) {
         return 0
@@ -671,44 +774,92 @@ export default {
       }
       return discountAmount > subtotal ? subtotal : discountAmount
     },
+    /**
+     * 获取商品价格
+     * 按优先级获取商品价格：预估采购价 > 批发价 > 普通价格
+     * @param {object} product - 商品对象
+     * @returns {number} 格式化后的价格
+     */
     getProductPrice(product) {
       return this.toFixedNumber(
         this.toNumber(product.estimatedPurchasePrice || product.wholesalePrice || product.price)
       )
     },
+    /**
+     * 获取商品折扣率
+     * 按优先级获取商品折扣率：discountRate1 > discountRate2 > discountRate
+     * @param {object} product - 商品对象
+     * @returns {number} 格式化后的折扣率
+     */
     getProductDiscountRate(product) {
       return this.toFixedNumber(this.toNumber(product.discountRate1 || product.discountRate2 || product.discountRate))
     },
+    /**
+     * 优惠率输入处理
+     * 标记结算优惠计算模式为按优惠率计算
+     */
     onPreferentialRateInput() {
       this.settlementDiscountCalcMode = 'rate'
     },
+    /**
+     * 优惠金额输入处理
+     * 标记结算优惠计算模式为按优惠金额计算
+     */
     onPreferentialAmountInput() {
       this.settlementDiscountCalcMode = 'amount'
     },
+    /**
+     * 优惠后金额输入处理
+     * 标记结算优惠计算模式为按优惠后金额计算
+     */
     onPreferredAmountInput() {
       this.settlementDiscountCalcMode = 'preferred'
     },
+    /**
+     * 本次付款输入处理
+     * 标记付款计算模式为按本次付款计算
+     */
     onCurrentAmountInput() {
       this.paymentCalcMode = 'current'
     },
+    /**
+     * 本次欠款输入处理
+     * 标记付款计算模式为按本次欠款计算
+     */
     onDebtAmountInput() {
       this.paymentCalcMode = 'debt'
     },
+    /**
+     * 商品列表变更处理
+     * 当购货单中的商品列表发生变化时，重新计算结算信息
+     */
     handleProductListChanged() {
       this.recalculateSettlementByMode()
     },
+    /**
+     * 优惠率变更处理
+     * 当优惠率发生变化且处于同步保护状态外时，按优惠率重新计算结算信息
+     */
     handlePreferentialRateChanged() {
       if (this.isSettlementSyncing || this.settlementDiscountCalcMode !== 'rate') {
         return
       }
       this.calculateSettlementByRate()
     },
+    /**
+     * 优惠金额变更处理
+     * 当优惠金额发生变化且处于同步保护状态外时，按优惠金额重新计算结算信息
+     */
     handlePreferentialAmountChanged() {
       if (this.isSettlementSyncing || this.settlementDiscountCalcMode !== 'amount') {
         return
       }
       this.calculateSettlementByAmount()
     },
+    /**
+     * 优惠后金额变更处理
+     * 当优惠后金额发生变化时，先重新计算付款信息，再按优惠后金额重新计算结算信息
+     */
     handlePreferredAmountChanged() {
       if (!this.isPaymentSyncing) {
         this.recalculatePaymentByMode()
@@ -718,18 +869,30 @@ export default {
       }
       this.calculateSettlementByPreferredAmount()
     },
+    /**
+     * 本次付款变更处理
+     * 当本次付款发生变化且处于同步保护状态外时，按本次付款重新计算欠款
+     */
     handleCurrentAmountChanged() {
       if (this.isPaymentSyncing || this.paymentCalcMode !== 'current') {
         return
       }
       this.calculateByCurrentAmount()
     },
+    /**
+     * 本次欠款变更处理
+     * 当本次欠款发生变化且处于同步保护状态外时，按本次欠款重新计算付款
+     */
     handleDebtAmountChanged() {
       if (this.isPaymentSyncing || this.paymentCalcMode !== 'debt') {
         return
       }
       this.calculateByDebtAmount()
     },
+    /**
+     * 根据当前模式重新计算结算信息
+     * 根据settlementDiscountCalcMode决定按哪种方式计算优惠信息
+     */
     recalculateSettlementByMode() {
       if (this.settlementDiscountCalcMode === 'amount') {
         this.calculateSettlementByAmount()
@@ -739,6 +902,10 @@ export default {
         this.calculateSettlementByRate()
       }
     },
+    /**
+     * 根据当前模式重新计算付款信息
+     * 根据paymentCalcMode决定按本次付款还是本次欠款进行计算
+     */
     recalculatePaymentByMode() {
       if (this.paymentCalcMode === 'debt') {
         this.calculateByDebtAmount()
@@ -746,7 +913,10 @@ export default {
         this.calculateByCurrentAmount()
       }
     },
-    // 公式：优惠金额 = 商品总金额 * 优惠率；优惠后金额 = 商品总金额 - 优惠金额
+    /**
+     * 按优惠率计算结算信息
+     * 公式：优惠金额 = 商品总金额 × 优惠率；优惠后金额 = 商品总金额 - 优惠金额
+     */
     calculateSettlementByRate() {
       const totalAmount = this.getProductTotalAmount()
       const preferentialRate = this.toNumber(this.saveForm.preferentialRate)
@@ -757,7 +927,10 @@ export default {
         preferredAmount
       })
     },
-    // 公式：优惠率 = 优惠金额 / 商品总金额；优惠后金额 = 商品总金额 - 优惠金额
+    /**
+     * 按优惠金额计算结算信息
+     * 公式：优惠率 = 优惠金额 / 商品总金额；优惠后金额 = 商品总金额 - 优惠金额
+     */
     calculateSettlementByAmount() {
       const totalAmount = this.getProductTotalAmount()
       const rawPreferentialAmount = this.toNumber(this.saveForm.preferentialAmount)
@@ -774,7 +947,10 @@ export default {
         preferredAmount
       })
     },
-    // 公式：优惠金额 = 商品总金额 - 优惠后金额；优惠率 = 优惠金额 / 商品总金额
+    /**
+     * 按优惠后金额计算结算信息
+     * 公式：优惠金额 = 商品总金额 - 优惠后金额；优惠率 = 优惠金额 / 商品总金额
+     */
     calculateSettlementByPreferredAmount() {
       const totalAmount = this.getProductTotalAmount()
       const rawPreferredAmount = this.toNumber(this.saveForm.preferredAmount)
@@ -791,6 +967,11 @@ export default {
         preferredAmount
       })
     },
+    /**
+     * 同步结算相关字段
+     * 更新优惠率、优惠金额和优惠后金额，使用同步锁防止watcher循环触发
+     * @param {object} params - 包含preferentialRate、preferentialAmount、preferredAmount的对象
+     */
     syncSettlementFields({ preferentialRate, preferentialAmount, preferredAmount }) {
       this.isSettlementSyncing = true
       if (preferentialRate !== undefined) {
@@ -807,7 +988,10 @@ export default {
         this.recalculatePaymentByMode()
       })
     },
-    // 公式：本次欠款 = 优惠后金额 - 本次付款
+    /**
+     * 按本次付款计算欠款
+     * 公式：本次欠款 = 优惠后金额 - 本次付款
+     */
     calculateByCurrentAmount() {
       const preferredAmount = this.toNumber(this.saveForm.preferredAmount)
       const currentAmount = this.limitAmountByTotal(preferredAmount, this.saveForm.currentAmount)
@@ -817,7 +1001,10 @@ export default {
         debtAmount
       })
     },
-    // 公式：本次付款 = 优惠后金额 - 本次欠款
+    /**
+     * 按本次欠款计算付款
+     * 公式：本次付款 = 优惠后金额 - 本次欠款
+     */
     calculateByDebtAmount() {
       const preferredAmount = this.toNumber(this.saveForm.preferredAmount)
       const debtAmount = this.limitAmountByTotal(preferredAmount, this.saveForm.debtAmount)
@@ -827,6 +1014,11 @@ export default {
         debtAmount
       })
     },
+    /**
+     * 同步付款相关字段
+     * 更新本次付款和本次欠款，使用同步锁防止watcher循环触发
+     * @param {object} params - 包含currentAmount、debtAmount的对象
+     */
     syncPaymentFields({ currentAmount, debtAmount }) {
       this.isPaymentSyncing = true
       if (currentAmount !== undefined) {
@@ -839,6 +1031,11 @@ export default {
         this.isPaymentSyncing = false
       })
     },
+    /**
+     * 计算商品总金额
+     * 遍历商品列表，累加所有商品的购货金额
+     * @returns {number} 格式化后的商品总金额
+     */
     getProductTotalAmount() {
       return this.toFixedNumber(
         this.saveForm.productList.reduce(
@@ -847,9 +1044,23 @@ export default {
         )
       )
     },
+    /**
+     * 限制优惠后金额范围
+     * 确保优惠后金额不超过商品总金额
+     * @param {number} totalAmount - 商品总金额
+     * @param {number} preferredAmount - 原始优惠后金额
+     * @returns {number} 限制后的优惠后金额
+     */
     limitPreferredAmount(totalAmount, preferredAmount) {
       return this.limitAmountByTotal(totalAmount, preferredAmount)
     },
+    /**
+     * 限制金额不超过总金额
+     * 确保目标金额在合理范围内，不超过总金额且不为负数
+     * @param {number} totalAmount - 总金额
+     * @param {number} targetAmount - 目标金额
+     * @returns {number} 限制后的金额
+     */
     limitAmountByTotal(totalAmount, targetAmount) {
       const normalizedTotal = this.toNumber(totalAmount)
       const normalizedTarget = this.toNumber(targetAmount)
@@ -861,6 +1072,12 @@ export default {
       }
       return normalizedTarget > normalizedTotal ? normalizedTotal : normalizedTarget
     },
+    /**
+     * 转换为数字类型
+     * 将任意值转换为数字，如果转换失败则返回0
+     * @param {*} value - 要转换的值
+     * @returns {number} 转换后的数字
+     */
     toNumber(value) {
       const numberValue = Number(value)
       if (Number.isNaN(numberValue)) {
@@ -868,10 +1085,19 @@ export default {
       }
       return numberValue
     },
+    /**
+     * 转换为保留两位小数的数字
+     * 先将值转换为数字，然后格式化为两位小数
+     * @param {*} value - 要转换的值
+     * @returns {number} 保留两位小数的数字
+     */
     toFixedNumber(value) {
       return Number(this.toNumber(value).toFixed(2))
     },
-    // 获取仓库列表
+    /**
+     * 获取仓库列表
+     * 从后端API获取所有仓库信息，用于商品编辑时的仓库选择
+     */
     async getWarehouseList() {
       const { data: result } = await this.$http.post('/warehouse/page', {
         current: 1,

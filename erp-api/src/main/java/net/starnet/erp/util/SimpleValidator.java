@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * 一个简单的验证类
  * 
- * @author David Chen
+ * @author Hao Liu
  *
  */
 public class SimpleValidator {

@@ -13,10 +13,10 @@
         </if>
         <if test="query.name != null and query.name != ''">
             AND (
-              p.`code` LIKE concat('%', #{query.name}, '%') OR
-              s.`name` LIKE concat('%', #{query.name}, '%') OR
-              s.`code` LIKE concat('%', #{query.name}, '%')
-              )
+            p.`code` LIKE concat('%', #{query.name}, '%') OR
+            s.`name` LIKE concat('%', #{query.name}, '%') OR
+            s.`code` LIKE concat('%', #{query.name}, '%')
+            )
         </if>
         <if test="query.startDate != null and query.startDate != ''">
             AND p.`issueDate` <![CDATA[ >= ]]> #{query.startDate}

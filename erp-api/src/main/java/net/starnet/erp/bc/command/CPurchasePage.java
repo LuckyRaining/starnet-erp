@@ -48,12 +48,12 @@ public class CPurchasePage extends BaseCommand {
         }
 
         String startDate = query.getString("startDate");
-        if (StrKit.notBlank(startDate)) {
+        if (StrKit.notBlank(startDate)) { // startDate 非空时，进行校验
             Assert.notFalse(SimpleValidator.validateDate(startDate), "起始时间不正确！");
         }
 
         String endDate = query.getString("endDate");
-        if (StrKit.notBlank(endDate)) {
+        if (StrKit.notBlank(endDate)) { // endDate 非空时，进行校验
             Assert.notFalse(SimpleValidator.validateDate(endDate), "结束时间不正确！");
         }
     }
