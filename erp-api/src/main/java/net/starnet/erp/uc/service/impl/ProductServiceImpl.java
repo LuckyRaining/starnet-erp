@@ -35,17 +35,17 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
                     .like("unitId", keyword));
         }
 
-        // 通过 categoryId 搜索
-        String categoryId = query.getString("categoryId");
-        if (StrKit.notBlank(categoryId)) {
-            wrapper.eq("categoryId", categoryId);
-        }
-
-        // 通过 unitId 搜索
-        String unitId = query.getString("unitId");
-        if (StrKit.notBlank(unitId)) {
-            wrapper.eq("unitId", unitId);
-        }
+//        // 通过 categoryId 搜索
+//        String categoryId = query.getString("categoryId");
+//        if (StrKit.notBlank(categoryId)) {
+//            wrapper.eq("categoryId", categoryId);
+//        }
+//
+//        // 通过 unitId 搜索
+//        String unitId = query.getString("unitId");
+//        if (StrKit.notBlank(unitId)) {
+//            wrapper.eq("unitId", unitId);
+//        }
 
         wrapper.orderByDesc("createdTime");
 
