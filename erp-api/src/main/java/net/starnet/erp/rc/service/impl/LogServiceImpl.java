@@ -12,6 +12,7 @@ import net.starnet.erp.rc.model.Log;
 import net.starnet.erp.rc.service.LogService;
 import net.starnet.erp.uc.model.User;
 import net.starnet.erp.uc.service.UserService;
+import net.starnet.erp.util.SimpleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,19 +56,29 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
         String description;
         switch (log.getType()) {
             case Define.LOG_TYPE_LOGIN:
-                description = "登录成功 用户名：" + log.getContentObject().getString("username");
+                description = "登录成功，用户名：" + log.getContentObject().getString("username");
+                String loginStyle = log.getContentObject().getString("loginStyle");
+                if (loginStyle != null){
+                    if (Integer.parseInt(loginStyle) == 0) {
+                        description += "，登录方式：" + "用户名+密码";
+                    } else if (Integer.parseInt(loginStyle) == 1) {
+                        description += "，登录方式：" + "手机号+密码";
+                    } else {
+                        description += "，登录方式：" + "其他方式+密码";
+                    }
+                }
                 break;
             case Define.LOG_TYPE_USER_ADD:
-                description = "新增用户 用户名：" + log.getContentObject().getString("username");
+                description = "新增用户，用户名：" + log.getContentObject().getString("username");
                 break;
             case Define.LOG_TYPE_USER_ACTIVATE:
-                description = "用户启用 用户名：" + log.getContentObject().getString("username");
+                description = "用户启用，用户名：" + log.getContentObject().getString("username");
                 break;
             case Define.LOG_TYPE_USER_DEACTIVATE:
-                description = "用户停用 用户名：" + log.getContentObject().getString("username");
+                description = "用户停用，用户名：" + log.getContentObject().getString("username");
                 break;
             case Define.LOG_TYPE_USER_RESET_PASSWORD:
-                description = "强制修改密码成功 用户名：" + log.getContentObject().getString("username");
+                description = "强制修改密码成功，用户名：" + log.getContentObject().getString("username");
                 break;
 
             default:
@@ -96,12 +107,23 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
     }
 
     @Override
-    public void logUserLogin(String username) {
+    public void logUserLogin(String username, int loginStyle) {
         JSONObject content = new JSONObject();
         content.put("username", username);
+        content.put("loginStyle", loginStyle);
 
-        // 这里的userId=0是故意的，因为产生登录事件时，用户是处于未登录状态的
+        // 这里的 userId = 0 是故意的，因为产生登录事件时，用户是处于未登录状态的
         log(Define.LOG_TYPE_LOGIN, 0, content);
+    }
+
+    @Override
+    public void logUserLogin(long userId, String username, int loginStyle) {
+        JSONObject content = new JSONObject();
+        content.put("username", username);
+        content.put("loginStyle", loginStyle);
+
+        // 这里的 userId = 0 是故意的，因为产生登录事件时，用户是处于未登录状态的
+        log(Define.LOG_TYPE_LOGIN, userId, content);
     }
 
     @Override

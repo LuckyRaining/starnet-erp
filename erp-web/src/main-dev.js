@@ -24,6 +24,7 @@ import moment from 'moment'
 import _ from 'lodash'
 
 import axios from 'axios'
+
 Vue.prototype.$moment = moment
 Vue.prototype.$_ = _
 moment.locale('zh-cn')

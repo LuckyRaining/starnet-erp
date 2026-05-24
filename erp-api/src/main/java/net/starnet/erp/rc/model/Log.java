@@ -51,8 +51,8 @@ public class Log extends BaseModel<Log> {
         return getJSONObject(content);
     }
 
-    public void setContentObject(JSONObject contetnObject) {
-        setContent(contetnObject == null ? "{}" : contetnObject.toJSONString());
+    public void setContentObject(JSONObject contentObject) {
+        setContent(contentObject == null ? "{}" : contentObject.toJSONString());
 
     }
 

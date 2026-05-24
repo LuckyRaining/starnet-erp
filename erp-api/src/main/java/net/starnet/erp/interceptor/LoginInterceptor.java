@@ -35,7 +35,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             throw new BizException("未登陆！", 99998);
         }
 
-        String token = authorization.substring(7);
+        String token = authorization.substring(7); // 去掉 “Bearer ”（Index:0-6），使 beginIndex 从 7 开始
 
         Claims claims = jwtUtil.parseJwt(token);
         if (claims == null) {

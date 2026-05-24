@@ -30,9 +30,13 @@ public class CUserLogin extends BaseCommand {
     @Autowired
     private LogService logService;
 
-    /** 登录名 */
+    /**
+     * 登录名
+     */
     private @Param(required = true) String loginName;
-    /** 密码 */
+    /**
+     * 密码
+     */
     private @Param(required = true) String password;
 
     @Override
@@ -56,7 +60,14 @@ public class CUserLogin extends BaseCommand {
 
         log.info("登录成功！");
 
-        logService.logUserLogin(user.getUsername());
+        // 记录登录日志。loginStyle = 0 表示用户名登录，1 表示手机号登录，2 其他方式登录
+        if (userService.findByUsername(loginName) != null) {
+            logService.logUserLogin(Long.parseLong(user.getId()), user.getUsername(), 0);
+        } else if (userService.findByMobile(loginName) != null) {
+            logService.logUserLogin(Long.parseLong(user.getId()), user.getUsername(), 1);
+        } else {
+            logService.logUserLogin(Long.parseLong(user.getId()), user.getUsername(), 2);
+        }
 
         data.put("token", token);
     }

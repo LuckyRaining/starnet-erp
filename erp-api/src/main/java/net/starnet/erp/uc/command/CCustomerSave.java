@@ -91,6 +91,7 @@ public class CCustomerSave extends BaseCommand {
             contact.setCustomerId(persistedCustomer.getId());
 
             // 处理首要联系人
+            // 首要联系人只能有一个！若有多个，则将第一个以外的 都设置为非首要联系人！
             if (!hasPrimary && contact.isPrimary()) {
                 hasPrimary = true;
                 continue;

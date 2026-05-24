@@ -65,9 +65,9 @@ public class CUserAdd extends BaseCommand {
         persistedUser.setName(user.getName());
         userService.save(persistedUser);
 
-        data.put("user", persistedUser);
-
         // 记录日志
-        // logService.logUserAdd(currentUser.getId(), persistedUser.getUsername());
+        logService.logUserAdd(currentUser.getId(), persistedUser.getUsername());
+
+        data.put("user", persistedUser);
     }
 }

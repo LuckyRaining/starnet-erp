@@ -37,11 +37,20 @@ public interface LogService extends IService<Log> {
      *
      * @param username
      */
-    void logUserLogin(String username);
+    void logUserLogin(String username, int loginStyle);
+
+    /**
+     * 记录用户登录
+     *
+     * @param userId
+     * @param username
+     */
+    void logUserLogin(long userId, String username, int loginStyle);
 
     /**
      * 记录新增用户
      *
+     * @param userId
      * @param username
      */
     void logUserAdd(long userId, String username);
@@ -49,6 +58,7 @@ public interface LogService extends IService<Log> {
     /**
      * 记录启用用户
      *
+     * @param userId
      * @param username
      */
     void logUserActive(long userId, String username);
@@ -56,6 +66,7 @@ public interface LogService extends IService<Log> {
     /**
      * 记录停用用户
      *
+     * @param userId
      * @param username
      */
     void logUserDeactive(long userId, String username);
