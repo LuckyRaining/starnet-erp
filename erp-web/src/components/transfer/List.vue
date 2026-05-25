@@ -22,7 +22,7 @@
           </el-date-picker>
         </el-col>
         <el-col :span="8">
-          <el-input placeholder="请输入单据号查询"
+          <el-input placeholder="请输入单据编号查询"
                     v-model="params.query.name"
                     clearable
                     @clear="getPage">

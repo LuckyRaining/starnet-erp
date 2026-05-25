@@ -8,22 +8,26 @@
     <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.bc.model.Sale">
         SELECT s.* from bc_sale s left join
         uc_customer c on s.customerId = c.id WHERE 1 = 1
+        <!-- 区分是 “销货” 查询、还是 “销退” 查询！ -->
         <if test="query.type != null">
             AND s.`type` = #{query.type}
         </if>
+        <!-- 根据 “单据编号”、“客户编号”、“客户名称” 查询！ -->
         <if test="query.name != null and query.name != ''">
             AND (
-              s.`code` LIKE concat('%', #{query.name}, '%') OR
-              c.`name` LIKE concat('%', #{query.name}, '%') OR
-              c.`code` LIKE concat('%', #{query.name}, '%')
-              )
+            s.`code` LIKE concat('%', #{query.name}, '%') OR
+            c.`code` LIKE concat('%', #{query.name}, '%') OR
+            c.`name` LIKE concat('%', #{query.name}, '%')
+            )
         </if>
+        <!-- 根据 “startDate” <= “单据日期”bc_sale.issueDate <= “endDate” 查询！ -->
         <if test="query.startDate != null and query.startDate != ''">
             AND s.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
         </if>
         <if test="query.endDate != null and query.endDate != ''">
-            AND s.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
+            AND s.`issueDate` <![CDATA[ <= ]]> #{query.endDate}
         </if>
+        <!-- 根据 “createdTime” 降序！ -->
         ORDER BY s.createdTime DESC
     </select>
 

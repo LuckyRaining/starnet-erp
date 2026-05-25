@@ -384,11 +384,12 @@ export default {
     }
   },
   created() {
+    // 从'/purchase/list'页面请求参数中，获取购货单编号 purchaseId
     let purchaseId = this.$route.query.purchaseId
-    if (purchaseId !== undefined) {
+    if (purchaseId !== undefined) { // 如果存在 if，则调用后端API，获取购货单信息
       console.log(purchaseId)
       this.getPurchaseDetail(purchaseId)
-    } else {
+    } else { // 如果不存在 else，则调用后端API，生成新的购货单编号
       this.getPurchaseCode()
     }
 
@@ -479,6 +480,7 @@ export default {
     async savePurchase() {
       this.$refs.saveFormRef.validate(async (valid) => {
         if (!valid) return
+
         // 可以发起新增购货单的网络请求
         const { data: result } = await this.$http.post('/purchase/save', {
           purchase: this.saveForm,

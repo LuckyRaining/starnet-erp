@@ -21,7 +21,7 @@ public interface IssueProductService extends IService<IssueProduct> {
     List<IssueProduct> findListByBusiness(String businessId);
 
     /**
-     * 根据订单删除
+     * 根据订单的 业务ID 删除
      *
      * @param businessId
      */

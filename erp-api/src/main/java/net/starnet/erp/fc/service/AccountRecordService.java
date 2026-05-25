@@ -13,17 +13,17 @@ public interface AccountRecordService extends IService<AccountRecord> {
     /**
      * 获取账单列表
      *
-     * @param targetId
+     * @param businessId
      * @return
      */
-    List<AccountRecord> findListByBusiness(String targetId);
+    List<AccountRecord> findListByBusiness(String businessId);
 
     /**
-     * 根据目标ID删除
+     * 根据 业务ID 删除
      *
-     * @param targetId
+     * @param businessId
      */
-    void deleteByBusiness(String targetId);
+    void deleteByBusiness(String businessId);
 
     /**
      * 新增记录列表

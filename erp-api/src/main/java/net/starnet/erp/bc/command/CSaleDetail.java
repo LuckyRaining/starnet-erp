@@ -5,6 +5,8 @@ import net.kingborn.core.command.Command;
 import net.kingborn.core.command.Param;
 import net.kingborn.core.exception.Assert;
 import net.starnet.erp.bc.model.Sale;
+import net.starnet.erp.fc.model.AccountRecord;
+import net.starnet.erp.fc.service.AccountRecordService;
 import net.starnet.erp.wc.model.IssueProduct;
 import net.starnet.erp.wc.service.IssueProductService;
 import net.starnet.erp.bc.service.SaleService;
@@ -29,6 +31,8 @@ public class CSaleDetail extends BaseCommand {
     @Autowired
     private IssueProductService issueProductService;
     @Autowired
+    private AccountRecordService accountService;
+    @Autowired
     private ProductService productService;
     @Autowired
     private WarehouseService warehouseService;
@@ -48,6 +52,9 @@ public class CSaleDetail extends BaseCommand {
         Sale sale = saleService.getById(saleId);
         Assert.notNull(sale, "ID为【" + saleId + "】的销售订单不存在！");
 
+        // 1. 获取 商品列表 productList；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
+        // 3. 然后添加到 销售订单 sale 下
         List<IssueProduct> productList = issueProductService.findListByBusiness(sale.getId());
         for (IssueProduct orderProduct : productList) {
             Product product = productService.getById(orderProduct.getProductId());
@@ -64,6 +71,12 @@ public class CSaleDetail extends BaseCommand {
         }
         sale.put("productList", productList);
 
+        // 1. 获取 单据账户列表 accountList；
+        // 2. 然后添加到 销售订单 sale 下
+        List<AccountRecord> accountList = accountService.findListByBusiness(sale.getId());
+        sale.put("accountList", accountList);
+
+        // 将 销售订单 sale 作为 查询结果 Result，并用 response 返回给前端
         data.put("sale", sale);
     }
 }

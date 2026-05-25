@@ -48,6 +48,9 @@ public class CCheckoutDetail extends BaseCommand {
         Checkout checkout = checkoutService.getById(checkoutId);
         Assert.notNull(checkout, "ID为【" + checkoutId + "】的出库订单不存在！");
 
+        // 1. 获取 商品列表 productList；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
+        // 3. 然后添加到 出库订单 checkout 下
         List<IssueProduct> productList = issueProductService.findListByBusiness(checkout.getId());
         for (IssueProduct checkoutProduct : productList) {
             Product product = productService.getById(checkoutProduct.getProductId());
@@ -64,6 +67,7 @@ public class CCheckoutDetail extends BaseCommand {
         }
         checkout.put("productList", productList);
 
+        // 将 出库订单 checkout 作为 查询结果 Result，并用 response 返回给前端
         data.put("checkout", checkout);
     }
 }

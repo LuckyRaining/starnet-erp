@@ -52,6 +52,9 @@ public class CPurchaseDetail extends BaseCommand {
         Purchase purchase = purchaseService.getById(purchaseId);
         Assert.notNull(purchase, "ID为【" + purchaseId + "】的购货单不存在！");
 
+        // 1. 获取 商品列表 productList；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
+        // 3. 然后添加到 购货单 purchase 下
         List<IssueProduct> productList = issueProductService.findListByBusiness(purchase.getId());
         for (IssueProduct issueProduct : productList) {
             Product product = productService.getById(issueProduct.getProductId());
@@ -68,9 +71,12 @@ public class CPurchaseDetail extends BaseCommand {
         }
         purchase.put("productList", productList);
 
+        // 1. 获取 单据账户列表 accountList；
+        // 2. 然后添加到 购货单 purchase 下
         List<AccountRecord> accountList = accountService.findListByBusiness(purchase.getId());
         purchase.put("accountList", accountList);
 
+        // 将 购货单 purchase 作为 查询结果 Result，并用 response 返回给前端
         data.put("purchase", purchase);
     }
 }

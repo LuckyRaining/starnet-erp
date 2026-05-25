@@ -11,7 +11,7 @@ import net.starnet.erp.wc.model.TransferProduct;
 public interface StockService extends IService<Stock> {
 
     /**
-     * 根据商品和仓库获取库存
+     * 根据 “商品” 和 “仓库” 获取 “库存”
      *
      * @param productId
      * @param warehouseId
@@ -20,12 +20,12 @@ public interface StockService extends IService<Stock> {
     Stock findByProductAndWarehouse(String productId, String warehouseId);
 
     /**
-     * 处理库存
+     * 处理 库存
      */
     Stock handleStock(IssueProduct issueProduct, String stockType);
 
     /**
-     * 处理调拨库存
+     * 处理 调拨库存
      *
      * @param transferProduct
      */

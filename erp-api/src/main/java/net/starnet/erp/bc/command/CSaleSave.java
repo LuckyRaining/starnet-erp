@@ -99,25 +99,26 @@ public class CSaleSave extends BaseCommand {
             issueProductService.deleteByBusiness(sale.getId());
         }
 
-        persistedSale.setIssueDate(sale.getIssueDate());
         persistedSale.setCustomerId(sale.getCustomerId());
+        persistedSale.setIssueDate(sale.getIssueDate());
+        persistedSale.setStatus(Define.SALE_STATUS_PART); // TODO 完善此处
+        persistedSale.setQuantity(getQuantity());
+        persistedSale.setDiscountAmount(sale.getDiscountAmount());
+        persistedSale.setAmount(sale.getAmount());
+        persistedSale.setPreferentialRate(sale.getPreferentialRate());
+        persistedSale.setPreferentialAmount(sale.getPreferentialAmount());
+        persistedSale.setPreferredAmount(sale.getPreferredAmount());
+        persistedSale.setCurrentAmount(sale.getCurrentAmount());
+        persistedSale.setDebtAmount(sale.getDebtAmount());
+        persistedSale.setAttachments(sale.getAttachments());
+        persistedSale.setListerId(sale.getListerId());
+        persistedSale.setRemark(sale.getRemark());
+
         persistedSale.setSellerId(sale.getSellerId());
         persistedSale.setContactName(sale.getContactName());
         persistedSale.setAddress(sale.getAddress());
         persistedSale.setPhone(sale.getPhone());
-        persistedSale.setDiscountAmount(sale.getDiscountAmount());
-        persistedSale.setAmount(sale.getAmount());
-        persistedSale.setQuantity(getQuantity());
-        persistedSale.setPreferentialRate(sale.getPreferentialRate());
-        persistedSale.setPreferentialAmount(sale.getPreferentialAmount());
-        persistedSale.setPreferredAmount(sale.getPreferredAmount());
         persistedSale.setCustomerFee(sale.getCustomerFee());
-        persistedSale.setCurrentAmount(sale.getCurrentAmount());
-        persistedSale.setDebtAmount(sale.getDebtAmount());
-        persistedSale.setStatus(Define.SALE_STATUS_PART); // TODO 完善此处
-        persistedSale.setAttachments(sale.getAttachments());
-        persistedSale.setListerId(sale.getListerId());
-        persistedSale.setRemark(sale.getRemark());
         saleService.saveOrUpdate(persistedSale);
 
         // 新增商品

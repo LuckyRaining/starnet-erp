@@ -76,29 +76,30 @@ public class CPurchaseSave extends BaseCommand {
         Assert.notFalse(Define.validatePurchaseType(purchase.getType()), "类型不正确！");
 
         // 计算
-        if (StrKit.isBlank(purchase.getId())) {
+        // 购货单ID（更新时必填，新增时不传）
+        if (StrKit.isBlank(purchase.getId())) { // purchase.id 为空时，即没传，为“新增”的意思
             persistedPurchase = new Purchase();
-            persistedPurchase.setType(purchase.getType());
 
-            // TODO 校验编码是否合法
-            validatePurchaseCode(purchase.getCode());
+            persistedPurchase.setType(purchase.getType());
+            validatePurchaseCode(purchase.getCode()); // 校验 单据编号 是否合法，合法才能“新增”，即 加购货单
             persistedPurchase.setCode(purchase.getCode());
             persistedPurchase.setChecked(false);
 
-        } else {
+        } else { // purchase.id 非空时，即传了，为“更新”的意思
             persistedPurchase = purchaseService.getById(purchase.getId());
             Assert.notNull(persistedPurchase, "ID为【" + purchase.getId() + "】的购货单不存在！");
 
-            // 删除原来的商品
+            // 删除该单原来的商品列表
             issueProductService.deleteByBusiness(purchase.getId());
 
-            // 删除原来的账户
+            // 删除该单原来的账户列表
             accountRecordService.deleteByBusiness(purchase.getId());
         }
 
         persistedPurchase.setSupplierId(purchase.getSupplierId());
         persistedPurchase.setIssueDate(purchase.getIssueDate());
         persistedPurchase.setCode(purchase.getCode());
+        persistedPurchase.setStatus(Define.PURCHASE_STATUS_UNPAID); // TODO 完善此处
         persistedPurchase.setQuantity(getPurchaseQuantity());
         persistedPurchase.setDiscountAmount(purchase.getDiscountAmount());
         persistedPurchase.setAmount(purchase.getAmount());
@@ -108,16 +109,15 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setCurrentAmount(purchase.getCurrentAmount());
         persistedPurchase.setDebtAmount(purchase.getDebtAmount());
         persistedPurchase.setContracts(purchase.getContracts());
-        persistedPurchase.setStatus(Define.PURCHASE_STATUS_UNPAID);
         persistedPurchase.setListerId(purchase.getListerId());
+        persistedPurchase.setRemark(purchase.getRemark());
         purchaseService.saveOrUpdate(persistedPurchase);
 
         // 新增商品
         addProductList();
 
         // 新增账户
-        String accountType = persistedPurchase.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
-                Define.ACCOUNT_RECORD_TYPE_OUT : Define.ACCOUNT_RECORD_TYPE_IN;
+        String accountType = persistedPurchase.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ? Define.ACCOUNT_RECORD_TYPE_OUT : Define.ACCOUNT_RECORD_TYPE_IN;
         for (AccountRecord record : accountList) {
             record.setAmount(persistedPurchase.getCurrentAmount());
         }
@@ -144,7 +144,7 @@ public class CPurchaseSave extends BaseCommand {
 
         } else { // 销退
             payableService.businessAdd(persistedPurchase.getSupplierId(), persistedPurchase.getIssueDate(),
-                    Define.BUSINESS_TYPE_PURCHASE_REFUND, persistedPurchase.getId(), - persistedPurchase.getDebtAmount(), 0);
+                    Define.BUSINESS_TYPE_PURCHASE_REFUND, persistedPurchase.getId(), -persistedPurchase.getDebtAmount(), 0);
         }
     }
 
@@ -156,6 +156,7 @@ public class CPurchaseSave extends BaseCommand {
     private void validatePurchaseCode(String code) {
         Purchase purchase = purchaseService.findByCode(code);
         if (purchase != null) {
+            Assert.notNull(purchase, "单据编号为【" + code + "】的购货单已经存在！");
             throw new BizException("单据编号为【" + code + "】的购货单已经存在！");
         }
     }
@@ -193,7 +194,6 @@ public class CPurchaseSave extends BaseCommand {
             Assert.notNull(warehouse, "ID为【" + issueProduct.getWarehouseId() + "】的仓库不存在！");
 
             persistedIssueProduct = new IssueProduct();
-            persistedIssueProduct.setCode(issueProduct.getCode());
             persistedIssueProduct.setIssueDate(persistedPurchase.getIssueDate());
             persistedIssueProduct.setBusinessType(persistedPurchase.getType());
             persistedIssueProduct.setBusinessId(persistedPurchase.getId());
@@ -201,14 +201,16 @@ public class CPurchaseSave extends BaseCommand {
             persistedIssueProduct.setWarehouseId(warehouse.getId());
 
             // TODO 校验数据
+            //  保证单价都是售价/预计采购价/批发价，统一折扣率为折扣率一
             persistedIssueProduct.setQuantity(issueProduct.getQuantity());
             persistedIssueProduct.setPrice(issueProduct.getPrice());
             persistedIssueProduct.setDiscountRate(issueProduct.getDiscountRate());
             persistedIssueProduct.setDiscountAmount(issueProduct.getDiscountAmount());
             persistedIssueProduct.setAmount(issueProduct.getAmount());
+            persistedIssueProduct.setCode(issueProduct.getCode());
             persistedIssueProduct.setRemark(issueProduct.getRemark());
 
-            // 处理库存
+            // 处理库存：购货为入库，购退为出库
             String stockType = persistedPurchase.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
                     Define.STOCK_TYPE_IN : Define.STOCK_TYPE_OUT;
             stockService.handleStock(persistedIssueProduct, stockType);

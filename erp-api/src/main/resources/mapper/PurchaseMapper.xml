@@ -8,22 +8,26 @@
     <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.bc.model.Purchase">
         SELECT p.* from bc_purchase p left join
         uc_supplier s on p.supplierId = s.id WHERE 1 = 1
+        <!-- 区分是 “购货” 查询、还是 “购退” 查询！ -->
         <if test="query.type != null">
             AND p.`type` = #{query.type}
         </if>
+        <!-- 根据 “单据编号”、“供应商编号”、“供应商名称” 查询！ -->
         <if test="query.name != null and query.name != ''">
             AND (
             p.`code` LIKE concat('%', #{query.name}, '%') OR
-            s.`name` LIKE concat('%', #{query.name}, '%') OR
-            s.`code` LIKE concat('%', #{query.name}, '%')
+            s.`code` LIKE concat('%', #{query.name}, '%') OR
+            s.`name` LIKE concat('%', #{query.name}, '%')
             )
         </if>
+        <!-- 根据 “startDate” <= “单据日期”bc_purchase.issueDate <= “endDate” 查询！ -->
         <if test="query.startDate != null and query.startDate != ''">
             AND p.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
         </if>
         <if test="query.endDate != null and query.endDate != ''">
-            AND p.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
+            AND p.`issueDate` <![CDATA[ <= ]]> #{query.endDate}
         </if>
+        <!-- 根据 “createdTime” 降序！ -->
         ORDER BY p.createdTime DESC
     </select>
 

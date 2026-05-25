@@ -50,6 +50,9 @@ public class COrderDetail extends BaseCommand {
         Order order = orderService.getById(orderId);
         Assert.notNull(order, "ID为【" + orderId + "】的客户订单不存在！");
 
+        // 1. 获取 商品列表 productList；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
+        // 3. 然后添加到 客户订单 order 下
         List<IssueProduct> productList = orderProductService.findListByBusiness(order.getId());
         for (IssueProduct orderProduct : productList) {
             Product product = productService.getById(orderProduct.getProductId());
@@ -66,6 +69,7 @@ public class COrderDetail extends BaseCommand {
         }
         order.put("productList", productList);
 
+        // 将 客户订单 order 作为 查询结果 Result，并用 response 返回给前端
         data.put("order", order);
     }
 }

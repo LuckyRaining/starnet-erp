@@ -2,7 +2,7 @@
 
 ### 中文题目：基于SpringBoot和Vue的星络收银系统设计与实现
 
-### 英文题目：Design and Implementation of StarNet Cashier System Based on SpringBoot and Vue
+### 英文题目：Design and Implementation of StarNet POS System Based on SpringBoot and Vue
 
 ---
 
@@ -51,7 +51,7 @@
 
 ## 摘 要
 
-为了解决传统零售收银系统操作复杂、数据孤岛以及高峰期工作效率低的问题，“星络”智能收银系统应运而生，面向中小微零售商家提供一款高效、便捷、智能化的企业资源管理系统。该系统的前后端分离，在后端使用Spring Boot开发RESTful API，进行业务处理、数据存储以及安全性防护；前端Web端基于Vue.js结合Element UI制作一个动态的管理系统页面；移动端通过Uni-App编写微信小程序，利用uni.scanCode()方法实现扫码；数据库使用MySQL来建立35张核心的数据表并且进行相应的索引优化。此系统包含六个主要部分：基础信息管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款追踪）、仓库管理（多个仓库间调拨、出入库记录查询）、财务管理（收款付款抵消、应收应付自动监测）以及数据分析（多种报表展示）。经过测试，该系统稳定可靠，主要接口响应速度都在200毫秒之内，扫码识别率在良好的光线下超过95%，各个功能正常可用，单据审核合理有效，应收应付账款自动跟踪准确无误，可以满足小型零售企业的一般要求。本文证明了基于Spring Boot和Vue的前后端分离的设计方式对于建设小型收银系统是切实可行并且有效的，对小型零售企业数字化升级具有一定的指导意义。
+为解决传统零售收银系统操作繁琐、存在数据孤岛以及高峰期工作效率低下的问题，“星络”智能收银系统应运而生——面向中小微零售商家提供一款高效、便捷、智能化的企业资源管理系统。该系统采用前后端分离架构，在后端使用Spring Boot开发RESTful API，进行业务处理、数据存储以及安全性防护；Web前端基于Vue.js结合Element UI构建动态的管理系统页面；移动端通过Uni-App编写微信小程序，利用uni.scanCode()方法实现扫码；数据库采用MySQL来建立35张核心数据表并进行相应的索引优化。此系统包含六个主要部分：基础信息管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款追踪）、仓库管理（多个仓库间调拨、出入库记录查询）、财务管理（收款付款抵消、应收应付自动监测）以及数据分析（多种报表展示）。经过测试，该系统稳定可靠，主要接口响应速度都在200毫秒之内，扫码识别率在良好的光线下超过95%，各项功能均正常运行，单据审核机制合理有效，应收应付账款自动跟踪准确无误，可以满足小型零售企业的日常管理需求。本文证明了基于Spring Boot和Vue的前后端分离的设计方式对于建设小型收银系统是切实可行并且有效的，对小型零售企业数字化升级具有一定的指导意义。
 
 **关键词：** 收银系统; SpringBoot; MySQL数据库; 条码识别
 
@@ -59,7 +59,7 @@
 
 ## ABSTRACT
 
-This thesis will design and implement the intelligent cashier system called the StarNet, which will be an efficient, easy-to-use, and intelligent integrated enterprise resource management platform to small and medium-sized retail merchants to overcome the problem of cumbersome operation, data silos and poor performance at peak times in the traditional retail cashier systems. The system has a front-end and back-end separation design: the back-end uses the SpringBoot framework to build RESTful APIs to manage business logic, data persistence, and security control; the front-end Web interface uses Vue.js and Element UI component library; the mobile end creates WeChat mini-program using Uni-App framework, by invoking the API of uni.scanCode to achieve the function of scanning barcodes; 35 core data tables are standardized and indexed in MySQL database. Six core modules are implemented by the system, which includes basic data management (customers, suppliers, products, warehouses, etc.), purchase management (purchase order audit, warehousing, automatic generation of accounts payable), sales management (sales order audit, outbound, tracking of accounts receivable), warehouse management (multi-warehouse transfer, inbound/outbound flow tracing), fund management (payment/ receipt validation, automatic tracking of receivables/payables) and statistical analysis (multi-dimensional report analysis). According to test results, the system is stable in its operation, the response time of the core interfaces is limited up to 200 ms, the scanning recognition rate is more than 95 percent with standard lighting, all business modules are working properly, the document audit mechanism is developed, and automatic tracking of accounts receivable and payable are done correctly, all of these satisfy the daily management requirements of small and medium-sized retail companies. This system confirms the viability and utility of front-end/back-end separation design using SpringBoot and Vue in developing lightweight cashier systems that give a benchmark solution and practical example of the digitization of small and medium-sized retail businesses.
+To address the issues of cumbersome operations, data silos, and low efficiency during peak hours in traditional retail POS systems, the “StarNet” Smart POS System was developed—an efficient, convenient, and intelligent enterprise resource management system designed for small and medium-sized retail businesses. The system employs a frontend-backend separation architecture. On the backend, Spring Boot is used to develop RESTful APIs for business processing, data storage, and security protection; the web frontend utilizes Vue.js combined with Element UI to build dynamic management system pages; the mobile end uses Uni-App to develop a WeChat Mini Program, leveraging the `uni.scanCode()` method to enable QR code scanning; and MySQL is used to establish 35 core data tables with corresponding index optimization. The system comprises six main components: Basic Information Management (customers, suppliers, products, warehouses, etc.), Procurement Management (purchase order approval, inventory receipt, and automatic generation of accounts payable), Sales Management (sales order approval, inventory issuance, and accounts receivable tracking), Warehouse Management (inter-warehouse transfers and inventory transaction queries), Financial Management (payment offsetting and automatic monitoring of accounts receivable and payable), and Data Analysis (multiple report displays). Testing has confirmed that the system is stable and reliable, with response times for major interfaces under 200 milliseconds, a barcode recognition rate exceeding 95% under good lighting conditions, and all functions operating normally. The document approval mechanism is reasonable and effective, and the automatic tracking of accounts receivable and payable is accurate and error-free, meeting the daily management needs of small retail enterprises. This paper demonstrates that a front-end/back-end separation design based on Spring Boot and Vue is both feasible and effective for building a small-scale POS system, and offers valuable guidance for the digital transformation of small retail enterprises.
 
 **Key words:** Cashier System; SpringBoot; MySQL database; Barcode Recognition
 
@@ -75,29 +75,29 @@ This thesis will design and implement the intelligent cashier system called the 
 
 ### 1 绪论
 
-随着数字化时代的到来，信息化管理和传统零售业务的融合是大势所趋。而零售业特别是中小企业所面临的消费者需求多元化、经营日益频繁以及对精细化管理的要求越来越高。传统的收银方式在业务协作上、数据应用上和工作效率上都出现了问题，收银系统从单一的结账工具发展成为经营管理平台，是零售业进行数字化改革的一条可行的道路。
+随着数字化时代的到来，信息化管理和传统零售业务的融合是大势所趋。而零售业中，特别是中小企业正面临着消费者需求多元化、经营日益频繁以及对精细化管理的要求不断提高的挑战。传统的收银方式在业务协作上、数据应用上和工作效率上都出现了问题，推动收银系统从单一的结账工具发展成为经营管理平台，是零售业进行数字化改革的一条有效路径。
 
 ### 1.1 开发背景
 
-随着社会经济的发展以及消费者需求的变化，零售行业对于信息技术的应用日益广泛，而收银系统也由最初的单纯的结算工具发展到包括采购、销售、库存以及财务管理等在内的全方位管理系统。但是传统的收银模式以及一些旧有系统却有着明显的弊端之处，在高峰时段需要大量的人工操作造成工作效率低下，手工录入易出错并且会造成库存误差；而现金、刷卡、移动支付等多种支付方式无法统一处理增加了培训和使用的难度；对于多个店铺而言，其业务信息分布在各个地方不能及时总结分析，不利于企业管理者进行决策。
+随着社会经济的发展以及消费者需求的变化，零售行业对于信息技术的应用日益广泛，而收银系统也由最初的单纯的结算工具发展到包括采购、销售、库存以及财务管理等在内的全方位管理系统。但是传统的收银模式以及部分旧有系统却有着明显的弊端之处：在高峰时段需要大量的人工操作，导致工作效率低下；手工录入易出错，进而引发库存误差；而现金、刷卡、移动支付等多种支付方式无法统一处理增加了培训和使用的难度；对于多店铺的经营场景而言，其业务信息分散在各处难以及时汇总分析，不利于企业管理者进行决策。
 
 现阶段中，基于Spring Boot与Vue构建收银/进销存系统已成为较为常见的技术路线。多数项目采用Java后端、Vue前端与MySQL数据库组合，在保证开发速度的同时也具有良好的用户体验以及稳定的数据存储能力[1]。
 
-国外零售信息化发展较早，在系统集成程度以及智能化研究上更为超前。一方面，针对复杂业务进行微服务拆分是提升系统弹性和可扩展性的一种常用手段[2]；另一方面，智能购物车、视觉识别无人结账等也已经逐步实现[3]。这说明目前的收银系统除了完成交易外，还需要有数据收集以及对商家经营起到一定作用。
+国外零售信息化发展较早，在系统集成程度以及智能化研究上更为超前。一方面，针对复杂业务进行微服务拆分是提升系统弹性和可扩展性的一种常用手段[2]；另一方面，智能购物车、视觉识别无人结账等也已经逐步实现[3]。这说明目前的收银系统除了完成交易外，还需要有数据收集等能力来为商家经营起到一定作用。
 
 据以上内容得出，当前的研究成果为本文的技术选择、架构设计以及功能集成等起到很好的借鉴作用，也对星络收银系统的实现起到一定的指导意义。
 
 ### 1.2 开发目的
 
-本项目是基于Spring Boot以及Vue开发的一款星络收银系统（StarNet Cashier System）针对中小微型企业提供的“WEB端+APP端+后台”的一体化管理系统。系统以企业的日常运营工作为核心进行流程优化，旨在用统一、规范的操作流程取代传统的手工操作，提高工作效率并且便于控制。主要有以下几点目标：
+本项目是基于Spring Boot以及Vue开发的一款星络收银系统（StarNet Cashier System），亦是针对中小微型企业提供的“WEB端+APP端+后台”的一体化管理系统。系统以企业的日常运营工作为核心进行流程优化，旨在用统一、规范的操作流程取代传统的手工操作，提高工作效率并且便于控制。主要有以下几点目标：
 
 第一，对于业务分散以及数据孤岛的问题，开发前后端分离的一体化系统，对客户、供应商、商品、仓库、职员等基本资料进行集中化管理并连接购货、销货、出入库、收付款等工作流，提高企业的整体工作效率及数据一致性。
 
-第二，解决资金管理复杂以及账务核对繁琐问题，实现应收应付自动跟踪功能，提供收款单、付款单核销和多种财务报表打印等功能，便于企业进行财务管理并给予管理者有效帮助[4]。
+第二，解决资金管理复杂以及账务核对繁琐问题，实现应收应付自动跟踪功能，提供收款单、付款单核销和多种财务报表打印等功能，便于企业进行财务管理，并给予管理者有效帮助[4]。
 
 第三，为解决库存管理水平较低的问题，建立多仓库管理和库存预警功能，支持调拨、盘盈盘亏、其他出入库等情况，做到对库存及时监控以及可追溯管理，提高库存水平并且减少库存成本[5]。
 
-第四，通过对完整的工程项目进行，“前后端分离+多端适配”的方式，在真实的收银环境中进行应用，进行需求分析、系统设计、代码编写、测试上线等工作，给类似的小型企业数字化转型起到借鉴作用[6]。
+第四，通过对完整的工程项目进行“前后端分离+多端适配”的技术路线验证，在真实的收银环境中进行应用，进行需求分析、系统设计、代码编写、测试上线等工作，给类似的小型企业数字化转型起到借鉴作用[6]。
 
 总体而言，系统的建立可以节约大量的人力成本以及减少错误发生几率，提高数据分析的能力，使企业管理更加细致化并且更具有竞争优势，在现实中有着很高的实用价值。
 
@@ -647,7 +647,7 @@ graph TB
 
 **（2）业务流程规范：**
 
-系统实现了整个业务流程操作，包括单据新建、保存、审核状态确认等内容，在现有实现中，如采购、销售、调拨等主要单据保存时记录大部分信息，而审核仅起到状态管理和复核作用，以便业务可追溯、可控。
+系统实现了整个业务流程操作，包括单据新建、保存、审核状态确认等内容，在现有实现中，如采购、销售、调拨等主要单据保存时记录大部分信息，而审核仅起到状态管理和复核作用，以确保业务的可追溯性与可控性。
 
 **（3）财务自动化：**
 
@@ -655,7 +655,7 @@ graph TB
 
 **（4）移动端扫码功能：**
 
-基于Uni-App框架开发微信小程序，使用uni.scanCode() API实现条码、二维码扫描。支持onlyFromCamera参数用于指定只从摄像头读取扫码内容，scanType参数可选值为barCode或者qrCode。扫描完成之后会自动向后端发起请求/product/page获取商品详情，不需要上传图片至服务器，速度更快，在category.vue、cart.vue等页面上均已完成扫码添加购物车功能。
+基于Uni-App框架开发微信小程序，使用uni.scanCode() API实现条码、二维码扫描。支持onlyFromCamera参数用于指定只从摄像头读取扫码内容，scanType参数可选值为barCode或者qrCode。扫描完成之后，系统会自动向后端/product/page接口发起请求以获取商品详情，该过程无需上传图片至服务器，响应速度更快，在category.vue、cart.vue等页面上均已完成扫码添加购物车功能。
 
 **（5）多维度报表分析：**
 
@@ -828,15 +828,15 @@ graph TB
 
 **（1）Java语言**
 
-Java语言以平台无关性著称，遵循“一次编写，到处运行”，极大地降低开发成本。Java虚拟机(JVM)起到纽带作用，使得代码可以在不同环境下保持一致性和鲁棒性[1]。Java具有庞大的标准库，同时也有大量的第三方库，几乎涉及所有方面，例如网络编程、数据库访问、图形界面以及Web开发等。安全性是Java设计重点，从类加载器到安全管理器，再到字节码校验，Java有多种方式防范恶意代码。
+Java语言以平台无关性著称，拥有着“一次编写，到处运行”的特性，极大地降低开发成本。Java虚拟机(JVM)起到纽带作用，使得代码可以在不同环境下保持一致性和鲁棒性[1]。Java具有庞大的标准库，同时也有大量的第三方库，几乎涉及所有方面，例如网络编程、数据库访问、图形界面以及Web开发等。安全性是Java设计重点，从类加载器到安全管理器，再到字节码校验，Java有多种方式防范恶意代码。
 
 **（2）Spring Boot框架**
 
-Spring Boot通过自动配置机制降低了项目初始化与工程配置复杂度和开发工作量，可显著提升开发效率，使得开发更为便捷[8]。其良好的生态环境，集成了大量常用的第三方库，例如数据库连接池、缓存方案、消息队列等，并提供较好的开箱即用特性，有助于减少重复地配置工作并提升系统组件的协同性。此外，SpringBoot有大量的扩展组件及工具，如Spring Boot CLI、Spring Initializr等配套工具，进一步提升了工程搭建与迭代效率。
+Spring Boot通过自动配置机制降低了项目初始化与工程配置复杂度和开发工作量，可显著提升开发效率，使得开发更为便捷[8]。其良好的生态环境，集成了大量常用的第三方库，例如数据库连接池、缓存方案、消息队列等，并提供较好的开箱即用特性，有助于减少重复的配置工作并提升系统组件的协同性。此外，SpringBoot有大量的扩展组件及工具，如Spring Boot CLI、Spring Initializr等配套工具，进一步提升了工程搭建与迭代效率。
 
 **（3）Vue框架**
 
-Vue.js由于其轻量化以及渐进性特点给前端带来了一套简单而高效的方案，核心库聚焦视图层，简洁明了，便于学习者快速融入到Vue生态圈当中并提高迭代效率[7]。Vue的数据双向绑定大大减轻了开发人员的数据与视图之间的交互工作量，只需要关注数据的变化，Vue就会自动帮我们完成对DOM的操作。Vue的组件化也极大的提高代码复用率，让开发者可以使用一个个相对独立并且可以复用的小模块组合成一个复杂但是又容易管理的应用程序。
+Vue.js凭借其轻量化与渐进性的特点，给前端开发带来了一套简单而高效的方案，核心库聚焦视图层，简洁明了、易于理解，便于开发者快速融入到Vue生态圈当中并提高迭代效率[7]。Vue的数据双向绑定大大减轻了开发人员的数据与视图之间的交互工作量，只需要关注数据的变化，Vue就会自动帮我们完成对DOM的操作。Vue的组件化也极大的提高代码复用率，让开发者可以使用一个个相对独立并且可以复用的小模块组合成一个复杂但是又容易管理的应用程序。
 
 **（4）MyBatis框架**
 
@@ -964,7 +964,7 @@ graph TB
 
 #### 4.1.2 数据库表结构设计
 
-数据库表的设计构成了构建数据库系统的基础，其核心在于依据业务需求和数据模型来精心规划表结构及其相互之间的关系。在确定了实体属性之后，定义表与表之间的关系是重要步骤。对表格进行标准化是保证数据质量的重要环节，标准化可以有效消除数据的重复，确保数据的完整与一致。通过遵守第一范式、第二范式、第三范式等标准化原理，可有效降低数据存储中的冗余信息，提升数据库的运行效率与可靠性。本系统主要数据表如下：
+数据库表的设计构成了构建数据库系统的基础，其核心在于依据业务需求和数据模型来精心规划表结构及其相互之间的关系。在确定了实体属性之后，定义表与表之间的关系是重要步骤。对数据表进行规范化设计是保障数据质量的重要环节，可以有效消除数据的冗余现象，确保数据的完整性与一致性。通过遵守第一范式、第二范式、第三范式等标准化原理，可有效降低数据存储中的冗余信息，提升数据库的运行效率与可靠性。本系统主要数据表如下：
 
 (1) 客户表用于存储企业客户的基本信息，支持客户分类、等级管理和期初应收款设置，是销售业务和应收账款管理的基础数据。客户表的具体字段信息见表1。
 
@@ -1014,8 +1014,8 @@ graph TB
 | name | VARCHAR(255) | ❌ | NULL | 名称（供应商名称） |
 | categoryId | VARCHAR(20) | ❌ | NULL | 供应商类别ID（关联rc_category.id，type=20） |
 | balanceTime | TIMESTAMP | ❌ | NULL | 余额日期 |
-| beginReceivableAmount | BIGINT | ❌ | NULL | 期初应收款 |
-| beginPrepaidAmount | BIGINT | ❌ | NULL | 期初预收款 |
+| beginReceivableAmount | BIGINT | ❌ | NULL | 期初应付款 |
+| beginPrepaidAmount | BIGINT | ❌ | NULL | 期初预付款 |
 | vatRate | SMALLINT | ❌ | NULL | 增值税税率（如：17表示17%） |
 | remark | VARCHAR(255) | ❌ | NULL | 备注 |
 | active | BIT(1) | ❌ | 1 | 是否启用：0=停用，1=启用 |
@@ -1451,7 +1451,7 @@ graph TB
 
 #### 4.2.1 登录页面
 
-用户进入系统之后，进入登录页面，主要用于实现系统的身份认证功能，需要输入用户名及密码，系统使用BCrypt算法对密码进行加密存储以及校验工作，以保证用户信息的安全性。当校验成功后，后端会生成一个JWT Token并返回到前端，前端把Token存放在“essionStorage”内，并在后续每次请求中都需带上此Token用于身份认证。页面以账号登录为核心交互，便于门店人员快速进入业务流程，此过程同基于SpringBoot的网上商城管理系统的设计与实现的过程基本一致[11]。登录页面如图15所示。
+用户进入系统之后，首先访问登录页面并进行身份认证操作，需要输入用户名及密码，系统使用BCrypt算法对密码进行加密存储以及校验工作，以保证用户信息的安全性。当校验成功后，后端会生成一个JWT Token并返回到前端，前端把Token存放在“essionStorage”内，并在后续每次请求中都需带上此Token用于身份认证。页面以账号登录为核心交互，便于门店人员快速进入业务流程，此过程同基于SpringBoot的网上商城管理系统的设计与实现的过程基本一致[11]。登录页面如图15所示。
 
 *图15 登录页面*
 
@@ -1656,11 +1656,11 @@ onScan()
 
 ### 5.1 设计存在的问题
 
-系统采用单体架构造成各模块间耦合度过大；支付过程主要是对业务流程进行模仿，未实现微信支付、支付宝等外部第三方支付接口接入；在手机端已经实现搜索、扫码、加入购物车、采购结算、查看订单以及部分基础数据统计功能，但是在基础信息管理、复杂报表展示及系统设置等方面还是不如网页版。
+系统采用单体架构造成各模块间耦合度过大；支付过程仅模拟了业务流程，未实际接入微信支付、支付宝等外部第三方支付接口；在移动端已经实现搜索、扫码、加入购物车、采购结算、查看订单以及部分基础数据统计功能，但在基础信息管理、复杂报表展示及系统设置等方面，其功能完整性仍不及网页版。
 
 ### 5.2 进一步改进设想
 
-可拆分为微服务架构降低模块耦合度，围绕高频业务链路开展性能优化与代码重构；支付能力方面，后续可在具备企业资质与合规条件后接入微信、支付宝SDK，实现从模拟支付到真实支付闭环；界面设计方面也需要进一步改进，以提供更美观、友好、便捷的用户体验；系统的可操作性和简洁性也需要进一步提高，以方便商家们快速上手并高效地进行订单处理和商品管理。
+可将单体架构重构为微服务架构以降低模块耦合度，并围绕高频业务链路进行性能优化与代码重构；支付能力方面，后续可在具备企业资质与合规条件后接入微信、支付宝SDK，实现从模拟支付到真实支付闭环；界面设计方面也需要进一步改进，以提供更美观、友好、便捷的用户体验；系统的可操作性和简洁性也需要进一步提高，以方便商家们快速上手并高效地进行订单处理和商品管理。
 
 ### 5.3 经验与体会
 
@@ -1668,11 +1668,11 @@ onScan()
 
 通过星络收银系统的开发实践，使我在技术能力与工程化思维方面均有所提升。在本项目中，前端（Web端Vue.js+Element UI、移动端Uni-App）与后端（Spring Boot RESTful API）通过统一接口规范协同交互，Web端主要使用Axios发起请求，移动端则主要以uni.request的形式来请求API。同时，系统通过CorsFilter处理跨域请求，并基于JWT实现无状态认证，从而支持前后端并行开发与独立部署，提升了开发效率和系统可维护性。
 
-掌握复杂的业务场景下一致性控制的方法，在一张购货单的保存过程中需要进行保存主表(bc_purchase)、商品明细(wc_issue_product)、账户流水(fc_account_record)、应付账款(fc_payable)、库存更新(wc_stock)以及出入库记录(wc_stock_record)的操作，都必须在一个业务事务里面完成。利用命令执行链与服务层合作解决重要的写入操作，不在重要流程上增加过多的时间开销，理解了ACID特性在真实的业务中是如何被使用的。
+掌握了在复杂业务场景下一致性控制的方法。例如，在保存一张购货单时，需要同时保存主表购货单(bc_purchase)、商品明细(wc_issue_product)、账户流水(fc_account_record)、应付账款(fc_payable)、库存更新(wc_stock)以及出入库记录(wc_stock_record)，都必须在一个业务事务里面完成。利用命令执行链与服务层协作处理关键的写入操作，避免在重要流程上引入过多的时间开销，进而深刻地理解了ACID特性在真实业务场景中的应用方式。
 
 学习数据库设计中的规范化与性能权衡，系统核心业务数据表共有35张，总体上采用第三范式降低冗余度，在某些高频率业务操作上适当做出妥协并且给一些如issue_date、customer_id等常用查询字段加索引，使用EXPLAIN分析慢查询，体会到数据库设计需要兼顾规范化和性能这两者之间的关系。
 
-认识到了模块化设计以及代码重用的重要性，六个模块（uc/rc/bc/wc/fc/sc）各司其职，后台使用Command模式（CPurchaseSave、CSaleSave）包装业务逻辑，结构简洁利于后期开发及维护。体会到移动端开发的特殊性，Uni-App的生命周期管理、性能优化、用户体验都与Web端不同，uni.scanCode()调用微信原生能力比Web端ZXing库体验更好。
+认识到了模块化设计以及代码重用的重要性，六个模块（bc/fc/rc/sc/uc/wc）各司其职，后台使用Command模式（CPurchaseSave、CSaleSave）包装业务逻辑，结构简洁利于后期开发及维护。体会到移动端开发的特殊性，Uni-App的生命周期管理、性能优化、用户体验都与Web端不同，uni.scanCode()调用微信原生能力比Web端ZXing库体验更好。
 
 培养了工程化思维和问题解决能力，从需求分析到设计先行，使用Git版本控制和分支策略，编写详细的API文档和数据库文档，通过JUnit单元测试和接口测试保障代码质量。遇到JWT过期处理、Vue组件通信、MySQL事务隔离等问题时，通过查阅官方文档、搜索技术社区、阅读Spring Security和MyBatis-Plus源码、使用断点调试和日志定位等方式独立解决，养成了持续学习的习惯。同时，也认识到规范化文档沉淀与日志归档的重要性，应逐步形成可追溯的数字档案管理体系[15]。
 

@@ -6,22 +6,25 @@
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
     <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.Store">
-        SELECT p.* from wc_store p left join
-        uc_supplier s on p.supplierId = s.id WHERE 1 = 1
+        SELECT st.* from wc_store st left join
+        uc_supplier su on st.supplierId = su.id WHERE 1 = 1
+        <!-- 根据 “单据编号”、“供应商编号”、“供应商名称” 查询！ -->
         <if test="query.name != null and query.name != ''">
             AND (
-              p.`code` LIKE concat('%', #{query.name}, '%') OR
-              s.`name` LIKE concat('%', #{query.name}, '%') OR
-              s.`code` LIKE concat('%', #{query.name}, '%')
-              )
+            st.`code` LIKE concat('%', #{query.name}, '%') OR
+            su.`code` LIKE concat('%', #{query.name}, '%') OR
+            su.`name` LIKE concat('%', #{query.name}, '%')
+            )
         </if>
+        <!-- 根据 “startDate” <= “单据日期”wc_store.issueDate <= “endDate” 查询！ -->
         <if test="query.startDate != null and query.startDate != ''">
-            AND p.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
+            AND st.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
         </if>
         <if test="query.endDate != null and query.endDate != ''">
-            AND p.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
+            AND st.`issueDate` <![CDATA[ <= ]]> #{query.endDate}
         </if>
-        ORDER BY p.createdTime DESC
+        <!-- 根据 “createdTime” 降序！ -->
+        ORDER BY st.createdTime DESC
     </select>
 
 </mapper>

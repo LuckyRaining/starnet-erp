@@ -38,7 +38,7 @@ public class StockServiceImpl extends ServiceImpl<StockDao, Stock> implements St
         stock.setAmount(Define.STOCK_TYPE_IN.equals(stockType) ?
                 stock.getAmount() + issueProduct.getAmount() : stock.getAmount() - issueProduct.getAmount());
 
-        saveOrUpdate(stock);
+        saveOrUpdate(stock); // == this.saveOrUpdate(stock);
 
         // 处理出入库记录
         StockRecord record = new StockRecord();

@@ -13,6 +13,7 @@ import java.util.Random;
 @Command
 public class CPurchaseCreateCode extends BaseCommand {
 
+    // 将当前日期格式化为 -> 17位的时间戳
     private static SimpleDateFormat codeFormatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private static Random random = new Random();
 
@@ -23,6 +24,7 @@ public class CPurchaseCreateCode extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+        // PL + 17位时间戳 + 2位随机数(0-9 + 0-9)
         String code = "PL" + codeFormatter.format(new Date()) + random.nextInt(10) + random.nextInt(10);
 
         data.put("code", code);

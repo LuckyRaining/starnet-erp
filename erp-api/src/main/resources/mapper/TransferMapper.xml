@@ -5,18 +5,22 @@
 
     <resultMap type="com.alibaba.fastjson.JSONObject" id="resultObj"></resultMap>
 
-    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.Transfer">
-        SELECT s.* from wc_transfer s WHERE 1 = 1
+    <select id="queryPage" parameterType="com.alibaba.fastjson.JSONObject"
+            resultType="net.starnet.erp.wc.model.Transfer">
+        SELECT t.* from wc_transfer t WHERE 1 = 1
+        <!-- 根据 “单据编号” 查询！ -->
         <if test="query.name != null and query.name != ''">
-            AND s.`code` LIKE concat('%', #{query.name}, '%')
+            AND t.`code` LIKE concat('%', #{query.name}, '%')
         </if>
+        <!-- 根据 “startDate” <= “单据日期”wc_transfer.issueDate <= “endDate” 查询！ -->
         <if test="query.startDate != null and query.startDate != ''">
-            AND s.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
+            AND t.`issueDate` <![CDATA[ >= ]]> #{query.startDate}
         </if>
         <if test="query.endDate != null and query.endDate != ''">
-            AND s.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
+            AND t.`issueDate` <![CDATA[ <= ]]> #{query.endDate}
         </if>
-        ORDER BY s.createdTime DESC
+        <!-- 根据 “createdTime” 降序！ -->
+        ORDER BY t.createdTime DESC
     </select>
 
 </mapper>

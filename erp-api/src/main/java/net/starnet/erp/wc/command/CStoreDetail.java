@@ -48,6 +48,9 @@ public class CStoreDetail extends BaseCommand {
         Store store = storeService.getById(storeId);
         Assert.notNull(store, "ID为【" + storeId + "】的入库订单不存在！");
 
+        // 1. 获取 商品列表 productList；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
+        // 3. 然后添加到 入库订单 store 下
         List<IssueProduct> productList = issueProductService.findListByBusiness(store.getId());
         for (IssueProduct storeProduct : productList) {
             Product product = productService.getById(storeProduct.getProductId());
@@ -64,6 +67,7 @@ public class CStoreDetail extends BaseCommand {
         }
         store.put("productList", productList);
 
+        // 将 入库订单 store 作为 查询结果 Result，并用 response 返回给前端
         data.put("store", store);
     }
 }
