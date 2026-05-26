@@ -53,4 +53,9 @@ public class CheckoutController extends BaseController {
         return doAction(CCheckoutDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CCheckoutSwitchCheck.class);
+    }
+
 }

@@ -112,6 +112,7 @@ public class COrderSave extends BaseCommand {
         persistedOrder.setQuantity(getQuantity());
         persistedOrder.setDiscountRate(order.getDiscountRate());
         persistedOrder.setListerId(order.getListerId());
+        persistedOrder.setAuditorId(order.getAuditorId());
         persistedOrder.setRemark(order.getRemark()); // 实则新建 客户订单 时，并不会 备注
         // 新增/更新 客户订单 bc_order
         orderService.saveOrUpdate(persistedOrder);

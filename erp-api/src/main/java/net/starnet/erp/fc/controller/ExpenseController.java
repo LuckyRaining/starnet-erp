@@ -52,4 +52,9 @@ public class ExpenseController extends BaseController {
         return doAction(CExpenseDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CExpenseSwitchCheck.class);
+    }
+
 }

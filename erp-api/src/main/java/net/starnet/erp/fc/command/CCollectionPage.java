@@ -56,6 +56,7 @@ public class CCollectionPage extends BaseCommand {
 
         Customer customer;
         User lister;
+        User auditor;
         for (Collection collection : collectionPage.getRecords()) {
             customer = customerService.getById(collection.getCustomerId());
             collection.put("customerName", customer.getName());
@@ -63,6 +64,11 @@ public class CCollectionPage extends BaseCommand {
             if (StrKit.notBlank(collection.getListerId())) {
                 lister = userService.getById(collection.getListerId());
                 collection.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(collection.getAuditorId())) {
+                auditor = userService.getById(collection.getAuditorId());
+                collection.put("auditorName", auditor.getName());
             }
         }
 

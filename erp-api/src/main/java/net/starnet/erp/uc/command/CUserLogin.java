@@ -69,6 +69,21 @@ public class CUserLogin extends BaseCommand {
             logService.logUserLogin(Long.parseLong(user.getId()), user.getUsername(), 2);
         }
 
+        // 返回 token 信息
         data.put("token", token);
+
+
+        // JSONObject loginUser = new JSONObject();
+        // loginUser.put("id", user.getId());
+        // loginUser.put("username", user.getUsername());
+        // loginUser.put("name", user.getName());
+        // loginUser.put("mobile", user.getMobile());
+        User loginUser = new User();
+        loginUser.setId(user.getId());
+        loginUser.setUsername(user.getUsername());
+        loginUser.setName(user.getName());
+        loginUser.setMobile(user.getMobile());
+        // 返回 当前登录用户 的信息
+        data.put("user", loginUser);
     }
 }

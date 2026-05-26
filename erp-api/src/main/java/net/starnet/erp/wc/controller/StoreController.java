@@ -53,4 +53,9 @@ public class StoreController extends BaseController {
         return doAction(CStoreDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CStoreSwitchCheck.class);
+    }
+
 }

@@ -57,6 +57,16 @@ public class Checkout extends BaseModel<Checkout> {
     private String listerId;
 
     /**
+     * 审核人ID
+     */
+    private String auditorId;
+
+    /**
+     * 审核状态
+     */
+    private boolean checked;
+
+    /**
      * 备注
      */
     private String remark;

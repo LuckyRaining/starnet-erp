@@ -56,6 +56,7 @@ public class CIncomePage extends BaseCommand {
 
         Customer customer;
         User lister;
+        User auditor;
         for (Income income : incomePage.getRecords()) {
             customer = customerService.getById(income.getCustomerId());
             income.put("customerName", customer.getName());
@@ -63,6 +64,11 @@ public class CIncomePage extends BaseCommand {
             if (StrKit.notBlank(income.getListerId())) {
                 lister = userService.getById(income.getListerId());
                 income.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(income.getAuditorId())) {
+                auditor = userService.getById(income.getAuditorId());
+                income.put("auditorName", auditor.getName());
             }
         }
 

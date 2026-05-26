@@ -232,10 +232,40 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="制单人"
-                          prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+                          prop="listerId">
+              <el-select v-model="saveForm.listerId"
+                         placeholder="请选择制单人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="审核人"
+                          prop="auditorId">
+              <el-select v-model="saveForm.auditorId"
+                         placeholder="请选择审核人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="订单备注"
+                          prop="remark">
+              <el-input v-model="saveForm.remark"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -294,7 +324,10 @@
 </template>
 
 <script>
+import orderSaveUserMixin from '@/mixins/orderSaveUser'
+
 export default {
+  mixins: [orderSaveUserMixin],
   data() {
     return {
       // 客户列表
@@ -355,6 +388,7 @@ export default {
       }
 
       this.saveForm.code = result.data.code
+      this.applyDefaultLister()
     },
     // 获取结算账户列表
     async getAccountList() {

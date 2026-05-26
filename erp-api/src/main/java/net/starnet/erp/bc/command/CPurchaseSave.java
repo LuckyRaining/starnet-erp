@@ -133,6 +133,7 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setDebtAmount(purchase.getDebtAmount());
         persistedPurchase.setContracts(purchase.getContracts());
         persistedPurchase.setListerId(purchase.getListerId());
+        persistedPurchase.setAuditorId(purchase.getAuditorId());
         persistedPurchase.setRemark(purchase.getRemark()); // 实则新建 购货单 时，并不会 备注
         // 新增/更新 购货单 bc_purchase
         purchaseService.saveOrUpdate(persistedPurchase);

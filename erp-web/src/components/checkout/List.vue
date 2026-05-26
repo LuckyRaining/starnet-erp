@@ -73,6 +73,17 @@
         <el-table-column label="制单人"
                          prop="listerName">
         </el-table-column>
+        <el-table-column label="审核人"
+                         prop="auditorName">
+        </el-table-column>
+        <el-table-column label="审核状态"
+                         width="70px">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.checked"
+                       @change="checkedSwitch(scope.row)">
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="备注"
                          prop="remark">
         </el-table-column>
@@ -184,6 +195,18 @@ export default {
         path: '/checkout/save',
         query: { checkoutId }
       })
+    },
+    // 出库单审核状态改变
+    async checkedSwitch (checkout) {
+      const { data: result } = await this.$http.post('/checkout/switchCheck', {
+        checkoutId: checkout.id
+      })
+      if (!result.success) {
+        checkout.checked = !checkout.checked
+        return this.$message.error('更新审核状态失败！')
+      }
+      checkout.checked = result.data.checkout.checked
+      this.$message.success('更新审核状态成功！')
     },
     // 删除出库单
     async deleteCheckout(checkoutId) {

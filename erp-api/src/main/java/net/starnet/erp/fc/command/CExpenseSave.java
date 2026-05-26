@@ -54,6 +54,9 @@ public class CExpenseSave extends BaseCommand {
             // 校验编码是否合法
             validateCode(expense.getCode());
             persistedExpense.setCode(expense.getCode());
+            
+            // 初始化 支出单 的 checked 为 false
+            persistedExpense.setChecked(false);
 
         } else {
             persistedExpense = expenseService.getById(expense.getId());
@@ -70,6 +73,7 @@ public class CExpenseSave extends BaseCommand {
         persistedExpense.setIssueDate(expense.getIssueDate());
         persistedExpense.setPaidAmount(expense.getPaidAmount());
         persistedExpense.setListerId(expense.getListerId());
+        persistedExpense.setAuditorId(expense.getAuditorId());
         persistedExpense.setRemark(expense.getRemark());
         expenseService.saveOrUpdate(persistedExpense);
 

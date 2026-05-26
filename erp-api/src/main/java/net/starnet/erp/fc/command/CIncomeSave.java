@@ -54,6 +54,9 @@ public class CIncomeSave extends BaseCommand {
             // 校验编码是否合法
             validateCode(income.getCode());
             persistedIncome.setCode(income.getCode());
+            
+            // 初始化 收入单 的 checked 为 false
+            persistedIncome.setChecked(false);
 
         } else {
             persistedIncome = incomeService.getById(income.getId());
@@ -70,6 +73,7 @@ public class CIncomeSave extends BaseCommand {
         persistedIncome.setIssueDate(income.getIssueDate());
         persistedIncome.setCollectAmount(income.getCollectAmount());
         persistedIncome.setListerId(income.getListerId());
+        persistedIncome.setAuditorId(income.getAuditorId());
         persistedIncome.setRemark(income.getRemark());
         incomeService.saveOrUpdate(persistedIncome);
 

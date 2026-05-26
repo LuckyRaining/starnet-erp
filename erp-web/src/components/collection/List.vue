@@ -60,6 +60,17 @@
         <el-table-column label="制单人"
                          prop="listerName">
         </el-table-column>
+        <el-table-column label="审核人"
+                         prop="auditorName">
+        </el-table-column>
+        <el-table-column label="审核状态"
+                         width="70px">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.checked"
+                       @change="checkedSwitch(scope.row)">
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="备注"
                          prop="remark">
         </el-table-column>
@@ -171,6 +182,18 @@ export default {
         path: '/collection/save',
         query: { collectionId }
       })
+    },
+    // 收款单审核状态改变
+    async checkedSwitch (collection) {
+      const { data: result } = await this.$http.post('/collection/switchCheck', {
+        collectionId: collection.id
+      })
+      if (!result.success) {
+        collection.checked = !collection.checked
+        return this.$message.error('更新审核状态失败！')
+      }
+      collection.checked = result.data.collection.checked
+      this.$message.success('更新审核状态成功！')
     },
     // 删除收款单
     async deleteCollection(collectionId) {

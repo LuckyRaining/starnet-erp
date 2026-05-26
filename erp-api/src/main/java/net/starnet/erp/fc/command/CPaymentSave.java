@@ -57,6 +57,9 @@ public class CPaymentSave extends BaseCommand {
             // 校验编码是否合法
             validateCode(payment.getCode());
             persistedPayment.setCode(payment.getCode());
+            
+            // 初始化 付款单 的 checked 为 false
+            persistedPayment.setChecked(false);
 
         } else {
             persistedPayment = paymentService.getById(payment.getId());
@@ -79,6 +82,7 @@ public class CPaymentSave extends BaseCommand {
         persistedPayment.setCurrentVerifiedAmount(payment.getCurrentVerifiedAmount());
         persistedPayment.setAdvancePaidAmount(payment.getAdvancePaidAmount());
         persistedPayment.setListerId(payment.getListerId());
+        persistedPayment.setAuditorId(payment.getAuditorId());
         persistedPayment.setRemark(payment.getRemark());
         paymentService.saveOrUpdate(persistedPayment);
 

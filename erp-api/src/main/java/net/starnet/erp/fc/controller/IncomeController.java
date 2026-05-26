@@ -52,4 +52,9 @@ public class IncomeController extends BaseController {
         return doAction(CIncomeDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CIncomeSwitchCheck.class);
+    }
+
 }

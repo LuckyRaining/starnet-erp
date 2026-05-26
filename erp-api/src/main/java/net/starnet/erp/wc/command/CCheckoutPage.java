@@ -56,6 +56,7 @@ public class CCheckoutPage extends BaseCommand {
 
         Customer customer;
         User lister;
+        User auditor;
         for (Checkout checkout : checkoutPage.getRecords()) {
             customer = customerService.getById(checkout.getCustomerId());
             checkout.put("customerName", customer.getName());
@@ -63,6 +64,11 @@ public class CCheckoutPage extends BaseCommand {
             if (StrKit.notBlank(checkout.getListerId())) {
                 lister = userService.getById(checkout.getListerId());
                 checkout.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(checkout.getAuditorId())) {
+                auditor = userService.getById(checkout.getAuditorId());
+                checkout.put("auditorName", auditor.getName());
             }
         }
 

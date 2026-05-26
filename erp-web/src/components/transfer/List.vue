@@ -66,6 +66,17 @@
         <el-table-column label="制单人"
                          prop="listerName">
         </el-table-column>
+        <el-table-column label="审核人"
+                         prop="auditorName">
+        </el-table-column>
+        <el-table-column label="审核状态"
+                         width="70px">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.checked"
+                       @change="checkedSwitch(scope.row)">
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="备注"
                          prop="remark">
         </el-table-column>

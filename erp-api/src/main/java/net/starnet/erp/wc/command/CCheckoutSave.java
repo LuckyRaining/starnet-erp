@@ -79,7 +79,8 @@ public class CCheckoutSave extends BaseCommand {
             validateCheckoutCode(checkout.getCode());
             persistedCheckout.setCode(checkout.getCode());
 
-            // ！不涉及！ 初始化 入库单 的 checked 为 false
+            // 初始化 出库单 的 checked 为 false
+            persistedCheckout.setChecked(false);
 
         } else { // checkout.id 非空时，即传了，为“更新”的意思
             persistedCheckout = checkoutService.getById(checkout.getId());
@@ -109,6 +110,7 @@ public class CCheckoutSave extends BaseCommand {
         persistedCheckout.setAmount(getAmount());
         persistedCheckout.setQuantity(getQuantity());
         persistedCheckout.setListerId(checkout.getListerId());
+        persistedCheckout.setAuditorId(checkout.getAuditorId());
         persistedCheckout.setRemark(checkout.getRemark()); // 实则新建 出库单 时，并不会 备注
         // 新增/更新 出库单 wc_checkout
         checkoutService.saveOrUpdate(persistedCheckout);

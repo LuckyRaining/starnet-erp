@@ -114,7 +114,7 @@
               <el-select v-model="saveForm.accountId"
                          placeholder="请选择结算账户"
                          @change="selectAccountChanged">
-                <el-option v-for="account in accountList"
+                <el-option v-for="account in settlementAccountList"
                            :key="account.id"
                            :label="account.name"
                            :value="account.id">
@@ -130,10 +130,40 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="制单人"
-                          prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+                          prop="listerId">
+              <el-select v-model="saveForm.listerId"
+                         placeholder="请选择制单人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="审核人"
+                          prop="auditorId">
+              <el-select v-model="saveForm.auditorId"
+                         placeholder="请选择审核人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="订单备注"
+                          prop="remark">
+              <el-input v-model="saveForm.remark"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -150,12 +180,20 @@
 </template>
 
 <script>
+import orderSaveUserMixin from '@/mixins/orderSaveUser'
+import orderSaveSettlementMixin from '@/mixins/orderSaveSettlement'
+
 export default {
+  mixins: [orderSaveUserMixin, orderSaveSettlementMixin],
+  watch: {
+    '$route' () {
+      this.bootstrapExpensePage()
+    }
+  },
   data() {
     return {
       // 供应商列表
       supplierList: [],
-      accountList: [],
       categoryList: [],
       saveForm: {
         paidAmount: 0.0,
@@ -165,20 +203,28 @@ export default {
       saveFormRules: {}
     }
   },
-  created() {
-    let expenseId = this.$route.query.expenseId
-    if (expenseId !== undefined) {
-      console.log(expenseId)
-      this.getDetail(expenseId)
-    } else {
-      this.getCode()
-    }
 
-    this.getSupplierList()
-    this.getAccountList()
-    this.getCategoryList()
+  created() {
+    this.bootstrapExpensePage()
   },
+
   methods: {
+    bootstrapExpensePage() {
+      const expenseId = this.$route.query.expenseId
+      if (expenseId !== undefined) { // 如果存在 if，则调用后端API，获取 其他支出单 详细信息
+        console.log(expenseId)
+        this.getExpenseDetail(expenseId)
+      } else { // 如果不存在 else，则调用后端API，生成新的 其他支出单 单据编号
+        this.getExpenseCode()
+      }
+
+      // 获取 供应商 列表
+      this.getSupplierList()
+      // 获取 其他支出 分类列表
+      this.getCategoryList()
+      // 获取 结算账户 列表
+      this.getSettlementAccountList()
+    },
     // 获取供应商列表
     async getSupplierList() {
       const { data: result } = await this.$http.post('/supplier/page', {
@@ -190,7 +236,7 @@ export default {
       this.supplierList = result.data.supplierPage.records
     },
     // 获取单据编号
-    async getCode() {
+    async getExpenseCode() {
       const { data: result } = await this.$http.post('/expense/createCode')
       if (!result.success) return this.$message.error(result.message)
 
@@ -202,8 +248,9 @@ export default {
       }
 
       this.saveForm.code = result.data.code
+      this.applyDefaultLister()
     },
-    // 获取分类列表
+    // 获取 其他收入 分类列表
     async getCategoryList() {
       const { data: result } = await this.$http.post('/category/list', {
         type: 40
@@ -211,13 +258,6 @@ export default {
       if (!result.success) return this.$message.error(result.message)
 
       this.categoryList = result.data.categoryList
-    },
-    // 获取结算账户列表
-    async getAccountList() {
-      const { data: result } = await this.$http.post('/settlementAccount/list')
-      if (!result.success) return this.$message.error(result.message)
-
-      this.accountList = result.data.accountList
     },
     // 选择了结算账户
     selectAccountChanged(accountId) {
@@ -228,7 +268,7 @@ export default {
       this.saveForm.accountList.push(account)
     },
     // 获取详情
-    async getDetail(id) {
+    async getExpenseDetail(id) {
       const { data: result } = await this.$http.post('/expense/detail', {
         expenseId: id
       })
@@ -236,6 +276,7 @@ export default {
 
       console.log(result.data)
       this.saveForm = result.data.expense
+      this.applyAccountIdFromSaveForm()
     },
 
     // 新增记录行

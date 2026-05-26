@@ -52,4 +52,9 @@ public class PaymentController extends BaseController {
         return doAction(CPaymentDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CPaymentSwitchCheck.class);
+    }
+
 }

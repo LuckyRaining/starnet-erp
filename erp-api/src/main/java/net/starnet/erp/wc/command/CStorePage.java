@@ -56,6 +56,7 @@ public class CStorePage extends BaseCommand {
 
         Supplier supplier;
         User lister;
+        User auditor;
         for (Store store : storePage.getRecords()) {
             supplier = supplierService.getById(store.getSupplierId());
             store.put("supplierName", supplier.getName());
@@ -63,6 +64,11 @@ public class CStorePage extends BaseCommand {
             if (StrKit.notBlank(store.getListerId())) {
                 lister = userService.getById(store.getListerId());
                 store.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(store.getAuditorId())) {
+                auditor = userService.getById(store.getAuditorId());
+                store.put("auditorName", auditor.getName());
             }
         }
 

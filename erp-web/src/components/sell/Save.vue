@@ -198,7 +198,7 @@
               <el-select v-model="saveForm.accountId"
                          placeholder="请选择结算账户"
                          @change="selectAccountChanged">
-                <el-option v-for="account in accountList"
+                <el-option v-for="account in settlementAccountList"
                            :key="account.id"
                            :label="account.name"
                            :value="account.id">
@@ -223,10 +223,40 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="制单人"
-                          prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+                          prop="listerId">
+              <el-select v-model="saveForm.listerId"
+                         placeholder="请选择制单人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="审核人"
+                          prop="auditorId">
+              <el-select v-model="saveForm.auditorId"
+                         placeholder="请选择审核人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="订单备注"
+                          prop="remark">
+              <el-input v-model="saveForm.remark"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -359,10 +389,17 @@
 <script>
 import Vue from 'vue'
 import SelectProductDialog from '../common/SelectProductDialog'
+
+import orderSaveUserMixin from '@/mixins/orderSaveUser'
+import orderSaveSettlementMixin from '@/mixins/orderSaveSettlement'
 Vue.component('select-product-dialog', SelectProductDialog)
 
 export default {
+  mixins: [orderSaveUserMixin, orderSaveSettlementMixin],
   watch: {
+    '$route' () {
+      this.bootstrapSalePage()
+    },
     // 数量/单价变更时，按当前编辑模式自动重算
     'saveProductForm.quantity': 'handleQuantityOrPriceChanged',
     'saveProductForm.price': 'handleQuantityOrPriceChanged',
@@ -388,7 +425,6 @@ export default {
       customerLevelList: [],
       sellerList: [],
       contactList: [],
-      accountList: [],
       saveForm: {
         type: 'sell',
         preferentialRate: 0,
@@ -439,21 +475,30 @@ export default {
     }
   },
   created() {
-    let saleId = this.$route.query.saleId
-    if (saleId !== undefined) {
-      console.log(saleId)
-      this.getDetail(saleId)
-    } else {
-      this.getCode()
-    }
-
-    this.getCustomerList()
-    this.getCustomerLevelList()
-    this.getSellerList()
-    this.getAccountList()
-    this.getWarehouseList()
+    this.bootstrapSalePage()
   },
   methods: {
+    bootstrapSalePage() {
+      const saleId = this.$route.query.saleId
+      if (saleId !== undefined) { // 如果存在 if，则调用后端API，获取 销货单 详细信息
+        console.log(saleId)
+        this.getSaleDetail(saleId)
+      } else { // 如果不存在 else，则调用后端API，生成新的 销货单 单据编号
+        this.getSaleCode()
+      }
+
+      // 获取 客户 列表
+      this.getCustomerList()
+      // 获取 客户等级 列表
+      this.getCustomerLevelList()
+      // 获取 销售人员 列表
+      this.getSellerList()
+      // 获取 仓库 列表
+      this.getWarehouseList()
+      // 获取 结算账户 列表
+      this.getSettlementAccountList()
+    },
+
     // 获取客户列表
     async getCustomerList() {
       const { data: result } = await this.$http.post('/customer/page', {
@@ -464,6 +509,7 @@ export default {
 
       this.customerList = result.data.customerPage.records
     },
+
     // 获取客户等级列表
     async getCustomerLevelList() {
       const { data: result } = await this.$http.post('/dict/itemList', {
@@ -484,7 +530,7 @@ export default {
       this.sellerList = result.data.employeePage.records
     },
     // 获取单据编号
-    async getCode() {
+    async getSaleCode() {
       const { data: result } = await this.$http.post('/sale/createCode', {
         type: 'sell'
       })
@@ -504,17 +550,11 @@ export default {
       }
 
       this.saveForm.code = result.data.code
+      this.applyDefaultLister()
       this.recalculateSettlementByMode()
     },
-    // 获取结算账户列表
-    async getAccountList() {
-      const { data: result } = await this.$http.post('/settlementAccount/list')
-      if (!result.success) return this.$message.error(result.message)
-
-      this.accountList = result.data.accountList
-    },
     // 获取详情
-    async getDetail(id) {
+    async getSaleDetail(id) {
       const { data: result } = await this.$http.post('/sale/detail', {
         saleId: id
       })
@@ -522,6 +562,7 @@ export default {
 
       console.log(result.data)
       this.saveForm = result.data.sale
+      this.applyAccountIdFromSaveForm()
       this.recalculateSettlementByMode()
     },
 
@@ -582,7 +623,7 @@ export default {
     // 保存并新增
     async saveThenNew() {
       this.save()
-      this.getCode()
+      this.getSaleCode()
     },
     // 显示保存商品对话框
     showProductAddDialog() {

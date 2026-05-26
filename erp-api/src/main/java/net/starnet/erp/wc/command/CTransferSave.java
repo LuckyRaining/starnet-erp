@@ -93,6 +93,7 @@ public class CTransferSave extends BaseCommand {
         persistedTransfer.setIssueDate(transfer.getIssueDate());
         persistedTransfer.setQuantity(getQuantity());
         persistedTransfer.setListerId(transfer.getListerId());
+        persistedTransfer.setAuditorId(transfer.getAuditorId());
         persistedTransfer.setRemark(transfer.getRemark()); // 实则新建 调拨单 时，并不会 备注
         // 新增/更新 调拨单 wc_transfer
         transferService.saveOrUpdate(persistedTransfer);

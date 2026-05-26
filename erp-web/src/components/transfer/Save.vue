@@ -89,10 +89,40 @@
         </el-row>
         <el-divider content-position="left">结算信息</el-divider>
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="制单人"
-                          prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+                          prop="listerId">
+              <el-select v-model="saveForm.listerId"
+                         placeholder="请选择制单人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="审核人"
+                          prop="auditorId">
+              <el-select v-model="saveForm.auditorId"
+                         placeholder="请选择审核人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="订单备注"
+                          prop="remark">
+              <el-input v-model="saveForm.remark"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -206,7 +236,10 @@ import Vue from 'vue'
 import SelectProductDialog from '../common/SelectProductDialog'
 Vue.component('select-product-dialog', SelectProductDialog)
 
+import orderSaveUserMixin from '@/mixins/orderSaveUser'
+
 export default {
+  mixins: [orderSaveUserMixin],
   data() {
     return {
       saveForm: {
@@ -259,6 +292,7 @@ export default {
       }
 
       this.saveForm.code = result.data.code
+      this.applyDefaultLister()
     },
     // 获取详情
     async getDetail(id) {

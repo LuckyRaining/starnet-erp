@@ -56,6 +56,7 @@ public class CPaymentPage extends BaseCommand {
 
         Supplier supplier;
         User lister;
+        User auditor;
         for (Payment payment : paymentPage.getRecords()) {
             supplier = supplierService.getById(payment.getSupplierId());
             payment.put("supplierName", supplier.getName());
@@ -63,6 +64,11 @@ public class CPaymentPage extends BaseCommand {
             if (StrKit.notBlank(payment.getListerId())) {
                 lister = userService.getById(payment.getListerId());
                 payment.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(payment.getAuditorId())) {
+                auditor = userService.getById(payment.getAuditorId());
+                payment.put("auditorName", auditor.getName());
             }
         }
 

@@ -79,7 +79,8 @@ public class CStoreSave extends BaseCommand {
             validateStoreCode(store.getCode());
             persistedStore.setCode(store.getCode());
 
-            // ！不涉及！ 初始化 入库单 的 checked 为 false
+            // 初始化 入库单 的 checked 为 false
+            persistedStore.setChecked(false);
 
         } else { // store.id 非空时，即传了，为“更新”的意思
             persistedStore = storeService.getById(store.getId());
@@ -109,6 +110,7 @@ public class CStoreSave extends BaseCommand {
         persistedStore.setAmount(getAmount());
         persistedStore.setQuantity(getQuantity());
         persistedStore.setListerId(store.getListerId());
+        persistedStore.setAuditorId(store.getAuditorId());
         persistedStore.setRemark(store.getRemark()); // 实则新建 入库单 时，并不会 备注
         // 新增/更新 入库单 wc_store
         storeService.saveOrUpdate(persistedStore);

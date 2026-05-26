@@ -56,6 +56,7 @@ public class CExpensePage extends BaseCommand {
 
         Supplier supplier;
         User lister;
+        User auditor;
         for (Expense expense : expensePage.getRecords()) {
             supplier = supplierService.getById(expense.getSupplierId());
             expense.put("supplierName", supplier.getName());
@@ -63,6 +64,11 @@ public class CExpensePage extends BaseCommand {
             if (StrKit.notBlank(expense.getListerId())) {
                 lister = userService.getById(expense.getListerId());
                 expense.put("listerName", lister.getName());
+            }
+
+            if (StrKit.notBlank(expense.getAuditorId())) {
+                auditor = userService.getById(expense.getAuditorId());
+                expense.put("auditorName", auditor.getName());
             }
         }
 

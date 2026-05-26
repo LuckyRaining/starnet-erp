@@ -57,6 +57,9 @@ public class CCollectionSave extends BaseCommand {
             // 校验编码是否合法
             validateCode(collection.getCode());
             persistedCollection.setCode(collection.getCode());
+            
+            // 初始化 收款单 的 checked 为 false
+            persistedCollection.setChecked(false);
 
         } else {
             persistedCollection = collectionService.getById(collection.getId());
@@ -79,6 +82,7 @@ public class CCollectionSave extends BaseCommand {
         persistedCollection.setCurrentVerifiedAmount(collection.getCurrentVerifiedAmount());
         persistedCollection.setAdvanceCollectAmount(collection.getAdvanceCollectAmount());
         persistedCollection.setListerId(collection.getListerId());
+        persistedCollection.setAuditorId(collection.getAuditorId());
         persistedCollection.setRemark(collection.getRemark());
         collectionService.saveOrUpdate(persistedCollection);
 

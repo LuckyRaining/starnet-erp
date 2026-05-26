@@ -138,6 +138,7 @@ public class CSaleSave extends BaseCommand {
         persistedSale.setDebtAmount(sale.getDebtAmount());
         persistedSale.setAttachments(sale.getAttachments());
         persistedSale.setListerId(sale.getListerId());
+        persistedSale.setAuditorId(sale.getAuditorId());
         persistedSale.setRemark(sale.getRemark()); // 实则新建 销货单 时，并不会 备注
 
         persistedSale.setSellerId(sale.getSellerId());

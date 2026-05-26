@@ -52,4 +52,9 @@ public class CollectionController extends BaseController {
         return doAction(CCollectionDelete.class);
     }
 
+    @PostMapping("/switchCheck")
+    public Result switchCheck() {
+        return doAction(CCollectionSwitchCheck.class);
+    }
+
 }

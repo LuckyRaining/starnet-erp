@@ -148,7 +148,7 @@
               <el-select v-model="saveForm.accountId"
                          placeholder="请选择结算账户"
                          @change="selectAccountChanged">
-                <el-option v-for="account in accountList"
+                <el-option v-for="account in settlementAccountList"
                            :key="account.id"
                            :label="account.name"
                            :value="account.id">
@@ -174,8 +174,38 @@
         <el-row>
           <el-col :span="5">
             <el-form-item label="制单人"
-                          prop="listerName">
-              <el-input v-model="saveForm.listName"></el-input>
+                          prop="listerId">
+              <el-select v-model="saveForm.listerId"
+                         placeholder="请选择制单人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="审核人"
+                          prop="auditorId">
+              <el-select v-model="saveForm.auditorId"
+                         placeholder="请选择审核人"
+                         filterable
+                         clearable>
+                <el-option v-for="user in userList"
+                           :key="user.id"
+                           :label="userDisplayName(user)"
+                           :value="user.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="订单备注"
+                          prop="remark">
+              <el-input v-model="saveForm.remark"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -310,8 +340,15 @@ import Vue from 'vue'
 import SelectProductDialog from '../common/SelectProductDialog'
 Vue.component('select-product-dialog', SelectProductDialog)
 
+import orderSaveUserMixin from '@/mixins/orderSaveUser'
+import orderSaveSettlementMixin from '@/mixins/orderSaveSettlement'
+
 export default {
+  mixins: [orderSaveUserMixin, orderSaveSettlementMixin],
   watch: {
+    '$route' () {
+      this.bootstrapPurchasePage()
+    },
     // 数量/单价变更时，按当前编辑模式自动重算
     'saveProductForm.quantity': 'handleQuantityOrPriceChanged',
     'saveProductForm.price': 'handleQuantityOrPriceChanged',
@@ -334,7 +371,6 @@ export default {
       // 供应商
       supplierList: [],
       purchaseCode: '',
-      accountList: [],
       saveForm: {
         type: 'refund',
         preferentialRate: 0,
@@ -383,19 +419,29 @@ export default {
       isPaymentSyncing: false
     }
   },
-  created() {
-    let purchaseId = this.$route.query.purchaseId
-    if (purchaseId !== undefined) {
-      this.getPurchaseDetail(purchaseId)
-    } else {
-      this.getPurchaseCode()
-    }
 
-    this.getSupplierList()
-    this.getAccountList()
-    this.getWarehouseList()
+  created() {
+    this.bootstrapPurchasePage()
   },
+
   methods: {
+    bootstrapPurchasePage() {
+      const purchaseId = this.$route.query.purchaseId
+      if (purchaseId !== undefined) { // 如果存在 if，则调用后端API，获取 购退单 详细信息
+        console.log(purchaseId)
+        this.getPurchaseDetail(purchaseId)
+      } else { // 如果不存在 else，则调用后端API，生成新的 购退单 单据编号
+        this.getPurchaseCode()
+      }
+
+      // 获取 供应商 列表
+      this.getSupplierList()
+      // 获取 仓库 列表
+      this.getWarehouseList()
+      // 获取 结算账户 列表
+      this.getSettlementAccountList()
+    },
+
     // 获取供应商列表
     async getSupplierList() {
       const { data: result } = await this.$http.post('/supplier/page', {
@@ -424,14 +470,8 @@ export default {
 
       this.purchaseCode = result.data.code
       this.saveForm.code = this.purchaseCode
+      this.applyDefaultLister()
       this.recalculateSettlementByMode()
-    },
-    // 获取结算账户列表
-    async getAccountList() {
-      const { data: result } = await this.$http.post('/settlementAccount/list')
-      if (!result.success) return this.$message.error(result.message)
-
-      this.accountList = result.data.accountList
     },
     // 获取详情
     async getPurchaseDetail(purchaseId) {
@@ -442,6 +482,7 @@ export default {
 
       console.log(result.data)
       this.saveForm = result.data.purchase
+      this.applyAccountIdFromSaveForm()
       this.recalculateSettlementByMode()
     },
     // 选择了结算账户
