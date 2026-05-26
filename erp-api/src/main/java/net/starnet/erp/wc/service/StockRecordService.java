@@ -58,4 +58,19 @@ public interface StockRecordService extends IService<StockRecord> {
      * @return
      */
     List<StockRecord> distinctProductWarehouseIdList(JSONObject query);
+
+    /**
+     * 获取 出入库记录 列表
+     *
+     * @param businessId
+     * @return
+     */
+    List<StockRecord> findListByBusiness(String businessId);
+
+    /**
+     * 根据 业务ID 删除 出入库记录
+     *
+     * @param businessId
+     */
+    void deleteByBusiness(String businessId);
 }

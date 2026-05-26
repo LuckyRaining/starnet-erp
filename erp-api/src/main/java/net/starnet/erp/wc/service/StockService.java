@@ -20,14 +20,24 @@ public interface StockService extends IService<Stock> {
     Stock findByProductAndWarehouse(String productId, String warehouseId);
 
     /**
-     * 处理 库存
+     * 处理 库存：购货为入库，购退为出库
      */
     Stock handleStock(IssueProduct issueProduct, String stockType);
+
+    /**
+     * 回滚 库存 变动（不写入 出入库记录）
+     */
+    void rollbackStock(String businessId);
 
     /**
      * 处理 调拨库存
      *
      * @param transferProduct
      */
-    void handTransferStock(TransferProduct transferProduct);
+    void handleTransferStock(TransferProduct transferProduct);
+
+    /**
+     * 回滚 调拨库存 变动（不写入 出入库记录）
+     */
+    void rollbackTransferStock(String businessId);
 }

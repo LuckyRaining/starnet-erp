@@ -22,6 +22,7 @@ public class PayableServiceImpl extends ServiceImpl<PayableDao, Payable> impleme
         payable.setBusinessId(businessId);
         payable.setIncreasedAmount(increasedAmount);
         payable.setPaidAmount(paidAmount);
+        // 新增 应付账款记录 fc_payable
         save(payable);
     }
 

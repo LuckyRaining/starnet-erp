@@ -1,10 +1,12 @@
 package net.starnet.erp.bc.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.starnet.erp.bc.dao.OrderDao;
 import net.starnet.erp.bc.model.Order;
+import net.starnet.erp.bc.model.Purchase;
 import net.starnet.erp.bc.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,5 +20,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     @Override
     public Page<Order> pageSearch(long current, long size, JSONObject query) {
         return orderDao.queryPage(new Page<>(current, size), query);
+    }
+
+    @Override
+    public Order findByCode(String code) {
+        return getOne(new QueryWrapper<Order>().eq("code", code));
     }
 }

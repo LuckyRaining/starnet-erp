@@ -1,6 +1,7 @@
 package net.starnet.erp.wc.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.starnet.erp.wc.dao.StockRecordDao;
 import net.starnet.erp.wc.model.StockRecord;
@@ -42,5 +43,15 @@ public class StockRecordServiceImpl extends ServiceImpl<StockRecordDao, StockRec
     @Override
     public List<StockRecord> distinctProductWarehouseIdList(JSONObject query) {
         return recordDao.distinctProductWarehouseIdList(query);
+    }
+
+    @Override
+    public List<StockRecord> findListByBusiness(String businessId) {
+        return this.list(new QueryWrapper<StockRecord>().eq("businessId", businessId));
+    }
+
+    @Override
+    public void deleteByBusiness(String businessId) {
+        this.remove(new QueryWrapper<StockRecord>().eq("businessId", businessId));
     }
 }

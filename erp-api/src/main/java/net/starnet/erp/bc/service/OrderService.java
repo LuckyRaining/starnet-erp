@@ -20,4 +20,11 @@ public interface OrderService extends IService<Order> {
      */
     Page<Order> pageSearch(long current, long size, JSONObject query);
 
+    /**
+     * 根据编码获取购货单
+     *
+     * @param code
+     * @return
+     */
+    Order findByCode(String code);
 }

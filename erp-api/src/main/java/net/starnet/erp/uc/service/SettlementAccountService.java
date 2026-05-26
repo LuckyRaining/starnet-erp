@@ -8,4 +8,11 @@ import net.starnet.erp.uc.model.SettlementAccount;
  */
 public interface SettlementAccountService extends IService<SettlementAccount> {
 
+    /**
+     * 回滚业务单据 对应的结算账户余额变动
+     *
+     * @param businessId
+     */
+    void rollbackByBusiness(String businessId);
+
 }

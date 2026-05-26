@@ -13,11 +13,17 @@ import net.starnet.erp.uc.service.SettlementAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class AccountRecordServiceImpl extends ServiceImpl<AccountRecordDao, AccountRecord> implements AccountRecordService {
+
+    private static final SimpleDateFormat codeFormatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private static final Random random = new Random();
 
     @Autowired
     private AccountRecordDao recordDao;
@@ -33,6 +39,13 @@ public class AccountRecordServiceImpl extends ServiceImpl<AccountRecordDao, Acco
     @Override
     public void deleteByBusiness(String businessId) {
         this.remove(new QueryWrapper<AccountRecord>().eq("businessId", businessId));
+    }
+
+    /**
+     * 生成结算号：JS + 17位时间戳 + 2位随机数
+     */
+    private String generateSettlementCode() {
+        return "JS" + codeFormatter.format(new Date()) + random.nextInt(10) + random.nextInt(10);
     }
 
     @Override
@@ -54,26 +67,30 @@ public class AccountRecordServiceImpl extends ServiceImpl<AccountRecordDao, Acco
             persistedRecord.setBusinessId(businessId);
             persistedRecord.setAccountId(record.getAccountId());
 
-            // TODO 校验金额
+            // TODO 校验 结算金额
             persistedRecord.setAmount(record.getAmount());
 
-            persistedRecord.setSettlementCode(record.getSettlementCode());
+            // 自动生成结算号
+            persistedRecord.setSettlementCode(StrKit.isBlank(record.getSettlementCode()) ?
+                    generateSettlementCode() : record.getSettlementCode());
             persistedRecord.setSettlementType(record.getSettlementType());
-            persistedRecord.setRemark(record.getRemark());
 
-            if (Define.ACCOUNT_RECORD_TYPE_IN == type) {
+            if (Define.ACCOUNT_RECORD_TYPE_IN.equals(type)) {
                 account.setCurrentBalance(account.getCurrentBalance() + record.getAmount());
             } else {
                 account.setCurrentBalance(account.getCurrentBalance() - record.getAmount());
             }
 
+            // 更新 结算账户 uc_settlement_account
             accountService.updateById(account);
 
             persistedRecord.setCurrentAmount(account.getCurrentBalance());
+            persistedRecord.setRemark(record.getRemark());
 
             persistedPurchaseAccountList.add(persistedRecord);
         }
 
+        // 新增 单据账户 fc_account_record
         saveBatch(persistedPurchaseAccountList);
     }
 
@@ -91,4 +108,5 @@ public class AccountRecordServiceImpl extends ServiceImpl<AccountRecordDao, Acco
         }
         return this.list(wrapper.orderByAsc("accountId", "issueDate", "createdTime"));
     }
+
 }

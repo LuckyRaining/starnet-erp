@@ -30,8 +30,8 @@ public class CPurchaseFindCheckedListBySupplier extends BaseCommand {
     protected void doCommand() throws Exception {
         List<Purchase> purchaseList = purchaseService.findCheckedListBySupplier(supplierId);
         for (Purchase purchase : purchaseList) {
-            purchase.put("verifiedAmount", 0);
-            purchase.put("unverifiedAmount", 0);
+            // purchase.put("verifiedAmount", 0);
+            // purchase.put("unverifiedAmount", 0);
         }
 
         data.put("purchaseList", purchaseList);
