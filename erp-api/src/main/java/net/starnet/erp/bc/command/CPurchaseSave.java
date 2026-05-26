@@ -114,7 +114,7 @@ public class CPurchaseSave extends BaseCommand {
             // 即 删除 单据账户 fc_account_record
             accountRecordService.deleteByBusiness(purchase.getId());
 
-            // 删除 该单原来的应付账款记录
+            // 删除 该单原来的 应付账款记录
             // 即 删除 应付账款记录 fc_payable
             payableService.deleteByBusiness(purchase.getId());
         }

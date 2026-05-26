@@ -99,7 +99,7 @@ public class CStoreSave extends BaseCommand {
             // ！不涉及！ 删除 该单原来的账户列表 accountList[]
             // ！不涉及！ 即 删除 单据账户 fc_account_record
 
-            // ！不涉及！ 删除 该单原来的应付账款记录
+            // ！不涉及！ 删除 该单原来的 应付账款记录
             // ！不涉及！ 即 删除 应付账款记录 fc_payable
         }
 

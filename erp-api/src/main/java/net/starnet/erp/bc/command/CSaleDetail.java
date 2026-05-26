@@ -52,7 +52,7 @@ public class CSaleDetail extends BaseCommand {
         Sale sale = saleService.getById(saleId);
         Assert.notNull(sale, "ID为【" + saleId + "】的销售订单不存在！");
 
-        // 1. 获取 商品列表 productList；
+        // 1. 获取 商品列表 productList[]；
         // 2. 并添加 商品名称 productName、单位名称 unitName、仓库名称 warehouseName；
         // 3. 然后添加到 销售订单 sale 下
         List<IssueProduct> productList = issueProductService.findListByBusiness(sale.getId());
@@ -71,7 +71,7 @@ public class CSaleDetail extends BaseCommand {
         }
         sale.put("productList", productList);
 
-        // 1. 获取 单据账户列表 accountList；
+        // 1. 获取 单据账户列表 accountList[]；
         // 2. 然后添加到 销售订单 sale 下
         List<AccountRecord> accountList = accountService.findListByBusiness(sale.getId());
         sale.put("accountList", accountList);

@@ -120,7 +120,7 @@ public class CSaleSave extends BaseCommand {
             // 即 删除 单据账户 fc_account_record
             accountRecordService.deleteByBusiness(sale.getId());
 
-            // 删除 该单原来的应收账款记录
+            // 删除 该单原来的 应收账款记录
             // 即 删除 应收账款记录 fc_receivable
             receivableService.deleteByBusiness(sale.getId());
         }

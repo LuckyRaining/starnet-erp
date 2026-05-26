@@ -48,6 +48,9 @@ public class CTransferDetail extends BaseCommand {
         Transfer transfer = transferService.getById(transferId);
         Assert.notNull(transfer, "ID为【" + transferId + "】的调拨订单不存在！");
 
+        // 1. 获取 商品列表 productList[]；
+        // 2. 并添加 商品名称 productName、单位名称 unitName、调出仓库名称 fromWarehouseName、调入仓库名称 toWarehouseName；
+        // 3. 然后添加到 客户订单 order 下
         List<TransferProduct> productList = transferProductService.findListByTransfer(transfer.getId());
         for (TransferProduct transferProduct : productList) {
             Product product = productService.getById(transferProduct.getProductId());
@@ -68,6 +71,7 @@ public class CTransferDetail extends BaseCommand {
         }
         transfer.put("productList", productList);
 
+        // 将 调拨订单 transfer 作为 查询结果 Result，并用 response 返回给前端
         data.put("transfer", transfer);
     }
 }

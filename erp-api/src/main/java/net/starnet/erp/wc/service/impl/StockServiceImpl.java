@@ -116,7 +116,7 @@ public class StockServiceImpl extends ServiceImpl<StockDao, Stock> implements St
             fromStock = new Stock();
             fromStock.setProductId(transferProduct.getProductId());
             fromStock.setWarehouseId(transferProduct.getFromWarehouseId());
-            // 设置 出库仓库 的单价：使用商品的 “预计采购价” 作为库存成本对外展示的 “单价”，而非 “售价” or “批发价”。
+            // 设置 调出仓库 的单价：使用商品的 “预计采购价” 作为库存成本对外展示的 “单价”，而非 “售价” or “批发价”。
             fromStock.setPrice(product.getEstimatedPurchasePrice());
             // fromStock.setPrice(0.0);
         }
@@ -126,7 +126,7 @@ public class StockServiceImpl extends ServiceImpl<StockDao, Stock> implements St
             toStock = new Stock();
             toStock.setProductId(transferProduct.getProductId());
             toStock.setWarehouseId(transferProduct.getToWarehouseId());
-            // 设置 入库仓库 的单价：使用商品的 “预计采购价” 作为库存成本对外展示的 “单价”，而非 “售价” or “批发价”。
+            // 设置 调入仓库 的单价：使用商品的 “预计采购价” 作为库存成本对外展示的 “单价”，而非 “售价” or “批发价”。
             toStock.setPrice(product.getEstimatedPurchasePrice());
             // toStock.setPrice(0.0);
         }
@@ -134,16 +134,16 @@ public class StockServiceImpl extends ServiceImpl<StockDao, Stock> implements St
         // 转移成本
         Double productAmount = product.getEstimatedPurchasePrice() * transferProduct.getQuantity();
 
-        // 设置 出库仓库 的数量
+        // 设置 调出仓库 的数量
         fromStock.setQuantity(fromStock.getQuantity() - transferProduct.getQuantity());
-        // 设置 出库仓库 的总成本
+        // 设置 调出仓库 的总成本
         fromStock.setAmount(fromStock.getAmount() - productAmount);
         // 新增/更新 库存商品 wc_stock
         saveOrUpdate(fromStock); // == this.saveOrUpdate(fromStock);
 
-        // 设置 入库仓库 的数量
+        // 设置 调入仓库 的数量
         toStock.setQuantity(toStock.getQuantity() + transferProduct.getQuantity());
-        // 设置 入库仓库 的总成本
+        // 设置 调入仓库 的总成本
         toStock.setAmount(toStock.getAmount() + productAmount);
         // 新增/更新 库存商品 wc_stock
         saveOrUpdate(toStock); // == this.saveOrUpdate(toStock);
