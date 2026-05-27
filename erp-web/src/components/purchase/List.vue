@@ -64,13 +64,13 @@
         <el-table-column label="付款状态"
                          prop="status">
           <template slot-scope="scope">
-            <span v-if="scope.row.status = 10">
+            <span v-if="scope.row.status === 10">
               未付款
             </span>
-            <span v-else-if="scope.row.status = 20">
+            <span v-else-if="scope.row.status === 20">
               部分付款
             </span>
-            <span v-else-if="scope.row.status = 30">
+            <span v-else-if="scope.row.status === 30">
               已付款
             </span>
           </template>

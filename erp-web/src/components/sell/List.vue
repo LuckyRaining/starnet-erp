@@ -68,13 +68,13 @@
         <el-table-column label="收款状态"
                          prop="status">
           <template slot-scope="scope">
-            <span v-if="scope.row.status = 10">
+            <span v-if="scope.row.status === 10">
               未收款
             </span>
-            <span v-else-if="scope.row.status = 20">
+            <span v-else-if="scope.row.status === 20">
               部分收款
             </span>
-            <span v-else-if="scope.row.status = 30">
+            <span v-else-if="scope.row.status === 30">
               已收款
             </span>
           </template>

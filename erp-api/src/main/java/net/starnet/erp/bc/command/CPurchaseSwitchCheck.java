@@ -60,23 +60,15 @@ public class CPurchaseSwitchCheck extends BaseCommand {
             return;
         }
 
-        // 计算 付款单据金额
-        double issueAmount = purchase.getPreferredAmount() > 0 ?
-                purchase.getPreferredAmount() : purchase.getAmount();
-        // 计算 未核销金额
-        double unverifiedAmount = purchase.getDebtAmount();
-        // 计算 本次核销金额
-        double currentVerifiedAmount = purchase.getCurrentAmount();
-
         PaymentIssue paymentIssue = new PaymentIssue();
         paymentIssue.setPaymentId(null);
         paymentIssue.setSourceCode(purchase.getCode());
         paymentIssue.setType(resolvePaymentIssueType(purchase.getType()));
         paymentIssue.setIssueDate(purchase.getIssueDate());
-        paymentIssue.setIssueAmount(issueAmount);
+        paymentIssue.setIssueAmount(purchase.getAmount());
         paymentIssue.setVerifiedAmount(0);
-        paymentIssue.setUnverifiedAmount(unverifiedAmount);
-        paymentIssue.setCurrentVerifiedAmount(currentVerifiedAmount);
+        paymentIssue.setUnverifiedAmount(purchase.getDebtAmount());
+        paymentIssue.setCurrentVerifiedAmount(purchase.getCurrentAmount());
         // 新增 付款单据明细 fc_payment_issue
         paymentIssueService.save(paymentIssue);
     }

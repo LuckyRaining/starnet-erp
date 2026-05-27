@@ -304,12 +304,12 @@
         <el-table-column label="业务类别"
                          prop="type">
           <template slot-scope="scope">
-            <!-- <span v-if="scope.row.type = 10"> -->
-            <span v-if="scope.row.type = 'buy'">
+            <!-- <span v-if="scope.row.type === 10"> -->
+            <span v-if="scope.row.type === 'buy'">
               购货
             </span>
-            <!-- <span v-else-if="scope.row.type = 20"> -->
-            <span v-else-if="scope.row.type = 'refund'">
+            <!-- <span v-else-if="scope.row.type === 20"> -->
+            <span v-else-if="scope.row.type === 'refund'">
               购货退货
             </span>
           </template>
@@ -374,7 +374,7 @@ export default {
   methods: {
     // 获取供应商列表
     async getSupplierList() {
-      const {data: result} = await this.$http.post('/supplier/page', {
+      const { data: result } = await this.$http.post('/supplier/page', {
         current: 1,
         size: 10000
       })
@@ -384,7 +384,7 @@ export default {
     },
     // 获取单据编号
     async getCode() {
-      const {data: result} = await this.$http.post('/payment/createCode')
+      const { data: result } = await this.$http.post('/payment/createCode')
       if (!result.success) return this.$message.error(result.message)
 
       this.saveForm = {
@@ -401,14 +401,14 @@ export default {
     },
     // 获取结算账户列表
     async getAccountList() {
-      const {data: result} = await this.$http.post('/settlementAccount/list')
+      const { data: result } = await this.$http.post('/settlementAccount/list')
       if (!result.success) return this.$message.error(result.message)
 
       this.accountList = result.data.accountList
     },
     // 获取结算方式列表
     async getSettlementTypeList() {
-      const {data: result} = await this.$http.post('/dict/itemList', {
+      const { data: result } = await this.$http.post('/dict/itemList', {
         dictCode: 'settlement'
       })
       if (!result.success) return this.$message.error(result.message)
@@ -417,7 +417,7 @@ export default {
     },
     // 获取详情
     async getDetail(id) {
-      const {data: result} = await this.$http.post('/payment/detail', {
+      const { data: result } = await this.$http.post('/payment/detail', {
         paymentId: id
       })
       if (!result.success) return this.$message.error(result.message)
@@ -465,7 +465,7 @@ export default {
 
     // 计算合计
     getAccountSummaries(param) {
-      const {columns, data} = param
+      const { columns, data } = param
       const sums = []
       columns.forEach((column, index) => {
         if (column.label === '结算账户') {
@@ -492,7 +492,7 @@ export default {
       return sums
     },
     getIssueSummaries(param) {
-      const {columns, data} = param
+      const { columns, data } = param
       const sums = []
       columns.forEach((column, index) => {
         if (index === 1) {
@@ -547,7 +547,7 @@ export default {
         })
 
         // 可以发起新增付款单的网络请求
-        const {data: result} = await this.$http.post('/payment/save', {
+        const { data: result } = await this.$http.post('/payment/save', {
           payment: this.saveForm,
           accountList: persistAccountList,
           issueList: persistIssueList
@@ -572,7 +572,7 @@ export default {
       if (supplierId === undefined) {
         return this.$message.warning('请先选择购货单位')
       }
-      const {data: result} = await this.$http.post('/purchase/findCheckedListBySupplier', {
+      const { data: result } = await this.$http.post('/purchase/findCheckedListBySupplier', {
         supplierId
       })
       if (!result.success) {

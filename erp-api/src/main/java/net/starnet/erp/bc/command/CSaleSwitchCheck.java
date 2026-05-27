@@ -60,23 +60,15 @@ public class CSaleSwitchCheck extends BaseCommand {
             return;
         }
 
-        // 计算 收款单据金额
-        double issueAmount = sale.getPreferredAmount() > 0 ?
-                sale.getPreferredAmount() : sale.getAmount();
-        // 计算 未核销金额
-        double unverifiedAmount = sale.getDebtAmount();
-        // 计算 本次核销金额
-        double currentVerifiedAmount = sale.getCurrentAmount();
-
         CollectionIssue collectionIssue = new CollectionIssue();
         collectionIssue.setCollectionId(null);
         collectionIssue.setSourceCode(sale.getCode());
         collectionIssue.setType(resolveCollectionIssueType(sale.getType()));
         collectionIssue.setIssueDate(sale.getIssueDate());
-        collectionIssue.setIssueAmount(issueAmount);
+        collectionIssue.setIssueAmount(sale.getAmount());
         collectionIssue.setVerifiedAmount(0);
-        collectionIssue.setUnverifiedAmount(unverifiedAmount);
-        collectionIssue.setCurrentVerifiedAmount(currentVerifiedAmount);
+        collectionIssue.setUnverifiedAmount(sale.getDebtAmount());
+        collectionIssue.setCurrentVerifiedAmount(sale.getCurrentAmount());
         // 新增 收款单据明细 fc_collection_issue
         collectionIssueService.save(collectionIssue);
     }

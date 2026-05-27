@@ -391,10 +391,10 @@
 <script>
 import Vue from 'vue'
 import SelectProductDialog from '../common/SelectProductDialog'
-Vue.component('select-product-dialog', SelectProductDialog)
-
 import orderSaveUserMixin from '@/mixins/orderSaveUser'
 import orderSaveSettlementMixin from '@/mixins/orderSaveSettlement'
+
+Vue.component('select-product-dialog', SelectProductDialog)
 
 export default {
   mixins: [orderSaveUserMixin, orderSaveSettlementMixin],

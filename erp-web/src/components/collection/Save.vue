@@ -301,20 +301,20 @@
         <el-table-column label="业务类别"
                          prop="type">
           <template slot-scope="scope">
-            <!-- <span v-if="scope.row.type = 10"> -->
-            <span v-if="scope.row.type = 'sell'">
+            <!-- <span v-if="scope.row.type === 10"> -->
+            <span v-if="scope.row.type === 'sell'">
               销货
             </span>
-            <!-- <span v-else-if="scope.row.type = 20"> -->
-            <span v-else-if="scope.row.type = 'returned'">
+            <!-- <span v-else-if="scope.row.type === 20"> -->
+            <span v-else-if="scope.row.type === 'returned'">
               销货退货
             </span>
-            <!-- <span v-else-if="scope.row.type = 30"> -->
-            <span v-else-if="scope.row.type = 'order_order'">
+            <!-- <span v-else-if="scope.row.type === 30"> -->
+            <span v-else-if="scope.row.type === 'order_order'">
               订货
             </span>
-            <!-- <span v-else-if="scope.row.type = 40"> -->
-            <span v-else-if="scope.row.type = 'order_refund'">
+            <!-- <span v-else-if="scope.row.type === 40"> -->
+            <span v-else-if="scope.row.type === 'order_refund'">
               订货退货
             </span>
           </template>

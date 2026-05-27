@@ -129,7 +129,7 @@ public class CSaleSave extends BaseCommand {
         persistedSale.setIssueDate(sale.getIssueDate());
 
         // TODO 完善 收/退款状态 判定
-        persistedSale.setStatus(resolveSaleStatus(sale.getDiscountAmount(), sale.getCurrentAmount()));
+        persistedSale.setStatus(resolveSaleStatus(sale.getPreferredAmount(), sale.getCurrentAmount()));
         persistedSale.setQuantity(getQuantity());
         persistedSale.setDiscountAmount(sale.getDiscountAmount());
         persistedSale.setAmount(sale.getAmount());
@@ -268,20 +268,20 @@ public class CSaleSave extends BaseCommand {
     }
 
     /**
-     * 根据 本次收/退款与欠款 判定 收/退款状态
+     * 根据 已收款金额 和 优惠后金额 判定 收/退款状态
      */
-    private int resolveSaleStatus(double discountAmount, double collectedAmount) {
-        // 若 本次收款 为 0，则 状态为 未收/退款
+    private int resolveSaleStatus(double preferredAmount, double collectedAmount) {
+        // 若 已收款金额 <= 0，则 状态为 未收/退款
         if (collectedAmount <= 0) {
             return Define.SALE_STATUS_UNPAID;
         }
 
-        // 若 本次收款 为 0，则 状态为 未收/退款
-        if (collectedAmount > 0 && collectedAmount < discountAmount) {
+        // 若 已收款金额 > 0，且已收款金额 < 优惠后金额，则 状态为 部分收/退款
+        if (collectedAmount > 0 && collectedAmount < preferredAmount) {
             return Define.SALE_STATUS_PARTIAL;
         }
 
-        // 否则，状态为 部分收/退款
+        // 否则 为已收款金额 >= 优惠后金额，状态为 全部收/退款
         return Define.SALE_STATUS_PAID;
     }
 }

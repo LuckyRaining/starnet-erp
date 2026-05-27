@@ -104,7 +104,7 @@ public class Define {
     // ---------------------------------------- 购货单 付款状态
     public static final int PURCHASE_STATUS_UNPAID = 10; // 未付/退款
     public static final int PURCHASE_STATUS_PARTIAL = 20; // 部分付/退款
-    public static final int PURCHASE_STATUS_PAID = 30; // 已付/退款
+    public static final int PURCHASE_STATUS_PAID = 30; // 全部付/退款
 
 
     // ---------------------------------------- 销售单 收款状态

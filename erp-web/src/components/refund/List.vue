@@ -64,13 +64,13 @@
         <el-table-column label="退款状态"
                          prop="status">
           <template slot-scope="scope">
-            <span v-if="scope.row.status = 10">
+            <span v-if="scope.row.status === 10">
               未退款
             </span>
-            <span v-else-if="scope.row.status = 20">
+            <span v-else-if="scope.row.status === 20">
               部分退款
             </span>
-            <span v-else-if="scope.row.status = 30">
+            <span v-else-if="scope.row.status === 30">
               已退款
             </span>
           </template>

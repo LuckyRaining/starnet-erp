@@ -124,7 +124,7 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setCode(purchase.getCode());
 
          // TODO 完善 付/退款状态 判定
-        persistedPurchase.setStatus(resolvePurchaseStatus(purchase.getDiscountAmount(), purchase.getCurrentAmount()));
+        persistedPurchase.setStatus(resolvePurchaseStatus(purchase.getPreferredAmount(), purchase.getCurrentAmount()));
         persistedPurchase.setQuantity(getPurchaseQuantity());
         persistedPurchase.setDiscountAmount(purchase.getDiscountAmount());
         persistedPurchase.setAmount(purchase.getAmount());
@@ -257,20 +257,20 @@ public class CPurchaseSave extends BaseCommand {
     }
 
     /**
-     * 根据本次付/退款与欠款判定付/退款状态
+     * 根据 已付款金额 和 优惠后金额 判定 付/退款状态
      */
-    private int resolvePurchaseStatus(double discountAmount, double paidAmount) {
-        // 若 本次付款 为 0，则 状态为 未付/退款
+    private int resolvePurchaseStatus(double preferredAmount, double paidAmount) {
+        // 若 已付款金额 <= 0，则 状态为 未付/退款
         if (paidAmount <= 0) {
             return Define.PURCHASE_STATUS_UNPAID;
         }
 
-        // 若 本次付款 为 0，则 状态为 未付/退款
-        if (paidAmount > 0 && paidAmount < discountAmount) {
+        // 若 已付款金额 > 0，且已付款金额 < 优惠后金额，则 状态为 部分付/退款
+        if (paidAmount > 0 && paidAmount < preferredAmount) {
             return Define.PURCHASE_STATUS_PARTIAL;
         }
 
-        // 否则，状态为 部分付/退款
+        // 否则 为已付款金额 >= 优惠后金额，状态为 全部付/退款
         return Define.PURCHASE_STATUS_PAID;
     }
 }

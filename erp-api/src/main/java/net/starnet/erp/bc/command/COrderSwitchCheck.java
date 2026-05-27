@@ -61,20 +61,14 @@ public class COrderSwitchCheck extends BaseCommand {
             return;
         }
 
-        // 计算 收款单据金额
-        double issueAmount = order.getDiscountedAmount() > 0 ?
-                order.getDiscountedAmount() : order.getTotalAmount();
-        // 计算 未核销金额
-        double unverifiedAmount = issueAmount;
-
         CollectionIssue collectionIssue = new CollectionIssue();
         collectionIssue.setCollectionId(null);
         collectionIssue.setSourceCode(order.getCode());
         collectionIssue.setType(resolveCollectionIssueType(order.getBusinessType()));
         collectionIssue.setIssueDate(order.getIssueDate());
-        collectionIssue.setIssueAmount(issueAmount);
+        collectionIssue.setIssueAmount(order.getTotalAmount());
         collectionIssue.setVerifiedAmount(0);
-        collectionIssue.setUnverifiedAmount(unverifiedAmount);
+        collectionIssue.setUnverifiedAmount(order.getTotalAmount());
         collectionIssue.setCurrentVerifiedAmount(0);
         // 新增 收款单据明细 fc_collection_issue
         collectionIssueService.save(collectionIssue);
