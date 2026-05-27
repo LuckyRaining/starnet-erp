@@ -113,7 +113,7 @@ public class COrderSave extends BaseCommand {
         persistedOrder.setDiscountRate(order.getDiscountRate());
         persistedOrder.setListerId(order.getListerId());
         persistedOrder.setAuditorId(order.getAuditorId());
-        persistedOrder.setRemark(order.getRemark()); // 实则新建 客户订单 时，并不会 备注
+        persistedOrder.setRemark(order.getRemark());
         // 新增/更新 客户订单 bc_order
         orderService.saveOrUpdate(persistedOrder);
 
@@ -189,6 +189,7 @@ public class COrderSave extends BaseCommand {
 
             // TODO 需不需要设置 单据编号？
             // persistedIssueProduct.setCode(orderProduct.getCode());
+             persistedIssueProduct.setCode(orderProduct.getCode());
 
             persistedIssueProduct.setRemark(orderProduct.getRemark());
 

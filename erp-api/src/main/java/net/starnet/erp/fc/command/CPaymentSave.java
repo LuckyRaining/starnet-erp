@@ -28,21 +28,21 @@ public class CPaymentSave extends BaseCommand {
     @Autowired
     private PaymentService paymentService;
     @Autowired
-    private AccountRecordService accountService;
+    private AccountRecordService accountRecordService;
     @Autowired
-    private PaymentIssueService issueService;
+    private PaymentIssueService paymentIssueService;
     @Autowired
     private PayableService payableService;
 
     @Param(required = true)
     private Payment payment;
     @Param(defaultValue = "[]")
-    private List<PaymentIssue> issueList;
+    private List<PaymentIssue> paymentIssueList;
     @Param(defaultValue = "[]")
     private List<AccountRecord> accountList;
 
     private Payment persistedPayment;
-    
+
     @Override
     protected void init() throws Exception {
 
@@ -51,29 +51,32 @@ public class CPaymentSave extends BaseCommand {
     @Override
     protected void doCommand() throws Exception {
         // 计算
-        if (StrKit.isBlank(payment.getId())) {
+        // 付款单ID（更新时必填，新增时不传）
+        if (StrKit.isBlank(payment.getId())) { // payment.id 为空时，即没传，为“新增”的意思
             persistedPayment = new Payment();
 
-            // 校验编码是否合法
+            // 校验 单据编号 是否合法，合法才能“新增”，即 新增付款单
             validateCode(payment.getCode());
             persistedPayment.setCode(payment.getCode());
-            
+
             // 初始化 付款单 的 checked 为 false
             persistedPayment.setChecked(false);
 
-        } else {
+        } else { // payment.id 非空时，即传了，为“更新”的意思
             persistedPayment = paymentService.getById(payment.getId());
             Assert.notNull(persistedPayment, "ID为【" + payment.getId() + "】的付款订单不存在！");
 
-            // 删除原来的账户
-            accountService.deleteByBusiness(payment.getId());
+            // 删除 该单原来的账户列表 accountList[]
+            // 即 删除 单据账户 fc_account_record
+            accountRecordService.deleteByBusiness(payment.getId());
 
-            // 删除关联的单据
-            issueService.deleteByPayment(payment.getId());
+            // 删除 该单原来的明细列表 paymentIssueList[]
+            // 即 删除 付款单据明细列表 fc_payment_issue
+            paymentIssueService.deleteByPayment(payment.getId());
         }
 
-        persistedPayment.setSupplierId(payment.getSupplierId());
         persistedPayment.setIssueDate(payment.getIssueDate());
+        persistedPayment.setSupplierId(payment.getSupplierId());
         persistedPayment.setPaidAmount(payment.getPaidAmount());
         persistedPayment.setIssueAmount(payment.getIssueAmount());
         persistedPayment.setDiscountAmount(payment.getDiscountAmount());
@@ -84,31 +87,20 @@ public class CPaymentSave extends BaseCommand {
         persistedPayment.setListerId(payment.getListerId());
         persistedPayment.setAuditorId(payment.getAuditorId());
         persistedPayment.setRemark(payment.getRemark());
+        // 新增/更新 付款单 fc_payment
         paymentService.saveOrUpdate(persistedPayment);
 
-        // 新增账户
-        accountService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_OUT, persistedPayment.getIssueDate(), Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId());
+        // 新增 付款单据的 账户列表 accountList[]
+        // 新增 单据账户 fc_account_record，更新 结算账户 uc_settlement_account
+        accountRecordService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_OUT, persistedPayment.getIssueDate(), Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId());
 
-        // 新增单据
-        addIssueList();
+        // 新增 付款单据的 明细列表 paymentIssueList[]
+        addPaymentIssueListList();
 
-        // 处理应付账款
+        // 新增 应付账款记录
         handlePayable();
 
         data.put("payment", persistedPayment);
-    }
-
-    /**
-     * 处理应付账款
-     */
-    private void handlePayable() {
-        if (StrKit.notBlank(payment.getId())) {
-            // 删除原来的应收账款记录
-            payableService.deleteByBusiness(payment.getId());
-        }
-
-        payableService.businessAdd(persistedPayment.getSupplierId(), persistedPayment.getIssueDate(),
-                Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId(), 0, persistedPayment.getAdvancePaidAmount());
     }
 
     /**
@@ -124,27 +116,43 @@ public class CPaymentSave extends BaseCommand {
     }
 
     /**
-     * 新增商品列表
+     * 新增 付款单据的 明细列表 paymentIssueList[]
      */
-    private void addIssueList() {
-        if (issueList == null || issueList.size() == 0) return;
+    private void addPaymentIssueListList() {
+        if (paymentIssueList == null || paymentIssueList.size() == 0) return;
 
-        List<PaymentIssue> persistedIssueList = new ArrayList<>();
-        PaymentIssue persistedIssue;
-        for (PaymentIssue issue : issueList) {
-            persistedIssue = new PaymentIssue();
-            persistedIssue.setPaymentId(persistedPayment.getId());
-            persistedIssue.setSourceCode(issue.getSourceCode());
-            persistedIssue.setType(issue.getType());
-            persistedIssue.setIssueDate(issue.getIssueDate());
-            persistedIssue.setIssueAmount(issue.getIssueAmount());
-            persistedIssue.setVerifiedAmount(issue.getVerifiedAmount());
-            persistedIssue.setUnverifiedAmount(issue.getUnverifiedAmount());
-            persistedIssue.setCurrentVerifiedAmount(issue.getCurrentVerifiedAmount());
+        List<PaymentIssue> persistedPaymentIssueListList = new ArrayList<>();
+        PaymentIssue persistedPaymentIssue;
+        for (PaymentIssue paymentIssue : paymentIssueList) {
+            persistedPaymentIssue = new PaymentIssue();
+            persistedPaymentIssue.setPaymentId(persistedPayment.getId());
+            persistedPaymentIssue.setSourceCode(paymentIssue.getSourceCode());
+            persistedPaymentIssue.setType(paymentIssue.getType());
+            persistedPaymentIssue.setIssueDate(paymentIssue.getIssueDate());
+            persistedPaymentIssue.setIssueAmount(paymentIssue.getIssueAmount());
+            persistedPaymentIssue.setVerifiedAmount(paymentIssue.getVerifiedAmount());
+            persistedPaymentIssue.setUnverifiedAmount(paymentIssue.getUnverifiedAmount());
+            persistedPaymentIssue.setCurrentVerifiedAmount(paymentIssue.getCurrentVerifiedAmount());
 
-            persistedIssueList.add(persistedIssue);
+            persistedPaymentIssueListList.add(persistedPaymentIssue);
         }
 
-        issueService.saveBatch(persistedIssueList);
+        // 新增 单据商品 fc_payment_issue
+        paymentIssueService.saveBatch(persistedPaymentIssueListList);
     }
+
+    /**
+     * 新增 应付账款记录
+     */
+    private void handlePayable() {
+//        if (StrKit.notBlank(payment.getId())) {
+//            // 删除 该单原来的 应付账款记录
+//            payableService.deleteByBusiness(payment.getId());
+//        }
+
+        // 新增 应付账款记录 fc_payable
+        payableService.businessAdd(persistedPayment.getSupplierId(), persistedPayment.getIssueDate(),
+                Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId(), 0, persistedPayment.getAdvancePaidAmount());
+    }
+
 }

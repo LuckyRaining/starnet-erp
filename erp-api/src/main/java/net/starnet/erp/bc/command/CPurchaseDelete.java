@@ -50,6 +50,7 @@ public class CPurchaseDelete extends BaseCommand {
     protected void doCommand() throws Exception {
         Purchase purchase = purchaseService.getById(purchaseId);
         Assert.notNull(purchase, "ID为【" + purchaseId + "】的购货单不存在！");
+        Assert.notFalse(!purchase.isChecked(), "已审核的购货单不能删除！");
 
         // 删除 该单原来的信息
         // 即 删除 购货单 bc_purchase

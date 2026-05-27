@@ -54,13 +54,16 @@ public class SaleController extends BaseController {
     }
 
     /**
-     * 销货单切换审查
+     * 销货单 切换审核
      */
     @PostMapping("/switchCheck")
     public Result switchCheck() {
         return doAction(CSaleSwitchCheck.class);
     }
 
+    /**
+     * 获取 用户已审核的 销售单 + 客户订单
+     */
     @PostMapping("/findCheckedListByCustomer")
     public Result findCheckedListByCustomer() {
         return doAction(CSaleFindCheckedListByCustomer.class);

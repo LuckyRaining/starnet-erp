@@ -28,21 +28,21 @@ public class CCollectionSave extends BaseCommand {
     @Autowired
     private CollectionService collectionService;
     @Autowired
-    private AccountRecordService accountService;
+    private AccountRecordService accountRecordService;
     @Autowired
-    private CollectionIssueService issueService;
+    private CollectionIssueService collectionIssueService;
     @Autowired
     private ReceivableService receivableService;
 
     @Param(required = true)
     private Collection collection;
     @Param(defaultValue = "[]")
-    private List<CollectionIssue> issueList;
+    private List<CollectionIssue> collectionIssueList;
     @Param(defaultValue = "[]")
     private List<AccountRecord> accountList;
 
     private Collection persistedCollection;
-    
+
     @Override
     protected void init() throws Exception {
 
@@ -51,25 +51,27 @@ public class CCollectionSave extends BaseCommand {
     @Override
     protected void doCommand() throws Exception {
         // 计算
-        if (StrKit.isBlank(collection.getId())) {
+        if (StrKit.isBlank(collection.getId())) { // collection.id 为空时，即没传，为“新增”的意思
             persistedCollection = new Collection();
 
-            // 校验编码是否合法
+            // 校验 单据编号 是否合法，合法才能“新增”，即 新增收款单
             validateCode(collection.getCode());
             persistedCollection.setCode(collection.getCode());
-            
+
             // 初始化 收款单 的 checked 为 false
             persistedCollection.setChecked(false);
 
-        } else {
+        } else { // collection.id 非空时，即传了，为“更新”的意思
             persistedCollection = collectionService.getById(collection.getId());
             Assert.notNull(persistedCollection, "ID为【" + collection.getId() + "】的入库订单不存在！");
 
-            // 删除原来的账户
-            accountService.deleteByBusiness(collection.getId());
+            // 删除 该单原来的账户列表 accountList[]
+            // 即 删除 单据账户 fc_account_record
+            accountRecordService.deleteByBusiness(collection.getId());
 
-            // 删除关联的单据
-            issueService.deleteByCollection(collection.getId());
+            // 删除 该单原来的明细列表 collectionIssueList[]
+            // 即 删除 付款单据明细列表 fc_collection_issue
+            collectionIssueService.deleteByCollection(collection.getId());
         }
 
         persistedCollection.setCustomerId(collection.getCustomerId());
@@ -84,31 +86,20 @@ public class CCollectionSave extends BaseCommand {
         persistedCollection.setListerId(collection.getListerId());
         persistedCollection.setAuditorId(collection.getAuditorId());
         persistedCollection.setRemark(collection.getRemark());
+        // 新增/更新 付款单 fc_collection
         collectionService.saveOrUpdate(persistedCollection);
 
-        // 新增账户
-        accountService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_IN, persistedCollection.getIssueDate(), Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId());
+        // 新增 付款单据的 账户列表 accountList[]
+        // 新增 单据账户 fc_account_record，更新 结算账户 uc_settlement_account
+        accountRecordService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_IN, persistedCollection.getIssueDate(), Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId());
 
-        // 新增单据
-        addIssueList();
+        // 新增 付款单据的 明细列表 collectionIssueList[]
+        addCollectionIssueList();
 
         // 处理应收账款
         handleReceivable();
 
         data.put("collection", persistedCollection);
-    }
-
-    /**
-     * 处理应收账款
-     */
-    private void handleReceivable() {
-        if (StrKit.notBlank(collection.getId())) {
-            // 删除原来的应收账款记录
-            receivableService.deleteByBusiness(collection.getId());
-        }
-
-        receivableService.businessAdd(persistedCollection.getCustomerId(), persistedCollection.getIssueDate(),
-                Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId(), 0, persistedCollection.getAdvanceCollectAmount());
     }
 
     /**
@@ -124,27 +115,42 @@ public class CCollectionSave extends BaseCommand {
     }
 
     /**
-     * 新增商品列表
+     * 新增 付款单据的 明细列表 collectionIssueList[]
      */
-    private void addIssueList() {
-        if (issueList == null || issueList.size() == 0) return;
+    private void addCollectionIssueList() {
+        if (collectionIssueList == null || collectionIssueList.size() == 0) return;
 
-        List<CollectionIssue> persistedIssueList = new ArrayList<>();
-        CollectionIssue persistedIssue;
-        for (CollectionIssue issue : issueList) {
-            persistedIssue = new CollectionIssue();
-            persistedIssue.setCollectionId(persistedCollection.getId());
-            persistedIssue.setSourceCode(issue.getSourceCode());
-            persistedIssue.setType(issue.getType());
-            persistedIssue.setIssueDate(issue.getIssueDate());
-            persistedIssue.setIssueAmount(issue.getIssueAmount());
-            persistedIssue.setVerifiedAmount(issue.getVerifiedAmount());
-            persistedIssue.setUnverifiedAmount(issue.getUnverifiedAmount());
-            persistedIssue.setCurrentVerifiedAmount(issue.getCurrentVerifiedAmount());
+        List<CollectionIssue> persistedCollectionIssueList = new ArrayList<>();
+        CollectionIssue persistedCollectionIssue;
+        for (CollectionIssue collectionIssue : collectionIssueList) {
+            persistedCollectionIssue = new CollectionIssue();
+            persistedCollectionIssue.setCollectionId(persistedCollection.getId());
+            persistedCollectionIssue.setSourceCode(collectionIssue.getSourceCode());
+            persistedCollectionIssue.setType(collectionIssue.getType());
+            persistedCollectionIssue.setIssueDate(collectionIssue.getIssueDate());
+            persistedCollectionIssue.setIssueAmount(collectionIssue.getIssueAmount());
+            persistedCollectionIssue.setVerifiedAmount(collectionIssue.getVerifiedAmount());
+            persistedCollectionIssue.setUnverifiedAmount(collectionIssue.getUnverifiedAmount());
+            persistedCollectionIssue.setCurrentVerifiedAmount(collectionIssue.getCurrentVerifiedAmount());
 
-            persistedIssueList.add(persistedIssue);
+            persistedCollectionIssueList.add(persistedCollectionIssue);
         }
 
-        issueService.saveBatch(persistedIssueList);
+        // 新增 单据商品 fc_collection_issue
+        collectionIssueService.saveBatch(persistedCollectionIssueList);
+    }
+
+    /**
+     * 新增 应收账款记录
+     */
+    private void handleReceivable() {
+//        if (StrKit.notBlank(collection.getId())) {
+//            // 删除 该单原来的 应收账款记录
+//            receivableService.deleteByBusiness(collection.getId());
+//        }
+
+        // 新增 应收账款记录 fc_receivable
+        receivableService.businessAdd(persistedCollection.getCustomerId(), persistedCollection.getIssueDate(),
+                Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId(), 0, persistedCollection.getAdvanceCollectAmount());
     }
 }

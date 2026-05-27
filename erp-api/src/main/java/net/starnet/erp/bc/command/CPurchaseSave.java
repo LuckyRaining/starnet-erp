@@ -122,7 +122,9 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setSupplierId(purchase.getSupplierId());
         persistedPurchase.setIssueDate(purchase.getIssueDate());
         persistedPurchase.setCode(purchase.getCode());
-        persistedPurchase.setStatus(Define.PURCHASE_STATUS_UNPAID); // TODO 完善 付/退款状态 判定
+
+         // TODO 完善 付/退款状态 判定
+        persistedPurchase.setStatus(resolvePurchaseStatus(purchase.getDiscountAmount(), purchase.getCurrentAmount()));
         persistedPurchase.setQuantity(getPurchaseQuantity());
         persistedPurchase.setDiscountAmount(purchase.getDiscountAmount());
         persistedPurchase.setAmount(purchase.getAmount());
@@ -134,14 +136,14 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setContracts(purchase.getContracts());
         persistedPurchase.setListerId(purchase.getListerId());
         persistedPurchase.setAuditorId(purchase.getAuditorId());
-        persistedPurchase.setRemark(purchase.getRemark()); // 实则新建 购货单 时，并不会 备注
+        persistedPurchase.setRemark(purchase.getRemark());
         // 新增/更新 购货单 bc_purchase
         purchaseService.saveOrUpdate(persistedPurchase);
 
-        // 新增 单据的 商品列表 productList[]
+        // 新增 购货单据的 商品列表 productList[]
         addProductList();
 
-        // 新增 单据的 账户列表 accountList[]
+        // 新增 购货单据的 账户列表 accountList[]
         String accountType = persistedPurchase.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
                 Define.ACCOUNT_RECORD_TYPE_OUT : Define.ACCOUNT_RECORD_TYPE_IN;
         for (AccountRecord record : accountList) {
@@ -184,7 +186,7 @@ public class CPurchaseSave extends BaseCommand {
     }
 
     /**
-     * 新增 单据的 商品列表 productList[]
+     * 新增 购货单据的 商品列表 productList[]
      */
     private void addProductList() {
         if (productList == null || productList.size() == 0) return;
@@ -233,11 +235,11 @@ public class CPurchaseSave extends BaseCommand {
     }
 
     /**
-     * 处理 应付账款
+     * 新增 应付账款记录
      */
     private void handlePayable() {
 //        if (StrKit.notBlank(purchase.getId())) {
-//            // 删除 该单原来的应付账款记录
+//            // 删除 该单原来的 应付账款记录
 //            payableService.deleteByBusiness(purchase.getId());
 //        }
 
@@ -252,5 +254,23 @@ public class CPurchaseSave extends BaseCommand {
             payableService.businessAdd(persistedPurchase.getSupplierId(), persistedPurchase.getIssueDate(),
                     Define.BUSINESS_TYPE_PURCHASE_REFUND, persistedPurchase.getId(), persistedPurchase.getDebtAmount(), persistedPurchase.getCurrentAmount());
         }
+    }
+
+    /**
+     * 根据本次付/退款与欠款判定付/退款状态
+     */
+    private int resolvePurchaseStatus(double discountAmount, double paidAmount) {
+        // 若 本次付款 为 0，则 状态为 未付/退款
+        if (paidAmount <= 0) {
+            return Define.PURCHASE_STATUS_UNPAID;
+        }
+
+        // 若 本次付款 为 0，则 状态为 未付/退款
+        if (paidAmount > 0 && paidAmount < discountAmount) {
+            return Define.PURCHASE_STATUS_PARTIAL;
+        }
+
+        // 否则，状态为 部分付/退款
+        return Define.PURCHASE_STATUS_PAID;
     }
 }

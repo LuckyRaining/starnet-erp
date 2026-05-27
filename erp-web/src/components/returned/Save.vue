@@ -150,9 +150,11 @@
             </el-table>
           </el-card>
         </el-row>
+
         <el-divider content-position="left">结算信息</el-divider>
+
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="优惠率"
                           prop="preferentialRate">
               <el-input v-model.number="saveForm.preferentialRate"
@@ -161,21 +163,21 @@
               </el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="优惠金额"
                           prop="preferentialAmount">
               <el-input v-model="saveForm.preferentialAmount"
                         @input="onPreferentialAmountInput"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="优惠后金额"
                           prop="preferredAmount">
               <el-input v-model="saveForm.preferredAmount"
                         @input="onPreferredAmountInput"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="客户承担费用"
                           prop="customerFee">
               <el-input v-model="saveForm.customerFee"
@@ -184,7 +186,7 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="本次退款"
                           prop="currentAmount">
               <el-input v-model="saveForm.currentAmount"
@@ -192,7 +194,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="结算账户"
                           prop="accountId">
               <el-select v-model="saveForm.accountId"
@@ -206,7 +208,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="本次欠款"
                           prop="debtAmount">
               <el-input v-model="saveForm.debtAmount"
@@ -214,7 +216,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="销售附件"
                           prop="attachments">
               <el-input v-model="saveForm.attachments"

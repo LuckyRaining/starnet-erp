@@ -48,6 +48,7 @@ public class CSaleDelete extends BaseCommand {
     protected void doCommand() throws Exception {
         Sale sale = saleService.getById(saleId);
         Assert.notNull(sale, "ID为【" + saleId + "】的销售单不存在！");
+        Assert.notFalse(!sale.isChecked(), "已审核的销货单不能删除！");
 
         // 删除 该单原来的信息
         // 即 删除 销售单 bc_sale

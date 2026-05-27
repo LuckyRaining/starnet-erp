@@ -23,4 +23,18 @@ public interface CollectionIssueService extends IService<CollectionIssue> {
      * @param collectionId
      */
     void deleteByCollection(String collectionId);
+
+    /**
+     * 查询 由源单审核生成、尚未关联收款单 的明细
+     *
+     * @param sourceCode 源单编号
+     */
+    CollectionIssue findOldestBySourceCode(String sourceCode);
+
+    /**
+     * 按源单编号查询最新一条收款单据明细（创建时间降序）
+     *
+     * @param sourceCode 源单编号
+     */
+    CollectionIssue findLatestBySourceCode(String sourceCode);
 }

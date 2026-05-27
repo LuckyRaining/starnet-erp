@@ -127,6 +127,7 @@
                 </template>
               </el-table-column>
             </el-table>
+
             <el-row style="float:right;margin:10px 0;">
               <el-col>
                 <el-button type="primary"
@@ -134,6 +135,7 @@
                            @click="showSelectSourceIssueDialog()">选择源单</el-button>
               </el-col>
             </el-row>
+
             <!-- 单据列表区域 -->
             <el-table :data="saveForm.issueList"
                       border
@@ -216,15 +218,17 @@
             </el-table>
           </el-card>
         </el-row>
+
         <el-divider content-position="left">结算信息</el-divider>
+
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="整单折扣"
                           prop="discountAmount">
               <el-input v-model="saveForm.discountAmount"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="本次预收款"
                           prop="advanceCollectAmount">
               <el-input v-model="saveForm.advanceCollectAmount"></el-input>
@@ -297,11 +301,21 @@
         <el-table-column label="业务类别"
                          prop="type">
           <template slot-scope="scope">
-            <span v-if="scope.row.type = 10">
+            <!-- <span v-if="scope.row.type = 10"> -->
+            <span v-if="scope.row.type = 'sell'">
               销货
             </span>
-            <span v-else-if="scope.row.type = 20">
-              退货
+            <!-- <span v-else-if="scope.row.type = 20"> -->
+            <span v-else-if="scope.row.type = 'returned'">
+              销货退货
+            </span>
+            <!-- <span v-else-if="scope.row.type = 30"> -->
+            <span v-else-if="scope.row.type = 'order_order'">
+              订货
+            </span>
+            <!-- <span v-else-if="scope.row.type = 40"> -->
+            <span v-else-if="scope.row.type = 'order_refund'">
+              订货退货
             </span>
           </template>
         </el-table-column>

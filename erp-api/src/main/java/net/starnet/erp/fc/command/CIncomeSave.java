@@ -27,9 +27,9 @@ public class CIncomeSave extends BaseCommand {
     @Autowired
     private IncomeService incomeService;
     @Autowired
-    private AccountRecordService accountService;
+    private AccountRecordService accountRecordService;
     @Autowired
-    private FlowRecordService recordService;
+    private FlowRecordService flowRecordService;
 
     @Param(required = true)
     private Income income;
@@ -48,7 +48,7 @@ public class CIncomeSave extends BaseCommand {
     @Override
     protected void doCommand() throws Exception {
         // 计算
-        if (StrKit.isBlank(income.getId())) {
+        if (StrKit.isBlank(income.getId())) { // income.id 为空时，即没传，为“新增”的意思
             persistedIncome = new Income();
 
             // 校验编码是否合法
@@ -58,15 +58,15 @@ public class CIncomeSave extends BaseCommand {
             // 初始化 收入单 的 checked 为 false
             persistedIncome.setChecked(false);
 
-        } else {
+        } else { // income.id 非空时，即传了，为“更新”的意思
             persistedIncome = incomeService.getById(income.getId());
             Assert.notNull(persistedIncome, "ID为【" + income.getId() + "】的收入订单不存在！");
 
             // 删除原来的账户
-            accountService.deleteByBusiness(income.getId());
+            accountRecordService.deleteByBusiness(income.getId());
 
             // 删除关联的单据
-            recordService.deleteByBusiness(income.getId());
+            flowRecordService.deleteByBusiness(income.getId());
         }
 
         persistedIncome.setCustomerId(income.getCustomerId());
@@ -81,7 +81,7 @@ public class CIncomeSave extends BaseCommand {
         for (AccountRecord record : accountList) {
             record.setAmount(persistedIncome.getCollectAmount());
         }
-        accountService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_IN, persistedIncome.getIssueDate(), Define.BUSINESS_TYPE_INCOME, persistedIncome.getId());
+        accountRecordService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_IN, persistedIncome.getIssueDate(), Define.BUSINESS_TYPE_INCOME, persistedIncome.getId());
 
         // 新增单据
         addRecordList();
@@ -121,6 +121,6 @@ public class CIncomeSave extends BaseCommand {
             persistedRecordList.add(persistedRecord);
         }
 
-        recordService.saveBatch(persistedRecordList);
+        flowRecordService.saveBatch(persistedRecordList);
     }
 }

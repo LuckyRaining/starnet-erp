@@ -111,7 +111,7 @@ public class CCheckoutSave extends BaseCommand {
         persistedCheckout.setQuantity(getQuantity());
         persistedCheckout.setListerId(checkout.getListerId());
         persistedCheckout.setAuditorId(checkout.getAuditorId());
-        persistedCheckout.setRemark(checkout.getRemark()); // 实则新建 出库单 时，并不会 备注
+        persistedCheckout.setRemark(checkout.getRemark());
         // 新增/更新 出库单 wc_checkout
         checkoutService.saveOrUpdate(persistedCheckout);
 
@@ -206,6 +206,7 @@ public class CCheckoutSave extends BaseCommand {
 
             // TODO 需不需要设置 单据编号？
             // persistedIssueProduct.setCode(issueProduct.getCode());
+            persistedIssueProduct.setCode(issueProduct.getCode());
 
             persistedIssueProduct.setRemark(issueProduct.getRemark());
 

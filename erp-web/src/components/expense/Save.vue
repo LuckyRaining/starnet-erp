@@ -106,9 +106,11 @@
             </el-table>
           </el-card>
         </el-row>
+
         <el-divider content-position="left">结算信息</el-divider>
+
         <el-row>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="结算账户"
                           prop="accountId">
               <el-select v-model="saveForm.accountId"
@@ -122,7 +124,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="5">
             <el-form-item label="付款金额"
                           prop="paidAmount">
               <el-input v-model="saveForm.paidAmount"></el-input>

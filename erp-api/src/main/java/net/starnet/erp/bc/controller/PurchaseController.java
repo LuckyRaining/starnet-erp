@@ -53,13 +53,16 @@ public class PurchaseController extends BaseController {
     }
 
     /**
-     * 切换审查
+     * 购货单 切换审核
      */
     @PostMapping("/switchCheck")
     public Result switchCheck() {
         return doAction(CPurchaseSwitchCheck.class);
     }
 
+    /**
+     * 获取 用户已审核的 购货单
+     */
     @PostMapping("/findCheckedListBySupplier")
     public Result findCheckedListBySupplier() {
         return doAction(CPurchaseFindCheckedListBySupplier.class);

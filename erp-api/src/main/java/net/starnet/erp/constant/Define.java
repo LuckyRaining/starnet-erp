@@ -5,16 +5,16 @@ package net.starnet.erp.constant;
  */
 public class Define {
 
-    // --------------------------------pageSearch 中的 queryPage 部分参数
+    // ---------------------------------------- pageSearch 中的 queryPage 部分参数
     public static final String CURRENT = "1";
     public static final String SIZE = "15";
 
 
-    // --------------------------------系统设置的键
+    // ---------------------------------------- 系统设置的键
     public static final String SYSTEM_CONFIGURATION_KEY = "system_configuration";
 
 
-    // --------------------------------日志类型
+    // ---------------------------------------- 日志类型
     public static final int LOG_TYPE_LOGIN = 10000; // 登录
     /**
      * 用户相关
@@ -25,7 +25,7 @@ public class Define {
     public static final int LOG_TYPE_USER_RESET_PASSWORD = 11040; // 修改密码
 
 
-    // ---------------------------------类别类型
+    // ---------------------------------------- 类别类型
     public static final int CATEGORY_TYPE_CUSTOMER = 10; // 客户
     public static final int CATEGORY_TYPE_SUPPLIER = 20; // 供应商
     public static final int CATEGORY_TYPE_PRODUCT = 30; // 商品
@@ -42,19 +42,19 @@ public class Define {
     }
 
 
-    // ----------------------------------字典编码
+    // ---------------------------------------- 字典编码
     public static final String DICT_CODE_UNIT = "unit"; // 计量单位
     public static final String DICT_CODE_SETTLEMENT = "settlement"; // 计算方式
     public static final String DICT_CODE_CUSTOMER_LEVEL = "customer_level"; // 客户等级
     public static final String DICT_CODE_ACCOUNT_TYPE = "account_type"; // 账户类别
 
 
-    // -----------------------------------业务分类
+    // ---------------------------------------- 业务分类
     public static final String BUSINESS_CATEGORY_PURCHASE = "purchase"; // 采购
     public static final String BUSINESS_CATEGORY_SALE = "sale"; // 销售
 
 
-    // -------------------------------------业务类型
+    // ---------------------------------------- 业务类型
     public static final String BUSINESS_TYPE_PURCHASE_BUY = "buy"; // 购货
     public static final String BUSINESS_TYPE_PURCHASE_REFUND = "refund"; // 购退
     public static final String BUSINESS_TYPE_SALE_ORDER = "order"; // 客户订单
@@ -89,7 +89,7 @@ public class Define {
     }
 
 
-    // ------------------------------------客户订单 类型
+    // ---------------------------------------- 客户订单 类型
     public static final int ORDER_BUSINESS_TYPE_ORDER = 10; // 订货
     public static final int ORDER_BUSINESS_TYPE_RETURN = 20; // 退货
 
@@ -101,29 +101,41 @@ public class Define {
     }
 
 
-    // -----------------------------------购货单 付款状态
+    // ---------------------------------------- 购货单 付款状态
     public static final int PURCHASE_STATUS_UNPAID = 10; // 未付/退款
     public static final int PURCHASE_STATUS_PARTIAL = 20; // 部分付/退款
     public static final int PURCHASE_STATUS_PAID = 30; // 已付/退款
 
 
-    // ------------------------------------销售单 付款状态
+    // ---------------------------------------- 销售单 收款状态
     public static final int SALE_STATUS_UNPAID = 10; // 未收/退款
     public static final int SALE_STATUS_PARTIAL = 20; // 部分收/退款
     public static final int SALE_STATUS_PAID = 30; // 全部收/退款
 
 
-    // -------------------------------------账户记录 类型
+    // ---------------------------------------- 付款单据明细 类别
+    public static final int PAYMENT_ISSUE_TYPE_PURCHASE_BUY = 10; // 购货
+    public static final int PAYMENT_ISSUE_TYPE_PURCHASE_REFUND = 20; // 购货退货
+
+
+    // ---------------------------------------- 收款单据明细 类别
+    public static final int COLLECTION_ISSUE_TYPE_SALE_SELL = 10; // 销货
+    public static final int COLLECTION_ISSUE_TYPE_SALE_RETURNED = 20; // 销货退货
+    public static final int COLLECTION_ISSUE_TYPE_ORDER_ORDER = 30; // 订货
+    public static final int COLLECTION_ISSUE_TYPE_ORDER_RETURN = 40; // 退货
+
+
+    // ---------------------------------------- 账户记录 类型
     public static final String ACCOUNT_RECORD_TYPE_IN = "in"; // 收入
     public static final String ACCOUNT_RECORD_TYPE_OUT = "out"; // 支出
 
 
-    // -------------------------------------出入库 类型
+    // ---------------------------------------- 出入库 类型
     public static final String STOCK_TYPE_IN = "in"; // 入库
     public static final String STOCK_TYPE_OUT = "out"; // 出库
 
 
-    // -------------------------------------其他入库 类型
+    // ---------------------------------------- 其他入库 类型
     public static final int STORE_TYPE_PROFIT = 10; // 盘盈入库
     public static final int STORE_TYPE_OTHER = 20; // 其他入库
 
@@ -135,7 +147,7 @@ public class Define {
     }
 
 
-    // -------------------------------------其他出库 类型
+    // ---------------------------------------- 其他出库 类型
     public static final int CHECKOUT_TYPE_LOSS = 10; // 盘亏出库
     public static final int CHECKOUT_TYPE_OTHER = 20; // 其他出库
 

@@ -127,7 +127,9 @@ public class CSaleSave extends BaseCommand {
 
         persistedSale.setCustomerId(sale.getCustomerId());
         persistedSale.setIssueDate(sale.getIssueDate());
-        persistedSale.setStatus(Define.SALE_STATUS_PARTIAL); // TODO 完善此处
+
+        // TODO 完善 收/退款状态 判定
+        persistedSale.setStatus(resolveSaleStatus(sale.getDiscountAmount(), sale.getCurrentAmount()));
         persistedSale.setQuantity(getQuantity());
         persistedSale.setDiscountAmount(sale.getDiscountAmount());
         persistedSale.setAmount(sale.getAmount());
@@ -139,7 +141,7 @@ public class CSaleSave extends BaseCommand {
         persistedSale.setAttachments(sale.getAttachments());
         persistedSale.setListerId(sale.getListerId());
         persistedSale.setAuditorId(sale.getAuditorId());
-        persistedSale.setRemark(sale.getRemark()); // 实则新建 销货单 时，并不会 备注
+        persistedSale.setRemark(sale.getRemark());
 
         persistedSale.setSellerId(sale.getSellerId());
         persistedSale.setContactName(sale.getContactName());
@@ -149,10 +151,10 @@ public class CSaleSave extends BaseCommand {
         // 新增/更新 销货单 bc_sale
         saleService.saveOrUpdate(persistedSale);
 
-        // 新增 单据的 商品列表 productList[]
+        // 新增 销货单据的 商品列表 productList[]
         addProductList();
 
-        // 新增 单据的 账户列表 accountList[]
+        // 新增 销货单据的 账户列表 accountList[]
         String accountType = persistedSale.getType().equals(Define.BUSINESS_TYPE_SALE_SELL) ?
                 Define.ACCOUNT_RECORD_TYPE_IN : Define.ACCOUNT_RECORD_TYPE_OUT;
         for (AccountRecord record : accountList) {
@@ -195,7 +197,7 @@ public class CSaleSave extends BaseCommand {
     }
 
     /**
-     * 新增 单据的 商品列表 productList[]
+     * 新增 销货单据的 商品列表 productList[]
      */
     private void addProductList() {
         if (productList == null || productList.size() == 0) return;
@@ -244,11 +246,11 @@ public class CSaleSave extends BaseCommand {
     }
 
     /**
-     * 处理 应付账款
+     * 新增 应收账款记录
      */
     private void handleReceivable() {
 //        if (StrKit.notBlank(sale.getId())) {
-//            // 删除 该单原来的应收账款记录
+//            // 删除 该单原来的 应收账款记录
 //            receivableService.deleteByBusiness(sale.getId());
 //        }
 
@@ -263,5 +265,23 @@ public class CSaleSave extends BaseCommand {
             receivableService.businessAdd(persistedSale.getCustomerId(), persistedSale.getIssueDate(),
                     Define.BUSINESS_TYPE_SALE_RETURNED, persistedSale.getId(), persistedSale.getDebtAmount(), persistedSale.getCurrentAmount());
         }
+    }
+
+    /**
+     * 根据 本次收/退款与欠款 判定 收/退款状态
+     */
+    private int resolveSaleStatus(double discountAmount, double collectedAmount) {
+        // 若 本次收款 为 0，则 状态为 未收/退款
+        if (collectedAmount <= 0) {
+            return Define.SALE_STATUS_UNPAID;
+        }
+
+        // 若 本次收款 为 0，则 状态为 未收/退款
+        if (collectedAmount > 0 && collectedAmount < discountAmount) {
+            return Define.SALE_STATUS_PARTIAL;
+        }
+
+        // 否则，状态为 部分收/退款
+        return Define.SALE_STATUS_PAID;
     }
 }

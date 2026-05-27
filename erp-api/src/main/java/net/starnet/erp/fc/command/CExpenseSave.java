@@ -27,9 +27,9 @@ public class CExpenseSave extends BaseCommand {
     @Autowired
     private ExpenseService expenseService;
     @Autowired
-    private AccountRecordService accountService;
+    private AccountRecordService accountRecordService;
     @Autowired
-    private FlowRecordService recordService;
+    private FlowRecordService flowRecordService;
 
     @Param(required = true)
     private Expense expense;
@@ -48,7 +48,7 @@ public class CExpenseSave extends BaseCommand {
     @Override
     protected void doCommand() throws Exception {
         // 计算
-        if (StrKit.isBlank(expense.getId())) {
+        if (StrKit.isBlank(expense.getId())) { // expense.id 为空时，即没传，为“新增”的意思
             persistedExpense = new Expense();
 
             // 校验编码是否合法
@@ -58,15 +58,15 @@ public class CExpenseSave extends BaseCommand {
             // 初始化 支出单 的 checked 为 false
             persistedExpense.setChecked(false);
 
-        } else {
+        } else { // expense.id 非空时，即传了，为“更新”的意思
             persistedExpense = expenseService.getById(expense.getId());
             Assert.notNull(persistedExpense, "ID为【" + expense.getId() + "】的支出订单不存在！");
 
             // 删除原来的账户
-            accountService.deleteByBusiness(expense.getId());
+            accountRecordService.deleteByBusiness(expense.getId());
 
             // 删除关联的单据
-            recordService.deleteByBusiness(expense.getId());
+            flowRecordService.deleteByBusiness(expense.getId());
         }
 
         persistedExpense.setSupplierId(expense.getSupplierId());
@@ -81,7 +81,7 @@ public class CExpenseSave extends BaseCommand {
         for (AccountRecord record : accountList) {
             record.setAmount(persistedExpense.getPaidAmount());
         }
-        accountService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_OUT, persistedExpense.getIssueDate(), Define.BUSINESS_TYPE_EXPENSE, persistedExpense.getId());
+        accountRecordService.addRecordList(accountList, Define.ACCOUNT_RECORD_TYPE_OUT, persistedExpense.getIssueDate(), Define.BUSINESS_TYPE_EXPENSE, persistedExpense.getId());
 
         // 新增单据
         addRecordList();
@@ -121,6 +121,6 @@ public class CExpenseSave extends BaseCommand {
             persistedRecordList.add(persistedRecord);
         }
 
-        recordService.saveBatch(persistedRecordList);
+        flowRecordService.saveBatch(persistedRecordList);
     }
 }

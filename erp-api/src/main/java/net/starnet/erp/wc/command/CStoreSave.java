@@ -111,7 +111,7 @@ public class CStoreSave extends BaseCommand {
         persistedStore.setQuantity(getQuantity());
         persistedStore.setListerId(store.getListerId());
         persistedStore.setAuditorId(store.getAuditorId());
-        persistedStore.setRemark(store.getRemark()); // 实则新建 入库单 时，并不会 备注
+        persistedStore.setRemark(store.getRemark());
         // 新增/更新 入库单 wc_store
         storeService.saveOrUpdate(persistedStore);
 
@@ -206,6 +206,7 @@ public class CStoreSave extends BaseCommand {
 
             // TODO 需不需要设置 单据编号？
             // persistedIssueProduct.setCode(issueProduct.getCode());
+            persistedIssueProduct.setCode(issueProduct.getCode());
 
             persistedIssueProduct.setRemark(issueProduct.getRemark());
 

@@ -35,6 +35,7 @@ public class COrderDelete extends BaseCommand {
     protected void doCommand() throws Exception {
         Order order = orderService.getById(orderId);
         Assert.notNull(order, "ID为【" + orderId + "】的客户订单不存在！");
+        Assert.notFalse(!order.isChecked(), "已审核的客户订单不能删除！");
 
         // 删除 该单原来的信息
         // 即 删除 客户订单 bc_order
