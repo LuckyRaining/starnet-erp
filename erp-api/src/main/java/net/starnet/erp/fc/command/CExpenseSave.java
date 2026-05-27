@@ -13,6 +13,7 @@ import net.starnet.erp.fc.model.FlowRecord;
 import net.starnet.erp.fc.service.ExpenseService;
 import net.starnet.erp.fc.service.AccountRecordService;
 import net.starnet.erp.fc.service.FlowRecordService;
+import net.starnet.erp.service.SaveAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class CExpenseSave extends BaseCommand {
     private AccountRecordService accountRecordService;
     @Autowired
     private FlowRecordService flowRecordService;
+    @Autowired
+    private SaveAuditService saveAuditService;
 
     @Param(required = true)
     private Expense expense;
@@ -39,6 +42,7 @@ public class CExpenseSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Expense persistedExpense;
+    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -49,6 +53,7 @@ public class CExpenseSave extends BaseCommand {
     protected void doCommand() throws Exception {
         // 计算
         if (StrKit.isBlank(expense.getId())) { // expense.id 为空时，即没传，为“新增”的意思
+            isNew = true;
             persistedExpense = new Expense();
 
             // 校验编码是否合法
@@ -59,6 +64,7 @@ public class CExpenseSave extends BaseCommand {
             persistedExpense.setChecked(false);
 
         } else { // expense.id 非空时，即传了，为“更新”的意思
+            isNew = false;
             persistedExpense = expenseService.getById(expense.getId());
             Assert.notNull(persistedExpense, "ID为【" + expense.getId() + "】的支出订单不存在！");
 
@@ -85,6 +91,12 @@ public class CExpenseSave extends BaseCommand {
 
         // 新增单据
         addRecordList();
+
+        // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
+        // （逻辑与 CExpenseSwitchCheck 一致）
+        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedExpense.isChecked(), persistedExpense.getAuditorId())) {
+            saveAuditService.checkExpense(persistedExpense, persistedExpense.getAuditorId());
+        }
 
         data.put("expense", persistedExpense);
     }

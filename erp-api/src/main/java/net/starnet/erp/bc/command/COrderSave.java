@@ -21,6 +21,7 @@ import net.starnet.erp.uc.service.SettlementAccountService;
 import net.starnet.erp.uc.service.WarehouseService;
 import net.starnet.erp.wc.model.IssueProduct;
 import net.starnet.erp.wc.service.IssueProductService;
+import net.starnet.erp.service.SaveAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ public class COrderSave extends BaseCommand {
     private WarehouseService warehouseService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private SaveAuditService saveAuditService;
 
     @Param(required = true)
     private Order order;
@@ -51,6 +54,7 @@ public class COrderSave extends BaseCommand {
     private List<IssueProduct> productList;
 
     private Order persistedOrder;
+    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -73,6 +77,7 @@ public class COrderSave extends BaseCommand {
         // 计算
         // 客户订单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(order.getId())) { // order.id 为空时，即没传，为“新增”的意思
+            isNew = true;
             persistedOrder = new Order();
 
             // 校验 单据编号 是否合法，合法才能“新增”，即 新增客户订单
@@ -83,6 +88,7 @@ public class COrderSave extends BaseCommand {
             persistedOrder.setChecked(false);
 
         } else { // order.id 非空时，即传了，为“更新”的意思
+            isNew = false;
             persistedOrder = orderService.getById(order.getId());
             Assert.notNull(persistedOrder, "ID为【" + order.getId() + "】的客户订单不存在！");
 
@@ -123,6 +129,12 @@ public class COrderSave extends BaseCommand {
         // ！不涉及！ 新增 单据的 账户列表 accountList[]
 
         // ！不涉及！ 新增 应付账款记录/应收账款记录
+
+        // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
+        // （逻辑与 COrderSwitchCheck 一致，审核通过后会生成 fc_collection_issue）
+        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedOrder.isChecked(), persistedOrder.getAuditorId())) {
+            saveAuditService.checkOrder(persistedOrder, persistedOrder.getAuditorId());
+        }
 
         data.put("order", persistedOrder);
     }

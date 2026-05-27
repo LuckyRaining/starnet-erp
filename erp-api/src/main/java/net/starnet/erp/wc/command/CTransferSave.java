@@ -18,6 +18,7 @@ import net.starnet.erp.wc.service.TransferProductService;
 import net.starnet.erp.uc.model.*;
 import net.starnet.erp.uc.service.*;
 import net.starnet.erp.wc.service.TransferService;
+import net.starnet.erp.service.SaveAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class CTransferSave extends BaseCommand {
     private ProductService productService;
     @Autowired
     private WarehouseService warehouseService;
+    @Autowired
+    private SaveAuditService saveAuditService;
 
     @Param(required = true)
     private Transfer transfer;
@@ -48,6 +51,7 @@ public class CTransferSave extends BaseCommand {
     private List<TransferProduct> productList;
 
     private Transfer persistedTransfer;
+    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -59,6 +63,7 @@ public class CTransferSave extends BaseCommand {
         // 计算
         // 调拨单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(transfer.getId())) { // transfer.id 为空时，即没传，为“新增”的意思
+            isNew = true;
             persistedTransfer = new Transfer();
 
             // 校验 单据编号 是否合法，合法才能“新增”，即 新增调拨单
@@ -69,6 +74,7 @@ public class CTransferSave extends BaseCommand {
             persistedTransfer.setChecked(false);
 
         } else { // transfer.id 非空时，即传了，为“更新”的意思
+            isNew = false;
             persistedTransfer = transferService.getById(transfer.getId());
             Assert.notNull(persistedTransfer, "ID为【" + transfer.getId() + "】的调拨订单不存在！");
 
@@ -104,6 +110,12 @@ public class CTransferSave extends BaseCommand {
         // ！不涉及！ 新增 单据的 账户列表 accountList[]
 
         // ！不涉及！ 新增 应付账款记录/应收账款记录
+
+        // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
+        // （逻辑与 CTransferSwitchCheck 一致）
+        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedTransfer.isChecked(), persistedTransfer.getAuditorId())) {
+            saveAuditService.checkTransfer(persistedTransfer, persistedTransfer.getAuditorId());
+        }
 
         data.put("transfer", persistedTransfer);
     }

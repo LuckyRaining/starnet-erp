@@ -86,3 +86,65 @@ export function applyDefaultLister (saveForm) {
     saveForm.listerId = userId
   }
 }
+
+/** 列表页切换审核但未登录时的提示文案 */
+export const SWITCH_CHECK_LOGIN_REQUIRED_MESSAGE = '当前未登录，请登陆后审核！'
+
+/** 列表页尝试取消审核时的提示文案（所有单据均为单向审核） */
+export const SWITCH_CHECK_UNCHECK_NOT_ALLOWED_MESSAGE = '已审核的单据不能取消审核！'
+
+/**
+ * 列表页切换审核状态时组装 *SwitchCheck 请求参数。
+ * <p>
+ * 规则：所有单据均为单向审核（仅 false → true）。
+ * <ul>
+ *   <li>checked 为 false：拒绝取消审核</li>
+ *   <li>checked 为 true：必须已登录，自动附带当前用户 id 为 auditorId</li>
+ * </ul>
+ *
+ * @param {string} idParam 主键字段名
+ * @param {string|number} id 单据 ID
+ * @param {boolean} checked 切换后的审核状态
+ * @returns {{ ok: boolean, payload?: Object, message?: string }}
+ */
+export function buildSwitchCheckPayload (idParam, id, checked) {
+  const payload = { [idParam]: id }
+
+  // 单向审核：不允许取消
+  if (!checked) {
+    return { ok: false, message: SWITCH_CHECK_UNCHECK_NOT_ALLOWED_MESSAGE }
+  }
+
+  const auditorId = getCurrentUserId()
+  if (!auditorId) {
+    return { ok: false, message: SWITCH_CHECK_LOGIN_REQUIRED_MESSAGE }
+  }
+
+  payload.auditorId = auditorId
+  return { ok: true, payload }
+}
+
+/**
+ * 审核成功后回填列表行的审核人 ID 与展示名称。
+ * 优先使用后端返回的 auditorId；若为空则回退为当前登录用户。
+ */
+export function applyAuditorToRow(row, entity) {
+  // 如果行数据或审核状态为空，则不进行处理
+  if (!row || !row.checked) {
+    return
+  }
+
+  if (entity && entity.auditorId) {
+    // 如果实体对象有审核人，则设置行数据的审核人
+    row.auditorId = entity.auditorId
+  } else {
+    // 如果实体对象没有审核人，则设置行数据的审核人为当前登录用户
+    row.auditorId = getCurrentUserId()
+  }
+
+  // 获取当前登录用户
+  const user = getCurrentUser()
+  if (user) {
+    row.auditorName = userDisplayName(user)
+  }
+}

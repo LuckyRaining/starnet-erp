@@ -18,6 +18,7 @@ import net.starnet.erp.bc.service.SaleService;
 import net.starnet.erp.constant.Define;
 import net.starnet.erp.fc.model.AccountRecord;
 import net.starnet.erp.fc.service.AccountRecordService;
+import net.starnet.erp.service.SaveAuditService;
 import net.starnet.erp.uc.model.*;
 import net.starnet.erp.uc.service.*;
 import net.starnet.erp.wc.model.IssueProduct;
@@ -56,6 +57,8 @@ public class CSaleSave extends BaseCommand {
     private StockRecordService stockRecordService;
     @Autowired
     private ReceivableService receivableService;
+    @Autowired
+    private SaveAuditService saveAuditService;
 
     @Param(required = true)
     private Sale sale;
@@ -65,6 +68,7 @@ public class CSaleSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Sale persistedSale;
+    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -91,6 +95,7 @@ public class CSaleSave extends BaseCommand {
         // 计算
         // 销货单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(sale.getId())) { // sale.id 为空时，即没传，为“新增”的意思
+            isNew = true;
             persistedSale = new Sale();
 
             persistedSale.setType(sale.getType());
@@ -102,6 +107,7 @@ public class CSaleSave extends BaseCommand {
             persistedSale.setChecked(false);
 
         } else { // sale.id 非空时，即传了，为“更新”的意思
+            isNew = false;
             persistedSale = saleService.getById(sale.getId());
             Assert.notNull(persistedSale, "ID为【" + sale.getId() + "】的销售订单不存在！");
 
@@ -165,6 +171,12 @@ public class CSaleSave extends BaseCommand {
 
         // 新增 应收账款记录
         handleReceivable();
+
+        // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
+        // （逻辑与 CSaleSwitchCheck 一致，审核通过后会生成 fc_collection_issue）
+        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedSale.isChecked(), persistedSale.getAuditorId())) {
+            saveAuditService.checkSale(persistedSale, persistedSale.getAuditorId());
+        }
 
         data.put("sale", persistedSale);
     }

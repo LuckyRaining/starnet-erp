@@ -69,6 +69,7 @@
                          width="70px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.checked"
+                       :disabled="scope.row.checked"
                        @change="orderCheckedSwitch(scope.row)">
             </el-switch>
           </template>
@@ -117,7 +118,10 @@
 </template>
 
 <script>
+import orderListSwitchCheck from '@/mixins/orderListSwitchCheck'
+
 export default {
+  mixins: [orderListSwitchCheck],
   data() {
     return {
       // 获取订单列表的参数对象
@@ -186,16 +190,8 @@ export default {
       })
     },
     // 订单审核状态改变
-    async orderCheckedSwitch(order) {
-      const { data: result } = await this.$http.post('/order/switchCheck', {
-        orderId: order.id
-      })
-      if (!result.success) {
-        order.checked = !order.checked
-        return this.$message.error('更新审核状态失败！')
-      }
-      order.checked = result.data.order.checked
-      this.$message.success('更新审核状态成功！')
+    async orderCheckedSwitch (order) {
+      await this.postSwitchCheck('/order/switchCheck', 'orderId', order, 'order', '订单审核成功！')
     },
     // 删除订单
     async deleteOrder(orderId) {

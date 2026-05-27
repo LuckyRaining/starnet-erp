@@ -73,6 +73,7 @@
                          width="70px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.checked"
+                       :disabled="scope.row.checked"
                        @change="checkedSwitch(scope.row)">
             </el-switch>
           </template>
@@ -121,7 +122,10 @@
 </template>
 
 <script>
+import orderListSwitchCheck from '@/mixins/orderListSwitchCheck'
+
 export default {
+  mixins: [orderListSwitchCheck],
   data() {
     return {
       // 获取职员列表的参数对象
@@ -190,16 +194,8 @@ export default {
       })
     },
     // 调拨单审核状态改变
-    async checkedSwitch(transfer) {
-      const { data: result } = await this.$http.post('/transfer/switchCheck', {
-        transferId: transfer.id
-      })
-      if (!result.success) {
-        transfer.checked = !transfer.checked
-        return this.$message.error('更新审核状态失败！')
-      }
-      transfer.checked = result.data.transfer.checked
-      this.$message.success('更新审核状态成功！')
+    async checkedSwitch (transfer) {
+      await this.postSwitchCheck('/transfer/switchCheck', 'transferId', transfer, 'transfer', '调拨单审核成功！')
     },
     // 删除调拨单
     async deleteTransfer(transferId) {
