@@ -52,4 +52,12 @@ public class ProductController extends BaseController {
         return doAction(CProductSwitchActive.class);
     }
 
+    /**
+     * 按商品分类统计商品数量
+     */
+    @PostMapping("/countByCategory")
+    public Result countByCategory() {
+        return doAction(CProductCountByCategory.class);
+    }
+
 }

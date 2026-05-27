@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import net.starnet.erp.uc.model.Product;
 
+import java.util.Map;
+
 /**
  * 商品服务
  */
@@ -27,4 +29,14 @@ public interface ProductService extends IService<Product> {
      * @return
      */
     Product findByCode(String code);
+
+    /**
+     * 按商品分类统计商品数量（仅统计直接归属该分类的商品）
+     */
+    Map<String, Long> countGroupByCategoryId();
+
+    /**
+     * 商品总数
+     */
+    long countAll();
 }

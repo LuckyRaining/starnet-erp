@@ -6,15 +6,18 @@
                width="70%">
       <el-container>
         <el-aside width="200px">
-          <el-card>
-            <el-tree :data="categoryList"
-                     :props="defaultProps"
-                     default-expand-all
-                     node-key="id"
-                     ref="tree"
-                     highlight-current
-                     :expand-on-click-node="false"
-                     @node-click="handleNodeClick"></el-tree>
+          <el-card class="category-card">
+            <div class="category-tree-wrap">
+              <el-tree :key="categoryTreeKey"
+                       :data="categoryList"
+                       :props="defaultProps"
+                       node-key="id"
+                       ref="tree"
+                       highlight-current
+                       :default-expanded-keys="defaultExpandedKeys"
+                       :expand-on-click-node="false"
+                       @node-click="handleNodeClick"></el-tree>
+            </div>
           </el-card>
         </el-aside>
         <el-main>
@@ -25,7 +28,7 @@
                     class="query">
               <el-col :span="10">
                 <el-input placeholder="请输入商品编号/名称/规格型号查询"
-                          v-model="params.query.name"
+                          v-model="params.query.keyword"
                           clearable
                           @clear="getProductPage">
                 </el-input>
@@ -93,7 +96,8 @@ export default {
       },
       params: {
         query: {
-          categoryId: ''
+          categoryId: '',
+          keyword: ''
         },
         current: 1,
         size: 5
@@ -105,6 +109,10 @@ export default {
           name: '全部'
         }
       ],
+      // 分类树节点 key
+      categoryTreeKey: 0,
+      // 默认展开的分类树节点 key
+      defaultExpandedKeys: [''],
       productList: [],
       currentRow: null
     }
@@ -127,6 +135,8 @@ export default {
     // 选择了树节点
     handleNodeClick (data) {
       this.params.query.categoryId = data.id
+      this.params.query.keyword = ''
+      this.params.current = 1
       this.getProductPage()
     },
     // 获取分类列表
@@ -136,30 +146,76 @@ export default {
       })
       if (!result.success) return this.$message.error(result.message)
 
+      const childList = result.data.categoryList || []
       this.categoryList = [
         {
           id: '',
           name: '全部',
-          childList: result.data.categoryList
+          childList
         }
       ]
+      this.defaultExpandedKeys = this.buildDefaultExpandedKeys(childList)
+      this.categoryTreeKey += 1
+    },
+    // 默认展开到第二层：展开「全部」及所有一级分类
+    buildDefaultExpandedKeys(level1List) {
+      // 默认展开的分类树节点 key 数组
+      const expandedKeys = ['']
+
+      // 遍历一级分类，将一级分类的 id 添加到默认展开的分类树节点 key 数组中
+      level1List.forEach((category) => {
+        expandedKeys.push(category.id)
+      })
+
+      return expandedKeys
     },
     // 搜索
     search () {
+      this.params.query.categoryId = ''
+      this.params.current = 1
+
+      // 清空当前选中的分类树节点，即 显示「全部」分类节点
+      this.$refs.tree.setCurrentKey('')
       this.getProductPage()
     },
     // 清空
     clear () {
-      this.params.query = {}
-      this.$refs.tree.setCurrentNode({
-        id: ''
-      })
+      this.params.query = {
+        categoryId: '',
+        keyword: ''
+      }
+      this.params.current = 1
+
+      // 清空当前选中的分类树节点，即 显示「全部」分类节点
+      this.$refs.tree.setCurrentKey('')
+
+      // 清空当前选中的商品，即 不选中任何商品
       this.$refs.productTable.setCurrentRow()
+
       this.getProductPage()
+    },
+    // 组装商品分页查询参数
+    buildProductPagePayload () {
+      const query = {}
+      const categoryId = this.params.query.categoryId
+      const keyword = (this.params.query.keyword || '').trim()
+
+      if (categoryId) {
+        query.categoryId = categoryId
+      }
+      if (keyword) {
+        query.keyword = keyword
+      }
+
+      return {
+        query,
+        current: this.params.current,
+        size: this.params.size
+      }
     },
     // 获取商品分页列表
     async getProductPage () {
-      const { data: result } = await this.$http.post('/product/page', this.params)
+      const { data: result } = await this.$http.post('/product/page', this.buildProductPagePayload())
       if (!result.success) return this.$message.error(result.message)
 
       this.productList = result.data.productPage.records
@@ -206,5 +262,14 @@ export default {
 }
 .el-main {
   padding-top: 0;
+}
+.category-card {
+  /deep/ .el-card__body {
+    padding: 10px;
+  }
+}
+.category-tree-wrap {
+  max-height: calc(70vh - 160px);
+  overflow-y: auto;
 }
 </style>
