@@ -292,30 +292,38 @@
                width="70%"
                @close="selectSourceIssueDialogClosed">
       <!-- 列表区域 -->
-      <el-table :data="purchaseList"
+      <el-table :data="displayPurchaseList"
                 border
                 stripe
                 @selection-change="handlePurchaseSelectionChange">
         <el-table-column type="selection"
                          width="55">
         </el-table-column>
-        <el-table-column label="源单编号"
-                         prop="code"></el-table-column>
-        <el-table-column label="业务类别"
-                         prop="type">
-          <template slot-scope="scope">
-            <!-- <span v-if="scope.row.type === 10"> -->
-            <span v-if="scope.row.type === 'buy'">
-              购货
-            </span>
-            <!-- <span v-else-if="scope.row.type === 20"> -->
-            <span v-else-if="scope.row.type === 'refund'">
-              购货退货
+        <el-table-column prop="code">
+          <template slot="header">
+            <span class="source-issue-header sortable"
+                  @click="toggleSourceIssueSort('code')">
+              源单编号
+              <i :class="sourceIssueSortIcon('code')"></i>
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="单据日期"
-                         prop="issueDate"></el-table-column>
+        <el-table-column label="业务类别"
+                         prop="type">
+          <template slot-scope="scope">
+            <span v-if="scope.row.type === 'buy'">购货</span>
+            <span v-else-if="scope.row.type === 'refund'">购货退货</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="issueDate">
+          <template slot="header">
+            <span class="source-issue-header sortable"
+                  @click="toggleSourceIssueSort('issueDate')">
+              单据日期
+              <i :class="sourceIssueSortIcon('issueDate')"></i>
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column label="已核销金额"
                          prop="verifiedAmount"></el-table-column>
         <el-table-column label="未核销金额"
@@ -355,7 +363,31 @@ export default {
 
       // 选择源单相关
       purchaseList: [],
-      selectedPurchaseList: []
+      selectedPurchaseList: [],
+      // 源单对话框：排序
+      sourceIssueSortProp: '', // 要排序的字段
+      sourceIssueSortOrder: 'asc' // 排序顺序
+    }
+  },
+  computed: {
+    // 源单列表：按表头排序
+    displayPurchaseList () {
+      let list = this.purchaseList.slice()
+
+      if (this.sourceIssueSortProp) {
+        const prop = this.sourceIssueSortProp
+        const order = this.sourceIssueSortOrder
+        list.sort((a, b) => {
+          const av = a[prop] == null ? '' : a[prop]
+          const bv = b[prop] == null ? '' : b[prop]
+          let result = 0
+          if (av < bv) result = -1
+          else if (av > bv) result = 1
+          return order === 'asc' ? result : -result
+        })
+      }
+
+      return list
     }
   },
   created() {
@@ -580,11 +612,45 @@ export default {
       }
 
       this.purchaseList = result.data.purchaseList
+      this.resetSourceIssueDialogQuery()
       this.selectSourceIssueDialogVisible = true
     },
 
+    // 重置源单对话框的排序
+    resetSourceIssueDialogQuery () {
+      this.sourceIssueSortProp = ''
+      this.sourceIssueSortOrder = 'asc'
+    },
+
+    // 点击表头切换升序 / 降序
+    toggleSourceIssueSort (prop) {
+      if (this.sourceIssueSortProp === prop) {
+        // 如果 当前要排序的字段 与 要排序的字段 相同，则切换排序顺序
+        this.sourceIssueSortOrder = this.sourceIssueSortOrder === 'asc' ? 'desc' : 'asc'
+      } else {
+        // 如果 当前要排序的字段 与 要排序的字段 不同，则设置要排序的字段为当前字段，并初始化排序顺序为升序
+        this.sourceIssueSortProp = prop
+        this.sourceIssueSortOrder = 'asc'
+      }
+    },
+
+    // 表头排序图标
+    sourceIssueSortIcon (prop) {
+      if (this.sourceIssueSortProp !== prop) {
+        // 如果 当前要排序的字段 与 要排序的字段 不同，则返回未排序的图标
+        return 'el-icon-d-caret sort-icon inactive'
+      }
+      // 如果 当前要排序的字段 与 要排序的字段 相同，则返回排序的图标
+      return this.sourceIssueSortOrder === 'asc'
+        // 如果 排序顺序为升序，则返回向上的图标
+        ? 'el-icon-caret-top sort-icon active'
+        // 如果 排序顺序为降序，则返回向下的图标
+        : 'el-icon-caret-bottom sort-icon active'
+    },
+
     // 选择源单对话框关闭
-    selectSourceIssueDialogClosed() {
+    selectSourceIssueDialogClosed () {
+      this.resetSourceIssueDialogQuery()
     },
 
     // 点击选择源单弹框的确定
@@ -645,5 +711,28 @@ export default {
 .el-icon-delete {
   cursor: pointer;
   margin: 0 3px;
+}
+
+.source-issue-header {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.source-issue-header.sortable:hover {
+  color: #409eff;
+}
+
+.sort-icon {
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+.sort-icon.inactive {
+  color: #c0c4cc;
+}
+
+.sort-icon.active {
+  color: #409eff;
 }
 </style>
