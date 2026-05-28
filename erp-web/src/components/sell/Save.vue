@@ -408,7 +408,7 @@ export default {
     // 折扣率和折扣额双向联动，分别走不同计算分支
     'saveProductForm.discountRate': 'handleDiscountRateChanged',
     'saveProductForm.discountAmount': 'handleDiscountAmountChanged',
-    // 结算信息联动：优惠三字段互算 + 收款/欠款互算（含客户承担费用）
+    // 结算信息联动：优惠三字段互算 + 收款/欠款互算 + 客户承担费用=本次收款
     'saveForm.preferentialRate': 'handlePreferentialRateChanged',
     'saveForm.preferentialAmount': 'handlePreferentialAmountChanged',
     'saveForm.preferredAmount': 'handlePreferredAmountChanged',
@@ -470,7 +470,7 @@ export default {
       isDiscountSyncing: false,
       // rate: 以优惠率为主输入；amount: 以优惠金额为主输入；preferred: 以优惠后金额为主输入
       settlementCalcMode: 'rate',
-      // current: 以本次收款为主输入；debt: 以本次欠款为主输入
+      // current: 以本次收款为主输入；customerFee: 以客户承担费用为主输入；debt: 以本次欠款为主输入（二者始终相等）
       paymentCalcMode: 'current',
       isSettlementSyncing: false,
       isPaymentSyncing: false
@@ -850,6 +850,11 @@ export default {
       }
       return discountAmount > subtotal ? subtotal : discountAmount
     },
+    // 金额限制为非负
+    limitNonNegativeAmount(value) {
+      const numberValue = this.toNumber(value)
+      return numberValue < 0 ? 0 : numberValue
+    },
     onPreferentialRateInput() {
       this.settlementCalcMode = 'rate'
     },
@@ -866,7 +871,7 @@ export default {
       this.paymentCalcMode = 'debt'
     },
     onCustomerFeeInput() {
-      this.recalculatePaymentByMode()
+      this.paymentCalcMode = 'customerFee'
     },
     handleSaleProductListChanged() {
       this.recalculateSettlementByMode()
@@ -905,9 +910,10 @@ export default {
       this.calculateByDebtAmount()
     },
     handleCustomerFeeChanged() {
-      if (!this.isPaymentSyncing) {
-        this.recalculatePaymentByMode()
+      if (this.isPaymentSyncing || this.paymentCalcMode !== 'customerFee') {
+        return
       }
+      this.calculateByCustomerFee()
     },
     recalculateSettlementByMode() {
       if (this.settlementCalcMode === 'amount') {
@@ -921,6 +927,8 @@ export default {
     recalculatePaymentByMode() {
       if (this.paymentCalcMode === 'debt') {
         this.calculateByDebtAmount()
+      } else if (this.paymentCalcMode === 'customerFee') {
+        this.calculateByCustomerFee()
       } else {
         this.calculateByCurrentAmount()
       }
@@ -978,37 +986,47 @@ export default {
         this.recalculatePaymentByMode()
       })
     },
-    // 公式：本次欠款 = 优惠后金额 + 客户承担费用 - 本次收款
-    calculateByCurrentAmount() {
-      const receivableTotal = this.toNumber(this.saveForm.preferredAmount) + this.toNumber(this.saveForm.customerFee)
-      const currentAmount = this.limitDiscountAmount(receivableTotal, this.saveForm.currentAmount)
-      const debtAmount = receivableTotal - currentAmount
-      this.syncPaymentFields({
-        currentAmount,
-        debtAmount
-      })
-    },
-    // 公式：本次收款 = 优惠后金额 + 客户承担费用 - 本次欠款
-    calculateByDebtAmount() {
-      const receivableTotal = this.toNumber(this.saveForm.preferredAmount) + this.toNumber(this.saveForm.customerFee)
-      const debtAmount = this.limitDiscountAmount(receivableTotal, this.saveForm.debtAmount)
-      const currentAmount = receivableTotal - debtAmount
-      this.syncPaymentFields({
-        currentAmount,
-        debtAmount
-      })
-    },
-    syncPaymentFields({ currentAmount, debtAmount }) {
+    // 客户承担费用与本次收款保持相等
+    syncPaymentAmountFields(paymentAmount, debtAmount) {
       this.isPaymentSyncing = true
-      if (currentAmount !== undefined) {
-        this.saveForm.currentAmount = this.toFixedNumber(currentAmount)
-      }
+      this.saveForm.customerFee = this.toFixedNumber(paymentAmount)
+      this.saveForm.currentAmount = this.toFixedNumber(paymentAmount)
       if (debtAmount !== undefined) {
         this.saveForm.debtAmount = this.toFixedNumber(debtAmount)
       }
       this.$nextTick(() => {
         this.isPaymentSyncing = false
       })
+    },
+    // 公式：本次欠款 = 优惠后金额 - 本次收款（客户承担费用与本次收款相等）
+    calculateByCurrentAmount() {
+      const preferredAmount = this.limitNonNegativeAmount(this.saveForm.preferredAmount)
+      const paymentAmount = this.limitDiscountAmount(
+        preferredAmount,
+        this.saveForm.currentAmount
+      )
+      const debtAmount = preferredAmount - paymentAmount
+      this.syncPaymentAmountFields(paymentAmount, debtAmount)
+    },
+    // 公式：本次欠款 = 优惠后金额 - 客户承担费用（客户承担费用与本次收款相等）
+    calculateByCustomerFee() {
+      const preferredAmount = this.limitNonNegativeAmount(this.saveForm.preferredAmount)
+      const paymentAmount = this.limitDiscountAmount(
+        preferredAmount,
+        this.saveForm.customerFee
+      )
+      const debtAmount = preferredAmount - paymentAmount
+      this.syncPaymentAmountFields(paymentAmount, debtAmount)
+    },
+    // 公式：本次收款 = 优惠后金额 - 本次欠款（客户承担费用与本次收款相等）
+    calculateByDebtAmount() {
+      const preferredAmount = this.limitNonNegativeAmount(this.saveForm.preferredAmount)
+      const debtAmount = this.limitDiscountAmount(
+        preferredAmount,
+        this.saveForm.debtAmount
+      )
+      const paymentAmount = preferredAmount - debtAmount
+      this.syncPaymentAmountFields(paymentAmount, debtAmount)
     },
     getSaleProductTotalAmount() {
       return this.toFixedNumber(

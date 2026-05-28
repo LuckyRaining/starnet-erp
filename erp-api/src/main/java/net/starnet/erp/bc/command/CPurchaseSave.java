@@ -14,12 +14,14 @@ import net.starnet.erp.fc.service.AccountRecordService;
 import net.starnet.erp.fc.service.PayableService;
 import net.starnet.erp.service.SaveAuditService;
 import net.starnet.erp.uc.model.Product;
+import net.starnet.erp.uc.model.SettlementAccount;
 import net.starnet.erp.uc.model.Supplier;
 import net.starnet.erp.uc.model.Warehouse;
 import net.starnet.erp.uc.service.ProductService;
 import net.starnet.erp.uc.service.SettlementAccountService;
 import net.starnet.erp.uc.service.SupplierService;
 import net.starnet.erp.uc.service.WarehouseService;
+import net.starnet.erp.util.SimpleValidator;
 import net.starnet.erp.wc.model.IssueProduct;
 import net.starnet.erp.wc.service.IssueProductService;
 import net.starnet.erp.wc.service.StockRecordService;
@@ -69,22 +71,39 @@ public class CPurchaseSave extends BaseCommand {
 
     @Override
     protected void init() throws Exception {
-        // BizException 为后端展示
-        if (!Define.validatePurchaseType(purchase.getType())) {
-            throw new BizException("采购类型不正确！");
+        // 校验数据
+
+        // Assert 为 前端 + 后端 展示，BizException 仅为后端展示
+        // 校验 采购类型 是否合法
+        Assert.notFalse(Define.validatePurchaseType(purchase.getType()), "采购类型不正确！");
+
+        // 校验 供应商ID 是否合法
+        Assert.notBlank(purchase.getSupplierId(), "供应商ID不能为空！");
+        Supplier supplier = supplierService.getById(purchase.getSupplierId());
+        // 校验 供应商 是否存在
+        Assert.notNull(supplier, "ID为【" + purchase.getSupplierId() + "】的供应商不存在！");
+
+        // 校验 单据日期 是否存在
+        Assert.notBlank(purchase.getIssueDate(), "单据日期不能为空！");
+        // 校验 单据日期 是否合法
+        Assert.notFalse(SimpleValidator.validateDate(purchase.getIssueDate()), "单据日期不正确！");
+
+        // 校验 账户列表 accountList[] 是否存在
+        Assert.notNull(accountList, "账户列表不能为空！");
+        // 校验 账户列表 accountList[] 中的 每个结算账户 是否存在
+        // 实则仅需校验 第一个结算账户 是否存在，因为 新增 购货单/购退单时，仅支持 一个结算账户 进行结算
+        for (AccountRecord account : accountList) {
+            // 校验 账户ID 是否合法
+            Assert.notBlank(account.getAccountId(), "账户ID不能为空！");
+            SettlementAccount settlementAccount = settlementAccountService.getById(account.getAccountId());
+            // 校验 结算账户 是否存在
+            Assert.notNull(settlementAccount, "ID为【" + account.getAccountId() + "】的账户不存在！");
         }
+
     }
 
     @Override
     protected void doCommand() throws Exception {
-        // 校验数据
-        Assert.notBlank(purchase.getSupplierId(), "供应商ID不能为空！");
-        Supplier supplier = supplierService.getById(purchase.getSupplierId());
-        Assert.notNull(supplier, "ID为【" + purchase.getSupplierId() + "】的供应商不存在！");
-
-        // 同 init() 初始化校验，但 Assert 为前端展示
-        Assert.notFalse(Define.validatePurchaseType(purchase.getType()), "类型不正确！");
-
         // 计算
         // 购货单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(purchase.getId())) { // purchase.id 为空时，即没传，为“新增”的意思
@@ -126,7 +145,7 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setIssueDate(purchase.getIssueDate());
         persistedPurchase.setCode(purchase.getCode());
 
-         // TODO 完善 付/退款状态 判定
+        // TODO 完善 付/退款状态 判定
         persistedPurchase.setStatus(resolvePurchaseStatus(purchase.getPreferredAmount(), purchase.getCurrentAmount()));
         persistedPurchase.setQuantity(getPurchaseQuantity());
         persistedPurchase.setDiscountAmount(purchase.getDiscountAmount());

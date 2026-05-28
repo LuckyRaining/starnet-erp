@@ -13,6 +13,7 @@ import net.starnet.erp.uc.model.Customer;
 import net.starnet.erp.uc.model.Employee;
 import net.starnet.erp.uc.model.Product;
 import net.starnet.erp.uc.model.Warehouse;
+import net.starnet.erp.util.SimpleValidator;
 import net.starnet.erp.wc.service.IssueProductService;
 import net.starnet.erp.bc.service.SaleService;
 import net.starnet.erp.constant.Define;
@@ -68,29 +69,47 @@ public class CSaleSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Sale persistedSale;
-    
+
     @Override
     protected void init() throws Exception {
-        // BizException 为后端展示
-        if (!Define.validateSaleType(sale.getType())) {
-            throw new BizException("销售类型不正确！");
+        // 校验数据
+
+        // Assert 为 前端 + 后端 展示，BizException 仅为后端展示
+        // 校验 销售类型 是否合法
+        Assert.notFalse(Define.validateSaleType(sale.getType()), "销售类型不正确！");
+
+        // 校验 客户ID 是否合法
+        Assert.notBlank(sale.getCustomerId(), "客户ID不能为空！");
+        Customer customer = customerService.getById(sale.getCustomerId());
+        // 校验 客户 是否存在
+        Assert.notNull(customer, "ID为【" + sale.getCustomerId() + "】的客户不存在！");
+
+        // 校验 销售员ID 是否合法
+        Assert.notBlank(sale.getSellerId(), "销售员ID不能为空！");
+        Employee seller = employeeService.getById(sale.getSellerId());
+        // 校验 销售员 是否存在
+        Assert.notNull(seller, "ID为【" + sale.getSellerId() + "】的销售员不存在！");
+
+        // 校验 单据日期 是否存在
+        Assert.notBlank(sale.getIssueDate(), "单据日期不能为空！");
+        // 校验 单据日期 是否合法
+        Assert.notFalse(SimpleValidator.validateDate(sale.getIssueDate()), "单据日期不正确！");
+
+        // 校验 账户列表 accountList[] 是否存在
+        Assert.notNull(accountList, "账户列表不能为空！");
+        // 校验 账户列表 accountList[] 中的 每个结算账户 是否存在
+        // 实则仅需校验 第一个结算账户 是否存在，因为 新增 销货单/销退单时，仅支持 一个结算账户 进行结算
+        for (AccountRecord account : accountList) {
+            // 校验 账户ID 是否合法
+            Assert.notBlank(account.getAccountId(), "账户ID不能为空！");
+            SettlementAccount settlementAccount = settlementAccountService.getById(account.getAccountId());
+            // 校验 结算账户 是否存在
+            Assert.notNull(settlementAccount, "ID为【" + account.getAccountId() + "】的账户不存在！");
         }
     }
 
     @Override
     protected void doCommand() throws Exception {
-        // 校验数据
-        Assert.notBlank(sale.getCustomerId(), "客户ID不能为空！");
-        Customer customer = customerService.getById(sale.getCustomerId());
-        Assert.notNull(customer, "ID为【" + sale.getCustomerId() + "】的客户不存在！");
-
-        Assert.notBlank(sale.getSellerId(), "销售员ID不能为空！");
-        Employee seller = employeeService.getById(sale.getSellerId());
-        Assert.notNull(seller, "ID为【" + sale.getSellerId() + "】的用户不存在！");
-
-        // 同 init() 初始化校验，但 Assert 为前端展示
-        Assert.notFalse(Define.validateSaleType(sale.getType()), "销售类型不正确！");
-
         // 计算
         // 销货单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(sale.getId())) { // sale.id 为空时，即没传，为“新增”的意思

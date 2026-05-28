@@ -22,6 +22,7 @@ import net.starnet.erp.uc.service.WarehouseService;
 import net.starnet.erp.wc.model.IssueProduct;
 import net.starnet.erp.wc.service.IssueProductService;
 import net.starnet.erp.service.SaveAuditService;
+import net.starnet.erp.util.SimpleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -54,25 +55,33 @@ public class COrderSave extends BaseCommand {
     private List<IssueProduct> productList;
 
     private Order persistedOrder;
-    
+
     @Override
     protected void init() throws Exception {
-        // BizException 为后端展示
-        if (!Define.validateOrderBusinessType(order.getBusinessType())) {
-            throw new BizException("客户订单类型不正确！");
-        }
+        // 校验数据
+
+        // Assert 为 前端 + 后端 展示，BizException 仅为后端展示
+        Assert.notFalse(Define.validateOrderBusinessType(order.getBusinessType()), "客户订单类型不正确！");
+
+        // 校验 客户ID 是否合法
+        Assert.notBlank(order.getCustomerId(), "客户ID不能为空！");
+        Customer customer = customerService.getById(order.getCustomerId());
+        // 校验 客户 是否存在
+        Assert.notNull(customer, "ID为【" + order.getCustomerId() + "】的客户不存在！");
+
+        // 校验 单据日期 是否存在
+        Assert.notBlank(order.getIssueDate(), "单据日期不能为空！");
+        // 校验 单据日期 是否合法
+        Assert.notFalse(SimpleValidator.validateDate(order.getIssueDate()), "单据日期不正确！");
+
+        // 校验 交货日期 是否存在
+        Assert.notBlank(order.getDeliveryDate(), "交货日期不能为空！");
+        // 校验 交货日期 是否合法
+        Assert.notFalse(SimpleValidator.validateDate(order.getDeliveryDate()), "交货日期不正确！");
     }
 
     @Override
     protected void doCommand() throws Exception {
-        // 校验数据
-        Assert.notBlank(order.getCustomerId(), "客户ID不能为空！");
-        Customer customer = customerService.getById(order.getCustomerId());
-        Assert.notNull(customer, "ID为【" + order.getCustomerId() + "】的客户不存在！");
-
-        // 同 init() 初始化校验，但 Assert 为前端展示
-        Assert.notFalse(Define.validateOrderBusinessType(order.getBusinessType()), "客户订单类型不正确！");
-
         // 计算
         // 客户订单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(order.getId())) { // order.id 为空时，即没传，为“新增”的意思
@@ -203,7 +212,7 @@ public class COrderSave extends BaseCommand {
 
             // TODO 需不需要设置 单据编号？
             // persistedIssueProduct.setCode(orderProduct.getCode());
-             persistedIssueProduct.setCode(orderProduct.getCode());
+            persistedIssueProduct.setCode(orderProduct.getCode());
 
             persistedIssueProduct.setRemark(orderProduct.getRemark());
 
