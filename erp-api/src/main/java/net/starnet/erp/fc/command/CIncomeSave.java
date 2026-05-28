@@ -14,6 +14,7 @@ import net.starnet.erp.fc.service.AccountRecordService;
 import net.starnet.erp.fc.service.FlowRecordService;
 import net.starnet.erp.fc.service.IncomeService;
 import net.starnet.erp.service.SaveAuditService;
+import net.starnet.erp.uc.service.SettlementAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class CIncomeSave extends BaseCommand {
     @Autowired
     private AccountRecordService accountRecordService;
     @Autowired
+    private SettlementAccountService settlementAccountService;
+    @Autowired
     private FlowRecordService flowRecordService;
     @Autowired
     private SaveAuditService saveAuditService;
@@ -42,7 +45,6 @@ public class CIncomeSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Income persistedIncome;
-    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -53,10 +55,9 @@ public class CIncomeSave extends BaseCommand {
     protected void doCommand() throws Exception {
         // 计算
         if (StrKit.isBlank(income.getId())) { // income.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedIncome = new Income();
 
-            // 校验编码是否合法
+            // 校验 单据编号 是否合法，合法才能“新增”，即 新增收入单
             validateCode(income.getCode());
             persistedIncome.setCode(income.getCode());
             
@@ -64,14 +65,18 @@ public class CIncomeSave extends BaseCommand {
             persistedIncome.setChecked(false);
 
         } else { // income.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedIncome = incomeService.getById(income.getId());
             Assert.notNull(persistedIncome, "ID为【" + income.getId() + "】的收入订单不存在！");
 
-            // 删除原来的账户
+            // 删除 该单原来的账户列表 accountList[] 对应的收支信息
+            // 即 回滚 结算账户 uc_settlement_account
+            settlementAccountService.rollbackByBusiness(income.getId());
+            // 删除 该单原来的账户列表 accountList[]
+            // 即 删除 单据账户 fc_account_record
             accountRecordService.deleteByBusiness(income.getId());
 
-            // 删除关联的单据
+            // 删除 该单原来的收支记录列表 flowRecordList[]
+            // 即 删除 收支记录 fc_flow_record
             flowRecordService.deleteByBusiness(income.getId());
         }
 
@@ -79,6 +84,11 @@ public class CIncomeSave extends BaseCommand {
         persistedIncome.setIssueDate(income.getIssueDate());
         persistedIncome.setCollectAmount(income.getCollectAmount());
         persistedIncome.setListerId(income.getListerId());
+
+        // 是否需要 审核？
+        // 新增保存 其他收入单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(income.getAuditorId()) && !income.isChecked();
+
         persistedIncome.setAuditorId(income.getAuditorId());
         persistedIncome.setRemark(income.getRemark());
         incomeService.saveOrUpdate(persistedIncome);
@@ -94,7 +104,7 @@ public class CIncomeSave extends BaseCommand {
 
         // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
         // （逻辑与 CIncomeSwitchCheck 一致）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedIncome.isChecked(), persistedIncome.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkIncome(persistedIncome, persistedIncome.getAuditorId());
         }
 

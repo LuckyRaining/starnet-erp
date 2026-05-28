@@ -35,8 +35,6 @@ import org.springframework.stereotype.Service;
  * <p>
  * 本类集中维护两类场景的审核逻辑，避免 {@code *Save} 与 {@code *SwitchCheck} 重复实现：
  * <ul>
- *     <li><b>保存页新增</b>：用户在 Save 页选择了审核人，但 {@code checked} 仍为 false，
- *     保存完成后由 {@link #shouldAuditOnNewSave} 判定并触发审核。</li>
  *     <li><b>列表页切换</b>：List 页点击审核开关，由对应的 {@code *SwitchCheck} 命令委托本类执行。</li>
  * </ul>
  * <p>
@@ -70,25 +68,6 @@ public class SaveAuditService {
     private PaymentIssueService paymentIssueService;
     @Autowired
     private CollectionIssueService collectionIssueService;
-
-    /**
-     * 判断「新增保存」是否需要在保存完成后自动审核。
-     * <p>
-     * 触发条件（须同时满足）：
-     * <ol>
-     *     <li>{@code isNew == true}：本次为新增，不是编辑已有单据；</li>
-     *     <li>{@code checked == false}：保存前尚未标记为已审核；</li>
-     *     <li>{@code auditorId} 非空：前端已指定审核人（通常来自 Save 页审核人下拉）。</li>
-     * </ol>
-     *
-     * @param isNew     是否新增
-     * @param checked   当前审核状态
-     * @param auditorId 审核人 ID
-     * @return 是否应在 Save 命令末尾调用对应的 check 方法
-     */
-    public boolean shouldAuditOnNewSave(boolean isNew, boolean checked, String auditorId) {
-        return isNew && !checked && StrKit.notBlank(auditorId);
-    }
 
     // ==================== 单向审核（bc 业务单据） ====================
 
@@ -260,8 +239,8 @@ public class SaveAuditService {
         paymentIssue.setSourceCode(purchase.getCode());
         paymentIssue.setType(resolvePaymentIssueType(purchase.getType()));
         paymentIssue.setIssueDate(purchase.getIssueDate());
-        paymentIssue.setIssueAmount(purchase.getAmount());
-        paymentIssue.setVerifiedAmount(0);
+        paymentIssue.setIssueAmount(purchase.getPreferredAmount()); // 设置 单据金额 issueAmount 为 购货单的 优惠后金额 preferentialAmount
+        paymentIssue.setVerifiedAmount(purchase.getCurrentAmount());
         paymentIssue.setUnverifiedAmount(purchase.getDebtAmount());
         paymentIssue.setCurrentVerifiedAmount(purchase.getCurrentAmount());
         paymentIssueService.save(paymentIssue);
@@ -283,8 +262,8 @@ public class SaveAuditService {
         collectionIssue.setSourceCode(sale.getCode());
         collectionIssue.setType(resolveSaleCollectionIssueType(sale.getType()));
         collectionIssue.setIssueDate(sale.getIssueDate());
-        collectionIssue.setIssueAmount(sale.getAmount());
-        collectionIssue.setVerifiedAmount(0);
+        collectionIssue.setIssueAmount(sale.getPreferredAmount()); // 设置 单据金额 issueAmount 为 销货单的 优惠后金额 preferentialAmount
+        collectionIssue.setVerifiedAmount(sale.getCurrentAmount());
         collectionIssue.setUnverifiedAmount(sale.getDebtAmount());
         collectionIssue.setCurrentVerifiedAmount(sale.getCurrentAmount());
         collectionIssueService.save(collectionIssue);

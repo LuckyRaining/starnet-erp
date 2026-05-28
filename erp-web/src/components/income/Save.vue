@@ -127,7 +127,8 @@
           <el-col :span="5">
             <el-form-item label="收款金额"
                           prop="collectAmount">
-              <el-input v-model="saveForm.collectAmount"></el-input>
+              <el-input v-model="saveForm.collectAmount"
+                        disabled></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -190,6 +191,15 @@ export default {
   watch: {
     '$route' () {
       this.bootstrapIncomePage()
+    },
+    'saveForm.recordList': {
+      // 监听 saveForm.recordList 的变化
+      // 当 saveForm.recordList 发生变化时，调用 syncCollectAmountFromRecords 方法
+      handler () {
+        // 计算收款金额
+        this.syncCollectAmountFromRecords()
+      },
+      deep: true // 深度监听
     }
   },
   data() {
@@ -250,6 +260,8 @@ export default {
 
       this.saveForm.code = result.data.code
       this.applyDefaultLister()
+      // 计算收款金额
+      this.syncCollectAmountFromRecords()
     },
     // 获取 其他收入 分类列表
     async getCategoryList() {
@@ -278,6 +290,21 @@ export default {
       console.log(result.data)
       this.saveForm = result.data.income
       this.applyAccountIdFromSaveForm()
+      // 计算收款金额
+      this.syncCollectAmountFromRecords()
+    },
+
+    /**
+     * 计算收款金额。
+     * 收款金额 = recordList 金额合计（一次性结清，不可手动修改）
+     */
+    syncCollectAmountFromRecords () {
+      // 计算收款金额 = recordList 金额合计
+      const total = (this.saveForm.recordList || []).reduce((sum, record) => {
+        const value = Number(record.amount)
+        return sum + (isNaN(value) ? 0 : value)
+      }, 0)
+      this.saveForm.collectAmount = total
     },
 
     // 新增记录行
@@ -292,6 +319,8 @@ export default {
         return this.$message.warning('至少保留一条记录')
       }
       this.saveForm.recordList.splice(index, 1)
+      // 计算收款金额
+      this.syncCollectAmountFromRecords()
     },
 
     // 处理编辑单元格

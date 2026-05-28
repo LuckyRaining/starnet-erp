@@ -54,7 +54,6 @@ public class CCheckoutSave extends BaseCommand {
     private List<IssueProduct> productList;
 
     private Checkout persistedCheckout;
-    private boolean isNew;
 
     @Override
     protected void init() throws Exception {
@@ -77,7 +76,6 @@ public class CCheckoutSave extends BaseCommand {
         // 计算
         // 出库单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(checkout.getId())) { // checkout.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedCheckout = new Checkout();
 
             // 校验 单据编号 是否合法，合法才能“新增”，即 新增出库单
@@ -88,7 +86,6 @@ public class CCheckoutSave extends BaseCommand {
             persistedCheckout.setChecked(false);
 
         } else { // checkout.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedCheckout = checkoutService.getById(checkout.getId());
             Assert.notNull(persistedCheckout, "ID为【" + checkout.getId() + "】的出库订单不存在！");
 
@@ -116,6 +113,11 @@ public class CCheckoutSave extends BaseCommand {
         persistedCheckout.setAmount(getAmount());
         persistedCheckout.setQuantity(getQuantity());
         persistedCheckout.setListerId(checkout.getListerId());
+
+        // 是否需要 审核？
+        // 新增保存 出库单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(checkout.getAuditorId()) && !checkout.isChecked();
+
         persistedCheckout.setAuditorId(checkout.getAuditorId());
         persistedCheckout.setRemark(checkout.getRemark());
         // 新增/更新 出库单 wc_checkout
@@ -130,7 +132,7 @@ public class CCheckoutSave extends BaseCommand {
 
         // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
         // （逻辑与 CCheckoutSwitchCheck 一致）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedCheckout.isChecked(), persistedCheckout.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkCheckout(persistedCheckout, persistedCheckout.getAuditorId());
         }
 

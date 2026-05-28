@@ -393,6 +393,7 @@ export default {
   created() {
     let paymentId = this.$route.query.paymentId
     if (paymentId !== undefined) {
+      console.log('paymentId: ')
       console.log(paymentId)
       this.getDetail(paymentId)
     } else {
@@ -454,19 +455,24 @@ export default {
       })
       if (!result.success) return this.$message.error(result.message)
 
+      console.log('result.data: ')
       console.log(result.data)
       this.saveForm = result.data.payment
     },
 
     // 新增账户行
     addAccountRow(index, row) {
+      console.log('index: ')
       console.log(index)
+      console.log('row: ')
       console.log(row)
       this.saveForm.accountList.splice(index + 1, 0, {})
     },
     // 新增单据行
     addIssueRow(index, row) {
+      console.log('index: ')
       console.log(index)
+      console.log('row: ')
       console.log(row)
       this.saveForm.issueList.splice(index + 1, 0, {})
     },
@@ -488,10 +494,12 @@ export default {
     // 处理编辑单元格
     handleAccountEdit(index, row) {
       this.saveForm.accountList[index] = row
+      console.log('this.saveForm.accountList: ')
       console.log(this.saveForm.accountList)
     },
     handleIssueEdit(index, row) {
       this.saveForm.issueList[index] = row
+      console.log('this.saveForm.issueList: ')
       console.log(this.saveForm.issueList)
     },
 
@@ -565,7 +573,9 @@ export default {
         // 处理数据
         let persistAccountList = []
         this.saveForm.accountList.forEach((account) => {
+          console.log('account.accountId:')
           console.log(account.accountId)
+          console.log('account.accountId !== undefined: ')
           console.log(account.accountId !== undefined)
           if (account.accountId !== undefined) {
             persistAccountList.push(account)
@@ -589,6 +599,7 @@ export default {
         }
 
         this.$message.success('保存付款单成功！')
+        console.log('result: ')
         console.log(result)
         this.saveForm.id = result.data.payment.id
       })
@@ -655,7 +666,9 @@ export default {
 
     // 点击选择源单弹框的确定
     confirmSelectSourceIssueDialog() {
+      console.log('this.saveForm.issueList: ')
       console.log(this.saveForm.issueList)
+      console.log('this.saveForm: ')
       console.log(this.saveForm)
 
       let emptyIssueIndexList = []
@@ -669,7 +682,7 @@ export default {
           sourceCode: purchase.code,
           type: purchase.type,
           issueDate: purchase.issueDate,
-          issueAmount: purchase.amount,
+          issueAmount: purchase.preferredAmount, // 设置 源单据金额 == 优惠后金额
           verifiedAmount: purchase.verifiedAmount,
           unverifiedAmount: purchase.unverifiedAmount
         }

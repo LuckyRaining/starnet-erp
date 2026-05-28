@@ -54,7 +54,6 @@ public class COrderSave extends BaseCommand {
     private List<IssueProduct> productList;
 
     private Order persistedOrder;
-    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -77,7 +76,6 @@ public class COrderSave extends BaseCommand {
         // 计算
         // 客户订单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(order.getId())) { // order.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedOrder = new Order();
 
             // 校验 单据编号 是否合法，合法才能“新增”，即 新增客户订单
@@ -88,7 +86,6 @@ public class COrderSave extends BaseCommand {
             persistedOrder.setChecked(false);
 
         } else { // order.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedOrder = orderService.getById(order.getId());
             Assert.notNull(persistedOrder, "ID为【" + order.getId() + "】的客户订单不存在！");
 
@@ -119,6 +116,11 @@ public class COrderSave extends BaseCommand {
         persistedOrder.setDiscountRate(order.getDiscountRate());
         persistedOrder.setListerId(order.getListerId());
         persistedOrder.setAuditorId(order.getAuditorId());
+
+        // 是否需要 审核？
+        // 新增保存 客户订单的订货/退货单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(order.getAuditorId()) && !order.isChecked();
+
         persistedOrder.setRemark(order.getRemark());
         // 新增/更新 客户订单 bc_order
         orderService.saveOrUpdate(persistedOrder);
@@ -132,7 +134,7 @@ public class COrderSave extends BaseCommand {
 
         // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
         // （逻辑与 COrderSwitchCheck 一致，审核通过后会生成 fc_collection_issue）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedOrder.isChecked(), persistedOrder.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkOrder(persistedOrder, persistedOrder.getAuditorId());
         }
 

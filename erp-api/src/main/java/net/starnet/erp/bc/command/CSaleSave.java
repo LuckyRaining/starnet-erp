@@ -68,7 +68,6 @@ public class CSaleSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Sale persistedSale;
-    private boolean isNew;
     
     @Override
     protected void init() throws Exception {
@@ -95,7 +94,6 @@ public class CSaleSave extends BaseCommand {
         // 计算
         // 销货单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(sale.getId())) { // sale.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedSale = new Sale();
 
             persistedSale.setType(sale.getType());
@@ -107,7 +105,6 @@ public class CSaleSave extends BaseCommand {
             persistedSale.setChecked(false);
 
         } else { // sale.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedSale = saleService.getById(sale.getId());
             Assert.notNull(persistedSale, "ID为【" + sale.getId() + "】的销售订单不存在！");
 
@@ -147,6 +144,11 @@ public class CSaleSave extends BaseCommand {
         persistedSale.setAttachments(sale.getAttachments());
         persistedSale.setListerId(sale.getListerId());
         persistedSale.setAuditorId(sale.getAuditorId());
+
+        // 是否需要 审核？
+        // 新增保存 销货单/销退单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(sale.getAuditorId()) && !sale.isChecked();
+
         persistedSale.setRemark(sale.getRemark());
 
         persistedSale.setSellerId(sale.getSellerId());
@@ -174,7 +176,7 @@ public class CSaleSave extends BaseCommand {
 
         // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
         // （逻辑与 CSaleSwitchCheck 一致，审核通过后会生成 fc_collection_issue）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedSale.isChecked(), persistedSale.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkSale(persistedSale, persistedSale.getAuditorId());
         }
 

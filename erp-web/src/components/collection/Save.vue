@@ -679,7 +679,7 @@ export default {
           sourceCode: sale.code,
           type: sale.type,
           issueDate: sale.issueDate,
-          issueAmount: sale.amount,
+          issueAmount: sale.preferredAmount, // 设置 源单据金额 == 优惠后金额
           verifiedAmount: sale.verifiedAmount,
           unverifiedAmount: sale.unverifiedAmount
         }

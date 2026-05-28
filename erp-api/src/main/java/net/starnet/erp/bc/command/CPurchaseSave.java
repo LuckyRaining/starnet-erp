@@ -66,7 +66,6 @@ public class CPurchaseSave extends BaseCommand {
     private List<AccountRecord> accountList;
 
     private Purchase persistedPurchase;
-    private boolean isNew;
 
     @Override
     protected void init() throws Exception {
@@ -89,7 +88,6 @@ public class CPurchaseSave extends BaseCommand {
         // 计算
         // 购货单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(purchase.getId())) { // purchase.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedPurchase = new Purchase();
 
             persistedPurchase.setType(purchase.getType());
@@ -101,7 +99,6 @@ public class CPurchaseSave extends BaseCommand {
             persistedPurchase.setChecked(false);
 
         } else { // purchase.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedPurchase = purchaseService.getById(purchase.getId());
             Assert.notNull(persistedPurchase, "ID为【" + purchase.getId() + "】的购货单不存在！");
 
@@ -142,6 +139,11 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setContracts(purchase.getContracts());
         persistedPurchase.setListerId(purchase.getListerId());
         persistedPurchase.setAuditorId(purchase.getAuditorId());
+
+        // 是否需要 审核？
+        // 新增保存 购货单/购退单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(purchase.getAuditorId()) && !purchase.isChecked();
+
         persistedPurchase.setRemark(purchase.getRemark());
         // 新增/更新 购货单 bc_purchase
         purchaseService.saveOrUpdate(persistedPurchase);
@@ -163,7 +165,7 @@ public class CPurchaseSave extends BaseCommand {
 
         // 新增保存时：Save 页，若选择了审核人，但 checked 仍为 false 的情况下，保存完成后自动审核。
         // （逻辑与 CPurchaseSwitchCheck 一致，审核通过后会生成 fc_payment_issue）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedPurchase.isChecked(), persistedPurchase.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkPurchase(persistedPurchase, persistedPurchase.getAuditorId());
         }
 

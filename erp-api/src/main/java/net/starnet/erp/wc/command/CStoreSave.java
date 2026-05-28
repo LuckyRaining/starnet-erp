@@ -54,7 +54,6 @@ public class CStoreSave extends BaseCommand {
     private List<IssueProduct> productList;
 
     private Store persistedStore;
-    private boolean isNew;
 
     @Override
     protected void init() throws Exception {
@@ -77,7 +76,6 @@ public class CStoreSave extends BaseCommand {
         // 计算
         // 入库单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(store.getId())) { // store.id 为空时，即没传，为“新增”的意思
-            isNew = true;
             persistedStore = new Store();
 
             // 校验 单据编号 是否合法，合法才能“新增”，即 新增入库单
@@ -88,7 +86,6 @@ public class CStoreSave extends BaseCommand {
             persistedStore.setChecked(false);
 
         } else { // store.id 非空时，即传了，为“更新”的意思
-            isNew = false;
             persistedStore = storeService.getById(store.getId());
             Assert.notNull(persistedStore, "ID为【" + store.getId() + "】的入库订单不存在！");
 
@@ -116,6 +113,11 @@ public class CStoreSave extends BaseCommand {
         persistedStore.setAmount(getAmount());
         persistedStore.setQuantity(getQuantity());
         persistedStore.setListerId(store.getListerId());
+
+        // 是否需要 审核？
+        // 新增保存 入库单时：Save 页已选审核人，但 checked 仍为 false，保存完成后 自动审核
+        boolean shouldCheck = StrKit.notNull(store.getAuditorId()) && !store.isChecked();
+
         persistedStore.setAuditorId(store.getAuditorId());
         persistedStore.setRemark(store.getRemark());
         // 新增/更新 入库单 wc_store
@@ -130,7 +132,7 @@ public class CStoreSave extends BaseCommand {
 
         // 新增保存时：Save 页已选审核人但 checked 仍为 false，保存完成后自动审核
         // （逻辑与 CStoreSwitchCheck 一致）
-        if (saveAuditService.shouldAuditOnNewSave(isNew, persistedStore.isChecked(), persistedStore.getAuditorId())) {
+        if (shouldCheck) {
             saveAuditService.checkStore(persistedStore, persistedStore.getAuditorId());
         }
 
