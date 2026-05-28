@@ -7,7 +7,11 @@
 
     <!-- 销售明细表 -->
     <select id="analysisSaleList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
-        SELECT sp.* from wc_issue_product sp left join
+        # 左连接，左边主表，右边从表，根据主表字段 查询从表信息。
+        # 主表该字段 可为 空NULL，即 右边从表 可能会出现 空数据条
+        # SELECT sp.* from wc_issue_product sp left join
+        # 内连接
+        SELECT sp.* from wc_issue_product sp inner join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
         <if test="query.customerIdList != null and query.customerIdList.size() > 0">
             AND s.`customerId` IN
@@ -44,8 +48,12 @@
 
     <!-- 销售汇总表（按商品） -->
     <select id="analysisSaleListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
+        # 用 GROUP BY 计算 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         SELECT sp.productId, sp.warehouseId, SUM(sp.quantity) as quantity, sp.price, SUM(sp.amount) as amount
-               from wc_issue_product sp left join
+        # 左连接
+        # from wc_issue_product sp left join
+        # 内连接
+        from wc_issue_product sp inner join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
         <if test="query.customerIdList != null and query.customerIdList.size() > 0">
             AND s.`customerId` IN
@@ -71,14 +79,19 @@
         <if test="query.endDate != null and query.endDate != ''">
             AND s.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
         </if>
+        # 用 GROUP BY 计算 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         GROUP BY sp.productId, sp.warehouseId
         ORDER BY sp.createdTime DESC
     </select>
 
     <!-- 销售汇总表（按客户） -->
     <select id="analysisSaleListByCustomer" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.sc.model.SaleCustomerSummary">
+        # 用 GROUP BY 计算 每个客户的 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         SELECT s.customerId, sp.productId, sp.warehouseId, SUM(sp.quantity) as quantity, sp.price, SUM(sp.amount) as amount
-        from wc_issue_product sp left join
+        # 左连接
+        # from wc_issue_product sp left join
+        # 内连接
+        from wc_issue_product sp inner join
         bc_sale s on s.id = sp.businessId WHERE 1 = 1 AND (sp.`businessType` = 'sell' OR sp.`businessType` = 'returned')
         <if test="query.customerIdList != null and query.customerIdList.size() > 0">
             AND s.`customerId` IN
@@ -104,13 +117,18 @@
         <if test="query.endDate != null and query.endDate != ''">
             AND s.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
         </if>
+        # 用 GROUP BY 计算 每个客户的 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         GROUP BY s.customerId, sp.productId, sp.warehouseId
         ORDER BY sp.createdTime DESC
     </select>
 
     <!-- 采购明细表 -->
     <select id="analysisPurchaseList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
-        SELECT pp.* from wc_issue_product pp left join
+        # 左连接，左边主表，右边从表，根据主表字段 查询从表信息。
+        # 主表该字段 可为 空NULL，即 右边从表 可能会出现 空数据条
+        # SELECT pp.* from wc_issue_product pp left join
+        # 内连接
+        SELECT pp.* from wc_issue_product pp inner join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')
         <if test="query.supplierIdList != null and query.supplierIdList.size() > 0">
             AND p.`supplierId` IN
@@ -141,8 +159,12 @@
 
     <!-- 采购汇总表（按商品） -->
     <select id="analysisPurchaseListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.IssueProduct">
+        # 用 GROUP BY 计算 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         SELECT pp.productId, pp.warehouseId, SUM(pp.quantity) as quantity, pp.price, SUM(pp.amount) as amount
-        from wc_issue_product pp left join
+        # 左连接
+        # from wc_issue_product pp left join
+        # 内连接
+        from wc_issue_product pp inner join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')
         <if test="query.supplierIdList != null and query.supplierIdList.size() > 0">
             AND p.`supplierId` IN
@@ -168,14 +190,19 @@
         <if test="query.endDate != null and query.endDate != ''">
             AND p.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
         </if>
+        # 用 GROUP BY 计算 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         GROUP BY pp.productId, pp.warehouseId
         ORDER BY pp.createdTime DESC
     </select>
 
     <!-- 采购汇总表（按供应商） -->
     <select id="analysisPurchaseListBySupplier" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.sc.model.PurchaseSupplierSummary">
+        # 用 GROUP BY 计算 每个供应商的 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         SELECT p.supplierId, pp.productId, pp.warehouseId, SUM(pp.quantity) as quantity, pp.price, SUM(pp.amount) as amount
-        from wc_issue_product pp left join
+        # 左连接
+        # from wc_issue_product pp left join
+        # 内连接
+        from wc_issue_product pp inner join
         bc_purchase p on p.id = pp.businessId WHERE 1 = 1 AND (pp.`businessType` = 'buy' OR pp.`businessType` = 'refund')
         <if test="query.supplierIdList != null and query.supplierIdList.size() > 0">
             AND p.`supplierId` IN
@@ -201,6 +228,7 @@
         <if test="query.endDate != null and query.endDate != ''">
             AND p.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
         </if>
+        # 用 GROUP BY 计算 每个供应商的 每个产品的 每个仓库的 总数量、总金额 返回给 SELECT 的聚合参数 SUM
         GROUP BY p.supplierId, pp.productId, pp.warehouseId
         ORDER BY pp.createdTime DESC
     </select>

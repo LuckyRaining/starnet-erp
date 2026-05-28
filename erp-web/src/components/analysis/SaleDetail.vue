@@ -49,10 +49,12 @@
                          prop="type"
                          width="80">
           <template slot-scope="scope">
-            <span v-if="scope.row.type === 10">
+            <!-- <span v-if="scope.row.type === 10"> -->
+            <span v-if="scope.row.type === 'sell'">
               销货
             </span>
-            <span v-else-if="scope.row.type === 20">
+            <!-- <span v-if="scope.row.type === 20"> -->
+            <span v-if="scope.row.type === 'returned'">
               销退
             </span>
           </template>
@@ -106,8 +108,15 @@ export default {
       rangedDate: []
     }
   },
+
   watch: {},
+
+  // 初始化
+  // create：data与methods已经初始化，但是还没有编译模板。
   created() {},
+
+  // 挂载，获取路由参数，设置查询条件，执行搜索
+  // mounted：已经将编译好的模板，挂载到页面指定的容器中。
   mounted() {
     let params = this.$route.query.params
     if (params !== undefined) {
@@ -123,11 +132,15 @@ export default {
 
     this.search()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
   updated() {
     this.$nextTick(() => {
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -140,6 +153,7 @@ export default {
       }
       this.getList()
     },
+
     // 清空
     clear() {
       this.rangedDate = []
@@ -153,6 +167,7 @@ export default {
 
       this.list = result.data.productList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param
@@ -181,16 +196,20 @@ export default {
 
       return sums
     },
+
+    // 行点击事件
     rowClick(row) {
-      if (row.type === 10) {
+      // if (row.type === 10) {
+      if (row.type === 'sell') {
         this.$router.push({
           path: '/sell/save',
-          query: { saleId: row.saleId }
+          query: { saleId: row.businessId }
         })
-      } else if (row.type === 20) {
+      // } else if (row.type === 20) {
+      } else if (row.type === 'returned') {
         this.$router.push({
           path: '/returned/save',
-          query: { saleId: row.saleId }
+          query: { saleId: row.businessId }
         })
       }
     }

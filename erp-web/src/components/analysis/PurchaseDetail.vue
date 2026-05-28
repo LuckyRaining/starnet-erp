@@ -23,11 +23,13 @@
         </el-col>
         <el-col :span="1.5">
           <el-button type="primary"
-                     @click="search">查询</el-button>
+                     @click="search">查询
+          </el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button type="success"
-                     @click="clear">重置</el-button>
+                     @click="clear">重置
+          </el-button>
         </el-col>
       </el-row>
 
@@ -49,10 +51,12 @@
                          prop="type"
                          width="80">
           <template slot-scope="scope">
-            <span v-if="scope.row.type === 10">
+            <!-- <span v-if="scope.row.type === 10"> -->
+            <span v-if="scope.row.type === 'buy'">
               购货
             </span>
-            <span v-else-if="scope.row.type === 20">
+            <!-- <span v-if="scope.row.type === 10"> -->
+            <span v-if="scope.row.type === 'refund'">
               退货
             </span>
           </template>
@@ -100,8 +104,16 @@ export default {
       rangedDate: []
     }
   },
+
   watch: {},
-  created() {},
+
+  // 初始化
+  // create：data与methods已经初始化，但是还没有编译模板。
+  created() {
+  },
+
+  // 挂载，获取路由参数，设置查询条件，执行搜索
+  // mounted：已经将编译好的模板，挂载到页面指定的容器中。
   mounted() {
     let params = this.$route.query.params
     if (params !== undefined) {
@@ -117,11 +129,15 @@ export default {
 
     this.search()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
   updated() {
     this.$nextTick(() => {
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -134,12 +150,14 @@ export default {
       }
       this.getList()
     },
+
     // 清空
     clear() {
       this.rangedDate = []
       this.params = {}
       this.getList()
     },
+
     // 获取列表
     async getList() {
       const { data: result } = await this.$http.post('/analysis/purchase/detailList', this.params)
@@ -147,9 +165,14 @@ export default {
 
       this.list = result.data.productList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param
+
+      console.log('columns: ')
+      console.log(columns)
+
       const sums = []
       columns.forEach((column, index) => {
         if (index === 0) {
@@ -175,16 +198,20 @@ export default {
 
       return sums
     },
+
+    // 行点击事件
     rowClick(row) {
-      if (row.type === 10) {
+      // if (row.type === 10) {
+      if (row.type === 'buy') {
         this.$router.push({
           path: '/purchase/save',
-          query: { purchaseId: row.purchaseId }
+          query: { purchaseId: row.businessId }
         })
-      } else if (row.type === 20) {
+        // } else if (row.type === 20) {
+      } else if (row.type === 'refund') {
         this.$router.push({
           path: '/refund/save',
-          query: { purchaseId: row.purchaseId }
+          query: { purchaseId: row.businessId }
         })
       }
     }
@@ -196,12 +223,15 @@ export default {
 .query {
   margin-bottom: 20px;
 }
+
 .el-select {
   width: 100%;
 }
+
 .el-date-editor.el-range-editor {
   width: 100%;
 }
+
 .el-table tr {
   cursor: pointer;
 }
