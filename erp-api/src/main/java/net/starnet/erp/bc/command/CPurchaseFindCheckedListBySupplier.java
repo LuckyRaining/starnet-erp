@@ -23,7 +23,9 @@ public class CPurchaseFindCheckedListBySupplier extends BaseCommand {
     @Autowired
     private PaymentIssueService paymentIssueService;
 
-    @Param(required = true)
+    /** 供应商ID，可选；不传时返回全部已审核购货/购退单 */
+    // @Param(required = true)
+    @Param
     private String supplierId;
 
     @Override

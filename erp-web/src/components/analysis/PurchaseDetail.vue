@@ -132,8 +132,12 @@ export default {
 
   // 更新
   // update：更新完成后执行此函数。data与页面上的数据都是最新的。
+  // 组件因数据变化重新渲染 之后 会执行
   updated() {
+    // 等待 DOM 更新完成，然后调用 doLayout() 方法，确保表格正确地重新计算布局。
     this.$nextTick(() => {
+      // 拿到模板里 ref="table" 的 el-table 实例
+      // 调用 doLayout() 方法，重新计算列宽、表头、合计行等布局
       this.$refs['table'].doLayout()
     })
   },
@@ -151,7 +155,7 @@ export default {
       this.getList()
     },
 
-    // 清空
+    // 清空查询条件
     clear() {
       this.rangedDate = []
       this.params = {}

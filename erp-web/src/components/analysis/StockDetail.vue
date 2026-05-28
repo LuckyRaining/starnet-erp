@@ -92,8 +92,11 @@ export default {
       rangedDate: []
     }
   },
+
   watch: {},
+
   created() {},
+
   mounted() {
     let params = this.$route.query.params
     if (params !== undefined) {
@@ -109,11 +112,19 @@ export default {
 
     this.search()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
+  // 组件因数据变化重新渲染 之后 会执行
   updated() {
+    // 等待 DOM 更新完成，然后调用 doLayout() 方法，确保表格正确地重新计算布局。
     this.$nextTick(() => {
+      // 拿到模板里 ref="table" 的 el-table 实例
+      // 调用 doLayout() 方法，重新计算列宽、表头、合计行等布局
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -126,12 +137,14 @@ export default {
       }
       this.getList()
     },
-    // 清空
+
+    // 清空查询条件
     clear() {
       this.rangedDate = []
       this.params = {}
       this.getList()
     },
+
     // 获取列表
     async getList() {
       const { data: result } = await this.$http.post('/analysis/stock/detailList', this.params)
@@ -139,6 +152,7 @@ export default {
 
       this.list = result.data.recordList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param
@@ -167,38 +181,47 @@ export default {
 
       return sums
     },
+
+    // 行点击事件
     rowClick(row) {
       if (row.businessType === 'buy') {
+        // 购货单
         this.$router.push({
           path: '/purchase/save',
           query: { purchaseId: row.businessId }
         })
       } else if (row.businessType === 'refund') {
+        // 购货退货单
         this.$router.push({
           path: '/refund/save',
           query: { purchaseId: row.businessId }
         })
       } else if (row.businessType === 'sell') {
+        // 销货单
         this.$router.push({
           path: '/sell/save',
           query: { saleId: row.businessId }
         })
       } else if (row.businessType === 'returned') {
+        // 销退单
         this.$router.push({
           path: '/returned/save',
           query: { saleId: row.businessId }
         })
-      } else if (row.businessType === 'transfer') {
+      } else if (row.businessType === 'transfer_in' || row.businessType === 'transfer_out') {
+        // 调拨单(入库/出库)
         this.$router.push({
           path: '/transfer/save',
           query: { transferId: row.businessId }
         })
-      } else if (row.businessType === 'store') {
+      } else if (row.businessType === 'store_profit' || row.businessType === 'store_other') {
+        // 其他入库单(盘盈/其他入库)
         this.$router.push({
           path: '/store/save',
           query: { storeId: row.businessId }
         })
-      } else if (row.businessType === 'checkout') {
+      } else if (row.businessType === 'checkout_loss' || row.businessType === 'checkout_other') {
+        // 其他出库单(盘亏/其他出库)
         this.$router.push({
           path: '/checkout/save',
           query: { checkoutId: row.businessId }

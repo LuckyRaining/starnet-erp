@@ -218,6 +218,7 @@ public class CCollectionSave extends BaseCommand {
 
         // 新增 应收账款记录 fc_receivable
         receivableService.businessAdd(persistedCollection.getCustomerId(), persistedCollection.getIssueDate(),
-                Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId(), 0, persistedCollection.getAdvanceCollectAmount());
+                Define.BUSINESS_TYPE_COLLECTION, persistedCollection.getId(),
+                0.0d, persistedCollection.getCurrentVerifiedAmount(), persistedCollection.getUnverifiedAmount() - persistedCollection.getCurrentVerifiedAmount());
     }
 }

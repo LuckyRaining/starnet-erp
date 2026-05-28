@@ -45,13 +45,11 @@ public class CAnalysisFlowDetailList extends BaseCommand {
     private SupplierService supplierService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
     /** 类别ID */
-    private @Param
-    String categoryId;
+    private @Param String categoryId;
 
     @Override
     protected void init() throws Exception {
@@ -65,9 +63,12 @@ public class CAnalysisFlowDetailList extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+
         List<FlowRecord> recordList = recordService.analysisList(startDate, endDate, categoryId);
+
         for (FlowRecord record : recordList) {
             if (record.getBusinessType().equals(Define.BUSINESS_TYPE_INCOME)) {
+                // 收入单信息
                 Income income = incomeService.getById(record.getBusinessId());
                 Assert.notNull(income, "ID为【" + record.getBusinessId() + "】的收入单不存在！");
 
@@ -79,6 +80,7 @@ public class CAnalysisFlowDetailList extends BaseCommand {
                 record.put("relatedUnit", customer.getName());
 
             } else if (record.getBusinessType().equals(Define.BUSINESS_TYPE_EXPENSE)) {
+                // 支出单信息
                 Expense expense = expenseService.getById(record.getBusinessId());
                 Assert.notNull(expense, "ID为【" + record.getBusinessId() + "】的支出单不存在！");
 

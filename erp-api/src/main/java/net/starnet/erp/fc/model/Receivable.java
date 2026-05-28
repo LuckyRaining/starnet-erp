@@ -52,6 +52,11 @@ public class Receivable extends BaseModel<Receivable> {
     private double paidAmount;
 
     /**
+     * 应收款余额
+     */
+    private double currentAmount;
+
+    /**
      * 创建时间
      */
     private Date createdTime;

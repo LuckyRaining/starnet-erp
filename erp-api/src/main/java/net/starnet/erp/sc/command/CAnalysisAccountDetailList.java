@@ -52,8 +52,7 @@ public class CAnalysisAccountDetailList extends BaseCommand {
     private ExpenseService expenseService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
     /** 账户ID列表 */
@@ -71,18 +70,21 @@ public class CAnalysisAccountDetailList extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+
         List<AccountRecord> recordList = recordService.analysisList(startDate, endDate, accountIdList);
+
         for (AccountRecord record : recordList) {
+            // 结算账户信息
             SettlementAccount account = accountService.getById(record.getAccountId());
             Assert.notNull(account, "ID为【" + record.getAccountId() + "】的结算账户不存在！");
-
             record.put("accountCode", account.getCode());
             record.put("accountName", account.getName());
-            if (Define.ACCOUNT_RECORD_TYPE_IN == record.getType()) {
+
+            if (Define.ACCOUNT_RECORD_TYPE_IN.equals(record.getType())) {
                 record.put("incomeAmount", record.getAmount());
-                record.put("expenseAmount", 0);
+                record.put("expenseAmount", 0.0d);
             } else {
-                record.put("incomeAmount", 0);
+                record.put("incomeAmount", 0.0d);
                 record.put("expenseAmount", record.getAmount());
             }
 
@@ -100,49 +102,57 @@ public class CAnalysisAccountDetailList extends BaseCommand {
     private void composeIssueInfo(AccountRecord record) {
         if (Define.BUSINESS_TYPE_PURCHASE_BUY.equals(record.getBusinessType())) {
             record.put("businessTypeName", "普通采购");
+
             Purchase purchase = purchaseService.getById(record.getBusinessId());
             record.put("issueCode", purchase.getCode());
-            record.put("relatedUnit", getSupplierName(purchase.getSupplierId()));
+            record.put("relatedUnit", getSupplierName(purchase.getSupplierId())); // 往来单位名称
 
         } else if (Define.BUSINESS_TYPE_PURCHASE_REFUND.equals(record.getBusinessType())) {
             record.put("businessTypeName", "采购退回");
+
             Purchase purchase = purchaseService.getById(record.getBusinessId());
             record.put("issueCode", purchase.getCode());
             record.put("relatedUnit", getSupplierName(purchase.getSupplierId()));
 
         } else if (Define.BUSINESS_TYPE_SALE_SELL.equals(record.getBusinessType())) {
             record.put("businessTypeName", "普通销售");
+
             Sale sale = saleService.getById(record.getBusinessId());
             record.put("issueCode", sale.getCode());
             record.put("relatedUnit", getCustomerName(sale.getCustomerId()));
 
         } else if (Define.BUSINESS_TYPE_SALE_RETURNED.equals(record.getBusinessType())) {
             record.put("businessTypeName", "销售退回");
+
             Sale sale = saleService.getById(record.getBusinessId());
             record.put("issueCode", sale.getCode());
             record.put("relatedUnit", getCustomerName(sale.getCustomerId()));
 
         } else if (Define.BUSINESS_TYPE_COLLECTION.equals(record.getBusinessType())) {
-            Collection collection = collectionService.getById(record.getBusinessId());
             record.put("businessTypeName", "收款");
+
+            Collection collection = collectionService.getById(record.getBusinessId());
             record.put("issueCode", collection.getCode());
             record.put("relatedUnit", getCustomerName(collection.getCustomerId()));
 
         } else if (Define.BUSINESS_TYPE_PAYMENT.equals(record.getBusinessType())) {
-            Payment payment = paymentService.getById(record.getBusinessId());
             record.put("businessTypeName", "付款");
+
+            Payment payment = paymentService.getById(record.getBusinessId());
             record.put("issueCode", payment.getCode());
             record.put("relatedUnit", getSupplierName(payment.getSupplierId()));
 
         } else if (Define.BUSINESS_TYPE_INCOME.equals(record.getBusinessType())) {
-            Income income = incomeService.getById(record.getBusinessId());
             record.put("businessTypeName", "其他收入");
+
+            Income income = incomeService.getById(record.getBusinessId());
             record.put("issueCode", income.getCode());
             record.put("relatedUnit", getCustomerName(income.getCustomerId()));
 
         } else if (Define.BUSINESS_TYPE_EXPENSE.equals(record.getBusinessType())) {
-            Expense expense = expenseService.getById(record.getBusinessId());
             record.put("businessTypeName", "其他支出");
+
+            Expense expense = expenseService.getById(record.getBusinessId());
             record.put("issueCode", expense.getCode());
             record.put("relatedUnit", getSupplierName(expense.getSupplierId()));
 

@@ -27,6 +27,20 @@ public class PayableServiceImpl extends ServiceImpl<PayableDao, Payable> impleme
     }
 
     @Override
+    public void businessAdd(String supplierId, String issueDate, String businessType, String businessId, double increasedAmount, double paidAmount, double currentAmount) {
+        Payable payable = new Payable();
+        payable.setSupplierId(supplierId);
+        payable.setIssueDate(issueDate);
+        payable.setBusinessType(businessType);
+        payable.setBusinessId(businessId);
+        payable.setIncreasedAmount(increasedAmount);
+        payable.setPaidAmount(paidAmount);
+        payable.setCurrentAmount(currentAmount);
+        // 新增 应付账款记录 fc_payable
+        save(payable);
+    }
+
+    @Override
     public void deleteByBusiness(String businessId) {
         this.remove(new QueryWrapper<Payable>().eq("businessId", businessId));
     }
@@ -58,6 +72,6 @@ public class PayableServiceImpl extends ServiceImpl<PayableDao, Payable> impleme
         if (StrKit.notBlank(supplierId)) {
             wrapper.eq("supplierId", supplierId);
         }
-        return this.list(wrapper.orderByAsc("issueDate", "createdTime"));
+        return this.list(wrapper.orderByAsc("supplierId", "issueDate", "createdTime"));
     }
 }

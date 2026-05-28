@@ -120,7 +120,7 @@ public class CAnalysisSaleDetailList extends BaseCommand {
             Assert.notNull(customer, "ID为【" + sale.getCustomerId() + "】的客户不存在！");
             issueProduct.put("customerName", customer.getName());
 
-            // 商品展示信息
+            // 商品信息
             Product product = productService.getById(issueProduct.getProductId());
             Assert.notNull(product, "ID为【" + issueProduct.getProductId() + "】的商品不存在！");
             issueProduct.put("productName", product.getName());

@@ -77,15 +77,25 @@ export default {
       rangedDate: null
     }
   },
+
   watch: {},
+
   created() {
     this.getList()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
+  // 组件因数据变化重新渲染 之后 会执行
   updated() {
+    // 等待 DOM 更新完成，然后调用 doLayout() 方法，确保表格正确地重新计算布局。
     this.$nextTick(() => {
+      // 拿到模板里 ref="table" 的 el-table 实例
+      // 调用 doLayout() 方法，重新计算列宽、表头、合计行等布局
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -98,12 +108,14 @@ export default {
       }
       this.getList()
     },
-    // 清空
+
+    // 清空查询条件
     clear() {
       this.rangedDate = null
       this.params = {}
       this.getList()
     },
+
     // 获取列表
     async getList() {
       const { data: result } = await this.$http.post('/analysis/sale/productSummaryList', this.params)
@@ -111,6 +123,7 @@ export default {
 
       this.list = result.data.summaryList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param
@@ -139,6 +152,8 @@ export default {
 
       return sums
     },
+
+    // 行点击事件
     rowClick(row) {
       this.$router.push({
         path: '/analysis/saleDetail',

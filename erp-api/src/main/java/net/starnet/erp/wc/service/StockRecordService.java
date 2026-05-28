@@ -25,7 +25,7 @@ public interface StockRecordService extends IService<StockRecord> {
                                    List<String> warehouseIdList);
 
     /**
-     * 获取不同的商品ID列表
+     * 获取 不同的 商品ID列表
      *
      * @param query
      * @return
@@ -33,7 +33,7 @@ public interface StockRecordService extends IService<StockRecord> {
     List<String> distinctProductIdList(JSONObject query);
 
     /**
-     * 获取某一商品的出入库仓列表
+     * 获取 某一商品的 出入库仓列表
      *
      * @param query
      * @param productId
@@ -42,7 +42,7 @@ public interface StockRecordService extends IService<StockRecord> {
     List<String> distinctWarehouseIdListByProduct(JSONObject query, String productId);
 
     /**
-     * 获取最近出入库记录
+     * 获取 最近的 出入库记录
      *
      * @param query
      * @param productId
@@ -52,7 +52,7 @@ public interface StockRecordService extends IService<StockRecord> {
     StockRecord findLatestRecord(JSONObject query, String productId, String warehouseId);
 
     /**
-     * 获取商品仓库ID列表
+     * 获取 商品仓库ID列表
      *
      * @param query
      * @return

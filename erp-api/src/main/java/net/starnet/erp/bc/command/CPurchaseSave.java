@@ -149,7 +149,7 @@ public class CPurchaseSave extends BaseCommand {
         persistedPurchase.setStatus(resolvePurchaseStatus(purchase.getPreferredAmount(), purchase.getCurrentAmount()));
         persistedPurchase.setQuantity(getPurchaseQuantity());
         persistedPurchase.setDiscountAmount(purchase.getDiscountAmount());
-        persistedPurchase.setAmount(purchase.getAmount());
+        persistedPurchase.setAmount(getAmount());
         persistedPurchase.setPreferentialRate(purchase.getPreferentialRate());
         persistedPurchase.setPreferentialAmount(purchase.getPreferentialAmount());
         persistedPurchase.setPreferredAmount(purchase.getPreferredAmount());
@@ -219,6 +219,19 @@ public class CPurchaseSave extends BaseCommand {
     }
 
     /**
+     * 获取 总金额
+     *
+     * @return
+     */
+    private Double getAmount() {
+        double amount = 0.0d;
+        for (IssueProduct product : productList) {
+            amount += product.getAmount();
+        }
+        return amount;
+    }
+
+    /**
      * 新增 购货单据的 商品列表 productList[]
      */
     private void addProductList() {
@@ -255,7 +268,7 @@ public class CPurchaseSave extends BaseCommand {
             persistedIssueProduct.setRemark(issueProduct.getRemark());
 
             // 处理 库存：购货 为 入库，购退 为 出库
-            String stockType = persistedPurchase.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
+            String stockType = Define.BUSINESS_TYPE_PURCHASE_BUY.equals(persistedPurchase.getType()) ?
                     Define.STOCK_TYPE_IN : Define.STOCK_TYPE_OUT;
             // 更新 库存商品 wc_stock，新增 出入库记录 wc_stock_record
             stockService.handleStock(persistedIssueProduct, stockType);
@@ -280,12 +293,12 @@ public class CPurchaseSave extends BaseCommand {
         if (Define.BUSINESS_TYPE_PURCHASE_BUY.equals(persistedPurchase.getType())) { // 购货
             // 新增 应付账款记录 fc_payable
             payableService.businessAdd(persistedPurchase.getSupplierId(), persistedPurchase.getIssueDate(),
-                    Define.BUSINESS_TYPE_PURCHASE_BUY, persistedPurchase.getId(), persistedPurchase.getDebtAmount(), persistedPurchase.getCurrentAmount());
+                    Define.BUSINESS_TYPE_PURCHASE_BUY, persistedPurchase.getId(), 0.0d, persistedPurchase.getCurrentAmount(), persistedPurchase.getDebtAmount());
 
         } else { // 购退
             // 新增 应付账款记录 fc_payable
             payableService.businessAdd(persistedPurchase.getSupplierId(), persistedPurchase.getIssueDate(),
-                    Define.BUSINESS_TYPE_PURCHASE_REFUND, persistedPurchase.getId(), persistedPurchase.getDebtAmount(), persistedPurchase.getCurrentAmount());
+                    Define.BUSINESS_TYPE_PURCHASE_REFUND, persistedPurchase.getId(), 0.0d, persistedPurchase.getCurrentAmount(), persistedPurchase.getDebtAmount());
         }
     }
 

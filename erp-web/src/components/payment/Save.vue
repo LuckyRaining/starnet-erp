@@ -94,7 +94,7 @@
                                prop="amount">
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.amount"
-                            @change="handleAccountEdit(scope.$index, scope.row)"></el-input>
+                            @input="handleAccountEdit(scope.$index, scope.row)"></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="结算方式"
@@ -214,7 +214,7 @@
                                prop="currentVerifiedAmount">
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.currentVerifiedAmount"
-                            @change="handleIssueEdit(scope.$index, scope.row)"></el-input>
+                            @input="handleIssueEdit(scope.$index, scope.row)"></el-input>
                 </template>
               </el-table-column>
             </el-table>
@@ -227,13 +227,15 @@
           <el-col :span="5">
             <el-form-item label="整单折扣"
                           prop="discountAmount">
-              <el-input v-model="saveForm.discountAmount"></el-input>
+              <el-input v-model="saveForm.discountAmount"
+                        @input="calculateAdvancePaidAmount"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="5">
             <el-form-item label="本次预付款"
                           prop="advancePaidAmount">
-              <el-input v-model="saveForm.advancePaidAmount"></el-input>
+              <el-input v-model="saveForm.advancePaidAmount"
+                        disabled></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -298,6 +300,12 @@
                 @selection-change="handlePurchaseSelectionChange">
         <el-table-column type="selection"
                          width="55">
+        </el-table-column>
+        <el-table-column label="购货单位"
+                         width="160">
+          <template slot-scope="scope">
+            {{ getSupplierName(scope.row.supplierId) }}
+          </template>
         </el-table-column>
         <el-table-column prop="code">
           <template slot="header">
@@ -458,6 +466,20 @@ export default {
       console.log('result.data: ')
       console.log(result.data)
       this.saveForm = result.data.payment
+      this.initAmountLastValues()
+    },
+    // 初始化各行的上次合法金额，供超限回退使用
+    initAmountLastValues() {
+      this.saveForm.issueList.forEach((issue) => {
+        if (issue.sourceCode !== undefined) {
+          issue.lastCurrentVerifiedAmount = this.toNumber(issue.currentVerifiedAmount)
+        }
+      })
+      this.saveForm.accountList.forEach((account) => {
+        if (account.amount !== undefined) {
+          account.lastAmount = this.toNumber(account.amount)
+        }
+      })
     },
 
     // 新增账户行
@@ -482,6 +504,7 @@ export default {
         return this.$message.warning('至少保留一条记录')
       }
       this.saveForm.accountList.splice(index, 1)
+      this.calculateAdvancePaidAmount()
     },
     // 删除单据行
     deleteIssueRow(index) {
@@ -489,18 +512,77 @@ export default {
         return this.$message.warning('至少保留一条记录')
       }
       this.saveForm.issueList.splice(index, 1)
+      this.calculateAdvancePaidAmount()
     },
 
     // 处理编辑单元格
     handleAccountEdit(index, row) {
+      const newAmount = this.toNumber(row.amount)
+      const lastAmount = row.lastAmount !== undefined ? this.toNumber(row.lastAmount) : 0
+      const totalPaid = this.saveForm.accountList.reduce((sum, account, accountIndex) => {
+        if (accountIndex === index) {
+          return sum + newAmount
+        }
+        return sum + this.toNumber(account.amount)
+      }, 0)
+      const totalVerified = this.sumCurrentVerifiedAmount()
+
+      if (totalPaid > totalVerified) {
+        this.$message.warning('输入的付款金额超过了本次核销金额')
+        row.amount = lastAmount
+        this.saveForm.accountList[index] = row
+        this.calculateAdvancePaidAmount()
+        return
+      }
+
+      row.lastAmount = newAmount
       this.saveForm.accountList[index] = row
-      console.log('this.saveForm.accountList: ')
-      console.log(this.saveForm.accountList)
+      this.calculateAdvancePaidAmount()
     },
     handleIssueEdit(index, row) {
+      const currentValue = this.toNumber(row.currentVerifiedAmount)
+      const maxValue = this.toNumber(row.unverifiedAmount)
+      const lastValue = row.lastCurrentVerifiedAmount !== undefined
+        ? this.toNumber(row.lastCurrentVerifiedAmount)
+        : maxValue
+
+      if (row.sourceCode !== undefined && currentValue > maxValue) {
+        this.$message.warning('输入的核销值超过了未核销金额')
+        row.currentVerifiedAmount = lastValue
+        this.saveForm.issueList[index] = row
+        this.calculateAdvancePaidAmount()
+        return
+      }
+
+      row.lastCurrentVerifiedAmount = currentValue
       this.saveForm.issueList[index] = row
-      console.log('this.saveForm.issueList: ')
-      console.log(this.saveForm.issueList)
+      this.calculateAdvancePaidAmount()
+    },
+    // 汇总付款金额
+    sumAccountAmount() {
+      return this.saveForm.accountList.reduce((sum, account) => {
+        return sum + this.toNumber(account.amount)
+      }, 0)
+    },
+    // 汇总本次核销金额
+    sumCurrentVerifiedAmount() {
+      return this.saveForm.issueList.reduce((sum, issue) => {
+        if (issue.sourceCode === undefined) {
+          return sum
+        }
+        return sum + this.toNumber(issue.currentVerifiedAmount)
+      }, 0)
+    },
+    // 本次预付款 = 付款金额合计 - 本次核销金额合计 - 整单折扣
+    calculateAdvancePaidAmount() {
+      const paidAmount = this.sumAccountAmount()
+      const currentVerifiedAmount = this.sumCurrentVerifiedAmount()
+      const discountAmount = this.toNumber(this.saveForm.discountAmount)
+      this.saveForm.advancePaidAmount = paidAmount - currentVerifiedAmount - discountAmount
+    },
+    toNumber(value) {
+      const num = parseFloat(value)
+      return isNaN(num) ? 0 : num
     },
 
     // 计算合计
@@ -612,9 +694,9 @@ export default {
     // 显示选择源单对话框
     async showSelectSourceIssueDialog() {
       let supplierId = this.saveForm.supplierId
-      if (supplierId === undefined) {
-        return this.$message.warning('请先选择购货单位')
-      }
+      // if (supplierId === undefined) {
+      //   return this.$message.warning('请先选择购货单位')
+      // }
       const { data: result } = await this.$http.post('/purchase/findCheckedListBySupplier', {
         supplierId
       })
@@ -666,10 +748,19 @@ export default {
 
     // 点击选择源单弹框的确定
     confirmSelectSourceIssueDialog() {
-      console.log('this.saveForm.issueList: ')
-      console.log(this.saveForm.issueList)
-      console.log('this.saveForm: ')
-      console.log(this.saveForm)
+      if (this.selectedPurchaseList.length === 0) {
+        return this.$message.warning('请选择源单')
+      }
+
+      const supplierIds = [...new Set(this.selectedPurchaseList.map((purchase) => purchase.supplierId).filter(Boolean))]
+      if (supplierIds.length > 1) {
+        return this.$message.warning('请选择同一购货单位的源单')
+      }
+
+      // 未选择购货单位时，从所选源单同步供应商
+      if (!this.saveForm.supplierId && supplierIds.length > 0) {
+        this.saveForm.supplierId = supplierIds[0]
+      }
 
       let emptyIssueIndexList = []
       this.saveForm.issueList.forEach((issue, index) => {
@@ -678,13 +769,16 @@ export default {
         }
       })
       this.selectedPurchaseList.forEach((purchase) => {
+        const unverifiedAmount = purchase.unverifiedAmount
         let newIssue = {
           sourceCode: purchase.code,
           type: purchase.type,
           issueDate: purchase.issueDate,
           issueAmount: purchase.preferredAmount, // 设置 源单据金额 == 优惠后金额
           verifiedAmount: purchase.verifiedAmount,
-          unverifiedAmount: purchase.unverifiedAmount
+          unverifiedAmount: unverifiedAmount,
+          currentVerifiedAmount: unverifiedAmount,
+          lastCurrentVerifiedAmount: this.toNumber(unverifiedAmount)
         }
         if (emptyIssueIndexList.length === 0) {
           this.saveForm.issueList.push(newIssue)
@@ -697,11 +791,19 @@ export default {
 
       this.selectedPurchaseList = []
       this.selectSourceIssueDialogVisible = false
+      this.calculateAdvancePaidAmount()
     },
 
     // 处理选择销售单
     handlePurchaseSelectionChange(purchaseList) {
       this.selectedPurchaseList = purchaseList
+    },
+    getSupplierName(supplierId) {
+      if (!supplierId) {
+        return ''
+      }
+      const supplier = this.supplierList.find((item) => item.id === supplierId)
+      return supplier ? supplier.name : ''
     }
   }
 }

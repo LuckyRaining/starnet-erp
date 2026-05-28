@@ -89,7 +89,7 @@ public class CAnalysisPurchaseProductSummaryList extends BaseCommand {
         List<IssueProduct> productList = issueProductService.analysisPurchaseListByProduct(query);
 
         for (IssueProduct issueProduct : productList) {
-            // businessId 指向 bc_purchase.id
+            // 商品信息
             Product product = productService.getById(issueProduct.getProductId());
             Assert.notNull(product, "ID为【" + issueProduct.getProductId() + "】的商品不存在！");
             issueProduct.put("productName", product.getName());

@@ -213,7 +213,8 @@ public class CPaymentSave extends BaseCommand {
 
         // 新增 应付账款记录 fc_payable
         payableService.businessAdd(persistedPayment.getSupplierId(), persistedPayment.getIssueDate(),
-                Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId(), 0, persistedPayment.getAdvancePaidAmount());
+                Define.BUSINESS_TYPE_PAYMENT, persistedPayment.getId(),
+                0.0d, persistedPayment.getCurrentVerifiedAmount(), persistedPayment.getUnverifiedAmount() - persistedPayment.getCurrentVerifiedAmount());
     }
 
 }

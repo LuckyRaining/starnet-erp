@@ -35,13 +35,11 @@ public class CAnalysisReceivableDetailList extends BaseCommand {
     private CustomerService customerService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
     /** 客户ID列表 */
-    private @Param
-    List<String> customerIdList;
+    private @Param List<String> customerIdList;
 
     @Override
     protected void init() throws Exception {
@@ -55,22 +53,26 @@ public class CAnalysisReceivableDetailList extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+
         List<Receivable> receivableList = receivableService.analysisList(startDate, endDate, customerIdList);
+
         for (Receivable receivable : receivableList) {
+            // 客户信息
             Customer customer = customerService.getById(receivable.getCustomerId());
             Assert.notNull(customer, "ID为【" + receivable.getCustomerId() + "】的客户不存在！");
             receivable.put("customerName", customer.getName());
 
-            if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL)
-                    || receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_RETURNED)) {
+            if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL) || receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_RETURNED)) {
+                // 销货/销退订单信息
                 Sale sale = saleService.getById(receivable.getBusinessId());
-                Assert.notNull(sale, "ID为【" + receivable.getBusinessId() + "】的销货订单不存在！");
+                Assert.notNull(sale, "ID为【" + receivable.getBusinessId() + "】的销货/销退订单不存在！");
 
                 receivable.put("issueCode", sale.getCode());
                 receivable.put("businessTypeName", receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL) ?
                         "销货" : "销退");
 
             } else if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_COLLECTION)) {
+                // 收款单信息
                 Collection collection = collectionService.getById(receivable.getBusinessId());
                 Assert.notNull(collection, "ID为【" + receivable.getBusinessId() + "】的收款单不存在！");
 

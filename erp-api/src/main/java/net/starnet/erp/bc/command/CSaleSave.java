@@ -154,7 +154,7 @@ public class CSaleSave extends BaseCommand {
         persistedSale.setStatus(resolveSaleStatus(sale.getPreferredAmount(), sale.getCurrentAmount()));
         persistedSale.setQuantity(getQuantity());
         persistedSale.setDiscountAmount(sale.getDiscountAmount());
-        persistedSale.setAmount(sale.getAmount());
+        persistedSale.setAmount(getAmount());
         persistedSale.setPreferentialRate(sale.getPreferentialRate());
         persistedSale.setPreferentialAmount(sale.getPreferentialAmount());
         persistedSale.setPreferredAmount(sale.getPreferredAmount());
@@ -230,6 +230,19 @@ public class CSaleSave extends BaseCommand {
     }
 
     /**
+     * 获取 总金额
+     *
+     * @return
+     */
+    private Double getAmount() {
+        double amount = 0.0d;
+        for (IssueProduct product : productList) {
+            amount += product.getAmount();
+        }
+        return amount;
+    }
+
+    /**
      * 新增 销货单据的 商品列表 productList[]
      */
     private void addProductList() {
@@ -265,9 +278,9 @@ public class CSaleSave extends BaseCommand {
             persistedIssueProduct.setCode(issueProduct.getCode());
             persistedIssueProduct.setRemark(issueProduct.getRemark());
 
-            // 处理 库存：销货 为 入库，销退 为 出库
-            String stockType = persistedSale.getType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
-                    Define.STOCK_TYPE_IN : Define.STOCK_TYPE_OUT;
+            // 处理 库存：销货 为 出库，销退 为 入库
+            String stockType = Define.BUSINESS_TYPE_SALE_SELL.equals(persistedSale.getType()) ?
+                    Define.STOCK_TYPE_OUT : Define.STOCK_TYPE_IN;
             // 更新 库存商品 wc_stock，新增 出入库记录 wc_stock_record
             stockService.handleStock(persistedIssueProduct, stockType);
 
@@ -291,12 +304,12 @@ public class CSaleSave extends BaseCommand {
         if (Define.BUSINESS_TYPE_SALE_SELL.equals(persistedSale.getType())) { // 销货
             // 新增 应收账款记录 fc_receivable
             receivableService.businessAdd(persistedSale.getCustomerId(), persistedSale.getIssueDate(),
-                    Define.BUSINESS_TYPE_SALE_SELL, persistedSale.getId(), persistedSale.getDebtAmount(), persistedSale.getCurrentAmount());
+                    Define.BUSINESS_TYPE_SALE_SELL, persistedSale.getId(), 0.0d, persistedSale.getCurrentAmount(), persistedSale.getDebtAmount());
 
         } else { // 销退
             // 新增 应收账款记录 fc_receivable
             receivableService.businessAdd(persistedSale.getCustomerId(), persistedSale.getIssueDate(),
-                    Define.BUSINESS_TYPE_SALE_RETURNED, persistedSale.getId(), persistedSale.getDebtAmount(), persistedSale.getCurrentAmount());
+                    Define.BUSINESS_TYPE_SALE_RETURNED, persistedSale.getId(), 0.0d, persistedSale.getCurrentAmount(), persistedSale.getDebtAmount());
         }
     }
 

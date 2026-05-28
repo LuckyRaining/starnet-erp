@@ -16,12 +16,25 @@ public interface ReceivableService extends IService<Receivable> {
      *
      * @param customerId
      * @param issueDate
-     * @param type
+     * @param businessType
      * @param businessId
      * @param increasedAmount
      * @param paidAmount
      */
-    void businessAdd(String customerId, String issueDate, String type, String businessId, double increasedAmount, double paidAmount);
+    void businessAdd(String customerId, String issueDate, String businessType, String businessId, double increasedAmount, double paidAmount);
+
+    /**
+     * 业务新增
+     *
+     * @param customerId
+     * @param issueDate
+     * @param businessType
+     * @param businessId
+     * @param increasedAmount
+     * @param paidAmount
+     * @param currentAmount
+     */
+    void businessAdd(String customerId, String issueDate, String businessType, String businessId, double increasedAmount, double paidAmount, double currentAmount);
 
     /**
      * 根据业务ID删除

@@ -52,6 +52,11 @@ public class Payable extends BaseModel<Payable> {
     private double paidAmount;
 
     /**
+     * 应付款余额
+     */
+    private double currentAmount;
+
+    /**
      * 创建时间
      */
     private Date createdTime;

@@ -84,30 +84,30 @@
                            width="70"
                            prop="storeOtherQuantity"></el-table-column>
         </el-table-column>
-        <el-table-column label="成本调整">
-          <el-table-column label="数量"
-                           width="70"
-                           prop="storeAdjustQuantity"></el-table-column>
-        </el-table-column>
         <el-table-column label="入库合计">
           <el-table-column label="数量"
                            width="70"
                            prop="storeTotalQuantity"></el-table-column>
+        </el-table-column>
+        <el-table-column label="成本调整">
+          <el-table-column label="数量"
+                           width="70"
+                           prop="storeAdjustQuantity"></el-table-column>
         </el-table-column>
         <el-table-column label="调拨出库">
           <el-table-column label="数量"
                            width="70"
                            prop="transferOutQuantity"></el-table-column>
         </el-table-column>
-        <el-table-column label="采购退回">
-          <el-table-column label="数量"
-                           width="70"
-                           prop="refundQuantity"></el-table-column>
-        </el-table-column>
         <el-table-column label="普通销售">
           <el-table-column label="数量"
                            width="70"
                            prop="sellQuantity"></el-table-column>
+        </el-table-column>
+        <el-table-column label="采购退回">
+          <el-table-column label="数量"
+                           width="70"
+                           prop="refundQuantity"></el-table-column>
         </el-table-column>
         <el-table-column label="盘亏">
           <el-table-column label="数量"
@@ -128,7 +128,7 @@
           <el-table-column label="数量"
                            width="70"
                            prop="endQuantity"></el-table-column>
-          <el-table-column label="数量"
+          <el-table-column label="成本"
                            width="70"
                            prop="endAmount"></el-table-column>
         </el-table-column>
@@ -152,8 +152,11 @@ export default {
       rangedDate: []
     }
   },
+
   watch: {},
+
   created() {},
+
   mounted() {
     let params = this.$route.query.params
     if (params !== undefined) {
@@ -169,11 +172,19 @@ export default {
 
     this.search()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
+  // 组件因数据变化重新渲染 之后 会执行
   updated() {
+    // 等待 DOM 更新完成，然后调用 doLayout() 方法，确保表格正确地重新计算布局。
     this.$nextTick(() => {
+      // 拿到模板里 ref="table" 的 el-table 实例
+      // 调用 doLayout() 方法，重新计算列宽、表头、合计行等布局
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -186,12 +197,14 @@ export default {
       }
       this.getList()
     },
-    // 清空
+
+    // 清空查询条件
     clear() {
       this.rangedDate = []
       this.params = {}
       this.getList()
     },
+
     // 获取列表
     async getList() {
       const { data: result } = await this.$http.post('/analysis/stock/summaryList', this.params)
@@ -201,25 +214,30 @@ export default {
       stockList.forEach((stock) => {
         stock.startQuantity = stock.startQuantity === undefined ? 0 : stock.startQuantity
         stock.startAmount = stock.startAmount === undefined ? 0 : stock.startAmount
+
         stock.transferInQuantity = stock.transferInQuantity === undefined ? 0 : stock.transferInQuantity
         stock.buyQuantity = stock.buyQuantity === undefined ? 0 : stock.buyQuantity
         stock.returnedQuantity = stock.returnedQuantity === undefined ? 0 : stock.returnedQuantity
         stock.storeProfitQuantity = stock.storeProfitQuantity === undefined ? 0 : stock.storeProfitQuantity
         stock.storeOtherQuantity = stock.storeOtherQuantity === undefined ? 0 : stock.storeOtherQuantity
-        stock.storeAdjustQuantity = stock.storeAdjustQuantity === undefined ? 0 : stock.storeAdjustQuantity
         stock.storeTotalQuantity = stock.storeTotalQuantity === undefined ? 0 : stock.storeTotalQuantity
+
+        stock.storeAdjustQuantity = stock.storeAdjustQuantity === undefined ? 0 : stock.storeAdjustQuantity
+
         stock.transferOutQuantity = stock.transferOutQuantity === undefined ? 0 : stock.transferOutQuantity
-        stock.refundQuantity = stock.refundQuantity === undefined ? 0 : stock.refundQuantity
         stock.sellQuantity = stock.sellQuantity === undefined ? 0 : stock.sellQuantity
+        stock.refundQuantity = stock.refundQuantity === undefined ? 0 : stock.refundQuantity
         stock.checkoutLossQuantity = stock.checkoutLossQuantity === undefined ? 0 : stock.checkoutLossQuantity
         stock.checkoutOtherQuantity = stock.checkoutOtherQuantity === undefined ? 0 : stock.checkoutOtherQuantity
         stock.checkoutTotalQuantity = stock.checkoutTotalQuantity === undefined ? 0 : stock.checkoutTotalQuantity
+
         stock.endQuantity = stock.endQuantity === undefined ? 0 : stock.endQuantity
         stock.endAmount = stock.endAmount === undefined ? 0 : stock.endAmount
       })
 
       this.list = stockList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param

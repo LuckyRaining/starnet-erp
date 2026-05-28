@@ -99,7 +99,9 @@ export default {
     }
   },
   watch: {},
+
   created() {},
+
   mounted() {
     let params = this.$route.query.params
     if (params !== undefined) {
@@ -115,11 +117,19 @@ export default {
 
     this.search()
   },
+
+  // 更新
+  // update：更新完成后执行此函数。data与页面上的数据都是最新的。
+  // 组件因数据变化重新渲染 之后 会执行（例如 getList() 更新了 list、warehouseList 等数据）
   updated() {
+    // 等待 DOM 更新完成，然后调用 doLayout() 方法，确保表格正确地重新计算布局。
     this.$nextTick(() => {
+      // 拿到模板里 ref="table" 的 el-table 实例
+      // 调用 doLayout() 方法，重新计算列宽、表头、合计行等布局
       this.$refs['table'].doLayout()
     })
   },
+
   methods: {
     // 搜索
     search() {
@@ -132,12 +142,14 @@ export default {
       }
       this.getList()
     },
-    // 清空
+
+    // 清空查询条件
     clear() {
       this.rangedDate = []
       this.params = {}
       this.getList()
     },
+
     // 获取列表
     async getList() {
       const { data: result } = await this.$http.post('/analysis/stock/amountList', this.params)
@@ -146,6 +158,7 @@ export default {
       this.warehouseList = result.data.warehouseList
       this.list = result.data.productList
     },
+
     // 计算合计
     getSummaries(param) {
       const { columns, data } = param

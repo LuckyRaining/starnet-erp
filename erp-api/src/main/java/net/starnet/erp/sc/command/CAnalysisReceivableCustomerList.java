@@ -12,6 +12,8 @@ import net.starnet.erp.fc.model.Collection;
 import net.starnet.erp.fc.model.Receivable;
 import net.starnet.erp.fc.service.CollectionService;
 import net.starnet.erp.fc.service.ReceivableService;
+import net.starnet.erp.uc.model.Customer;
+import net.starnet.erp.uc.service.CustomerService;
 import net.starnet.erp.util.SimpleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,15 +31,15 @@ public class CAnalysisReceivableCustomerList extends BaseCommand {
     private SaleService saleService;
     @Autowired
     private CollectionService collectionService;
+    @Autowired
+    private CustomerService customerService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
-    /** 客户ID列表 */
-    private @Param(required = true)
-    String customerId;
+    /** 客户ID，可选；不传时查询全部客户 */
+    private @Param (required = true) String customerId;
 
     @Override
     protected void init() throws Exception {
@@ -51,27 +53,37 @@ public class CAnalysisReceivableCustomerList extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+
         List<Receivable> receivableList = receivableService.listByCustomer(startDate, endDate, customerId);
+
         for (Receivable receivable : receivableList) {
-            if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL)
-                    || receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_RETURNED)) {
+            Customer customer = customerService.getById(receivable.getCustomerId());
+            Assert.notNull(customer, "ID为【" + receivable.getCustomerId() + "】的客户不存在！");
+            receivable.put("customerName", customer.getName());
+
+            if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL) || receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_RETURNED)) {
+                // 销货/销退订单信息
                 Sale sale = saleService.getById(receivable.getBusinessId());
-                Assert.notNull(sale, "ID为【" + receivable.getBusinessId() + "】的销货订单不存在！");
+                Assert.notNull(sale, "ID为【" + receivable.getBusinessId() + "】的销货/销退订单不存在！");
 
                 receivable.put("issueCode", sale.getCode());
                 receivable.put("businessTypeName", receivable.getBusinessType().equals(Define.BUSINESS_TYPE_SALE_SELL) ?
                         "销货" : "销退");
+
                 receivable.put("amount", sale.getAmount());
-                receivable.put("discountAmount", sale.getDiscountAmount());
+                // receivable.put("discountAmount", sale.getDiscountAmount());
+                receivable.put("discountAmount", sale.getPreferentialAmount());
                 receivable.put("preferredAmount", sale.getPreferredAmount());
                 receivable.put("actualAmount", sale.getCurrentAmount());
 
             } else if (receivable.getBusinessType().equals(Define.BUSINESS_TYPE_COLLECTION)) {
+                // 收款单信息
                 Collection collection = collectionService.getById(receivable.getBusinessId());
                 Assert.notNull(collection, "ID为【" + receivable.getBusinessId() + "】的收款单不存在！");
 
                 receivable.put("issueCode", collection.getCode());
                 receivable.put("businessTypeName", "收款");
+
                 receivable.put("actualAmount", collection.getCollectAmount());
             }
         }

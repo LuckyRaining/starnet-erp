@@ -21,6 +21,18 @@
                           end-placeholder="结束日期">
           </el-date-picker>
         </el-col>
+        <el-col :span="6">
+          <el-select v-model="params.customerId"
+                     filterable
+                     clearable
+                     placeholder="请选择客户">
+            <el-option v-for="customer in customerList"
+                       :key="customer.id"
+                       :label="customer.name"
+                       :value="customer.id">
+            </el-option>
+          </el-select>
+        </el-col>
         <el-col :span="1.5">
           <el-button type="primary"
                      @click="search">查询</el-button>
@@ -39,6 +51,9 @@
                 ref="table"
                 show-summary
                 :summary-method="getSummaries">
+        <!-- <el-table-column label="客户"
+                         prop="customerName"
+                         width="120"></el-table-column> -->
         <el-table-column label="单据日期"
                          prop="issueDate"></el-table-column>
         <el-table-column label="单据编号"
@@ -71,6 +86,7 @@ export default {
         endDate: '',
         customerId: ''
       },
+      customerList: [],
       list: [],
       rangedDate: []
     }
@@ -78,6 +94,8 @@ export default {
   watch: {},
   created() {},
   mounted() {
+    this.getCustomerList()
+
     let params = this.$route.query.params
     if (params !== undefined) {
       if (params.customerId !== undefined) {
@@ -104,13 +122,30 @@ export default {
         this.params.startDate = ''
         this.params.endDate = ''
       }
+
       this.getList()
     },
     // 清空
     clear() {
       this.rangedDate = []
-      this.params = {}
+      this.params = {
+        startDate: '',
+        endDate: '',
+        customerId: ''
+      }
+      this.list = []
+
       this.getList()
+    },
+    // 获取客户列表
+    async getCustomerList() {
+      const { data: result } = await this.$http.post('/customer/page', {
+        current: 1,
+        size: 10000
+      })
+      if (!result.success) return this.$message.error(result.message)
+
+      this.customerList = result.data.customerPage.records
     },
     // 获取列表
     async getList() {

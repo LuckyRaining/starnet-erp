@@ -12,6 +12,8 @@ import net.starnet.erp.fc.model.Payable;
 import net.starnet.erp.fc.model.Payment;
 import net.starnet.erp.fc.service.PayableService;
 import net.starnet.erp.fc.service.PaymentService;
+import net.starnet.erp.uc.model.Supplier;
+import net.starnet.erp.uc.service.SupplierService;
 import net.starnet.erp.util.SimpleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,15 +31,15 @@ public class CAnalysisPayableSupplierList extends BaseCommand {
     private PurchaseService purchaseService;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private SupplierService supplierService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
-    /** 供应商ID */
-    private @Param(required = true)
-    String supplierId;
+    /** 供应商ID，可选；不传时查询全部供应商 */
+    private @Param (required = true) String supplierId;
 
     @Override
     protected void init() throws Exception {
@@ -51,27 +53,37 @@ public class CAnalysisPayableSupplierList extends BaseCommand {
 
     @Override
     protected void doCommand() throws Exception {
+
         List<Payable> payableList = payableService.listBySupplier(startDate, endDate, supplierId);
+
         for (Payable payable : payableList) {
-            if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY)
-                    || payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_REFUND)) {
+            Supplier supplier = supplierService.getById(payable.getSupplierId());
+            Assert.notNull(supplier, "ID为【" + payable.getSupplierId() + "】的供应商不存在！");
+            payable.put("supplierName", supplier.getName());
+
+            if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) || payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_REFUND)) {
+                // 购货/购退订单信息
                 Purchase purchase = purchaseService.getById(payable.getBusinessId());
-                Assert.notNull(purchase, "ID为【" + payable.getBusinessId() + "】的购货订单不存在！");
+                Assert.notNull(purchase, "ID为【" + payable.getBusinessId() + "】的购货/购退订单不存在！");
 
                 payable.put("issueCode", purchase.getCode());
                 payable.put("businessTypeName", payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
                         "购货" : "购退");
+
                 payable.put("amount", purchase.getAmount());
-                payable.put("discountAmount", purchase.getDiscountAmount());
+                // payable.put("discountAmount", purchase.getDiscountAmount());
+                payable.put("discountAmount", purchase.getPreferentialAmount());
                 payable.put("preferredAmount", purchase.getPreferredAmount());
                 payable.put("actualAmount", purchase.getCurrentAmount());
 
             } else if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PAYMENT)) {
+                // 供应商信息
                 Payment payment = paymentService.getById(payable.getBusinessId());
                 Assert.notNull(payment, "ID为【" + payable.getBusinessId() + "】的付款单不存在！");
 
                 payable.put("issueCode", payment.getCode());
                 payable.put("businessTypeName", "付款");
+
                 payable.put("actualAmount", payable.getPaidAmount());
             }
         }

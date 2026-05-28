@@ -57,22 +57,22 @@ public class CStoreSave extends BaseCommand {
 
     @Override
     protected void init() throws Exception {
-        // BizException 为后端展示
-        if (!Define.validateStoreType(store.getType())) {
-            throw new BizException("采购类型不正确！");
-        }
+        // 校验数据
+
+        // Assert 为 前端 + 后端 展示，BizException 仅为后端展示
+        // 校验 采购类型 是否合法
+        Assert.notFalse(Define.validateStoreType(store.getType()), "入库类型不正确！");
+
+        // 校验 供应商ID 是否合法
+        Assert.notBlank(store.getSupplierId(), "供应商ID不能为空！");
+        Supplier supplier = supplierService.getById(store.getSupplierId());
+        // 校验 供应商 是否存在
+        Assert.notNull(supplier, "ID为【" + store.getSupplierId() + "】的供应商不存在！");
+
     }
 
     @Override
     protected void doCommand() throws Exception {
-        // 校验数据
-        Assert.notBlank(store.getSupplierId(), "供应商ID不能为空！");
-        Supplier supplier = supplierService.getById(store.getSupplierId());
-        Assert.notNull(supplier, "ID为【" + store.getSupplierId() + "】的供应商不存在！");
-
-        // 同 init() 初始化校验，但 Assert 为前端展示
-        Assert.notFalse(Define.validateStoreType(store.getType()), "类型不正确！");
-
         // 计算
         // 入库单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(store.getId())) { // store.id 为空时，即没传，为“新增”的意思

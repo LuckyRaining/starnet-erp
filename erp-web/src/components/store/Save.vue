@@ -222,7 +222,8 @@
           <el-col :span="8">
             <el-form-item label="入库金额"
                           prop="amount">
-              <el-input v-model="saveProductForm.amount"></el-input>
+              <el-input v-model="saveProductForm.amount"
+                        disabled></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -295,6 +296,10 @@ export default {
       },
       warehouseList: []
     }
+  },
+  watch: {
+    'saveProductForm.quantity': 'calculateAmount',
+    'saveProductForm.price': 'calculateAmount'
   },
   created() {
     let storeId = this.$route.query.storeId
@@ -445,7 +450,24 @@ export default {
         this.saveProductForm.productName = product.name
         this.saveProductForm.productId = product.id
         this.saveProductForm.unitName = product.unitName
+        // 入库单价默认取商品预计采购价（与后端入库成本口径一致）
+        this.saveProductForm.price = this.getProductPrice(product)
+        this.calculateAmount()
       }
+    },
+    // 获取商品入库单价
+    getProductPrice(product) {
+      return this.toNumber(product.estimatedPurchasePrice)
+    },
+    // 根据数量、入库单价计算入库金额
+    calculateAmount() {
+      const quantity = this.toNumber(this.saveProductForm.quantity)
+      const price = this.toNumber(this.saveProductForm.price)
+      this.saveProductForm.amount = quantity * price
+    },
+    toNumber(value) {
+      const num = parseFloat(value)
+      return isNaN(num) ? 0 : num
     },
     // 获取仓库列表
     async getWarehouseList() {

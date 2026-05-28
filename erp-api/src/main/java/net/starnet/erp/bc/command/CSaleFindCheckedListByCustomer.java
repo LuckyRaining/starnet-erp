@@ -4,11 +4,9 @@ import net.kingborn.core.command.BaseCommand;
 import net.kingborn.core.command.Command;
 import net.kingborn.core.command.Param;
 import net.kingborn.core.util.StrKit;
-import net.starnet.erp.bc.model.Purchase;
 import net.starnet.erp.bc.model.Sale;
 import net.starnet.erp.bc.service.SaleService;
 import net.starnet.erp.fc.model.CollectionIssue;
-import net.starnet.erp.fc.model.PaymentIssue;
 import net.starnet.erp.fc.service.CollectionIssueService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +23,9 @@ public class CSaleFindCheckedListByCustomer extends BaseCommand {
     @Autowired
     private CollectionIssueService collectionIssueService;
 
-    @Param(required = true)
+    /** 客户ID，可选；不传时返回全部已审核销货/销退单 */
+    // @Param(required = true)
+    @Param
     private String customerId;
 
     @Override

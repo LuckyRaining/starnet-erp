@@ -11,7 +11,7 @@ import java.util.List;
 public interface AccountRecordService extends IService<AccountRecord> {
 
     /**
-     * 获取账单列表
+     * 获取 账单 列表
      *
      * @param businessId
      * @return
@@ -26,14 +26,14 @@ public interface AccountRecordService extends IService<AccountRecord> {
     void deleteByBusiness(String businessId);
 
     /**
-     * 新增记录列表
+     * 新增 记录 列表
      *
      * @param recordList
      */
     void addRecordList(List<AccountRecord> recordList, String type, String issueDate, String businessType, String businessId);
 
     /**
-     * 获取现金银行报表
+     * 获取 现金/银行 报表
      *
      * @param startDate
      * @param endDate

@@ -35,13 +35,11 @@ public class CAnalysisPayableDetailList extends BaseCommand {
     private SupplierService supplierService;
 
     /** 开始时间 */
-    private @Param
-    String startDate;
+    private @Param String startDate;
     /** 结束时间 */
     private @Param String endDate;
     /** 供应商ID列表 */
-    private @Param
-    List<String> supplierIdList;
+    private @Param List<String> supplierIdList;
 
     @Override
     protected void init() throws Exception {
@@ -57,20 +55,22 @@ public class CAnalysisPayableDetailList extends BaseCommand {
     protected void doCommand() throws Exception {
         List<Payable> payableList = payableService.analysisList(startDate, endDate, supplierIdList);
         for (Payable payable : payableList) {
+            // 供应商信息
             Supplier supplier = supplierService.getById(payable.getSupplierId());
             Assert.notNull(supplier, "ID为【" + payable.getSupplierId() + "】的供应商不存在！");
             payable.put("supplierName", supplier.getName());
 
-            if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY)
-                    || payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_REFUND)) {
+            if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) || payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_REFUND)) {
+                // 购货/购退订单信息
                 Purchase purchase = purchaseService.getById(payable.getBusinessId());
-                Assert.notNull(purchase, "ID为【" + payable.getBusinessId() + "】的购货订单不存在！");
+                Assert.notNull(purchase, "ID为【" + payable.getBusinessId() + "】的购货/购退订单不存在！");
 
                 payable.put("issueCode", purchase.getCode());
                 payable.put("businessTypeName", payable.getBusinessType().equals(Define.BUSINESS_TYPE_PURCHASE_BUY) ?
                         "购货" : "购退");
 
             } else if (payable.getBusinessType().equals(Define.BUSINESS_TYPE_PAYMENT)) {
+                // 付款单信息
                 Payment payment = paymentService.getById(payable.getBusinessId());
                 Assert.notNull(payment, "ID为【" + payable.getBusinessId() + "】的付款单不存在！");
 

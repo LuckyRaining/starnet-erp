@@ -22,6 +22,21 @@ public class ReceivableServiceImpl extends ServiceImpl<ReceivableDao, Receivable
         receivable.setBusinessId(businessId);
         receivable.setIncreasedAmount(increasedAmount);
         receivable.setPaidAmount(paidAmount);
+        // 新增 应收账款记录 fc_receivable
+        save(receivable);
+    }
+
+    @Override
+    public void businessAdd(String customerId, String issueDate, String businessType, String businessId, double increasedAmount, double paidAmount, double currentAmount) {
+        Receivable receivable = new Receivable();
+        receivable.setCustomerId(customerId);
+        receivable.setIssueDate(issueDate);
+        receivable.setBusinessType(businessType);
+        receivable.setBusinessId(businessId);
+        receivable.setIncreasedAmount(increasedAmount);
+        receivable.setPaidAmount(paidAmount);
+        receivable.setCurrentAmount(currentAmount);
+        // 新增 应收账款记录 fc_receivable
         save(receivable);
     }
 
@@ -57,6 +72,6 @@ public class ReceivableServiceImpl extends ServiceImpl<ReceivableDao, Receivable
         if (StrKit.notBlank(customerId)) {
             wrapper.eq("customerId", customerId);
         }
-        return this.list(wrapper.orderByAsc("issueDate", "createdTime"));
+        return this.list(wrapper.orderByAsc("customerId", "issueDate", "createdTime"));
     }
 }

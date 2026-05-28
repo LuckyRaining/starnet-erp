@@ -9,47 +9,51 @@
       <el-button type="info"
                  @click="logout">退出</el-button>
     </el-header>
+
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
       <el-aside :width="isCollapse ? '64px' : '200px'">
+        <!-- 折叠按钮固定在顶部，不参与下方菜单滚动 -->
         <div class="toggle-button"
              @click="toggleCollapse">|||</div>
-        <!-- 侧边栏菜单区域 -->
-        <el-menu background-color="#333744"
-                 text-color="#fff"
-                 active-text-color="#409EFF"
-                 unique-opened
-                 :collapse="isCollapse"
-                 :collapse-transition="false"
-                 router
-                 :default-active="$route.path">
-          <!-- 一级菜单 -->
-          <el-submenu :index="item.id + ''"
-                      v-for="item in menulist"
-                      :key="item.id">
-            <!-- 一级菜单的模板区域 -->
-            <template slot="title">
-              <!-- 图标 -->
-              <i :class="item.icon"></i>
-              <!-- 文本 -->
-              <span>{{ item.title }}</span>
-            </template>
-
-            <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.path"
-                          v-for="subItem in item.childList"
-                          :key="subItem.id"
-                          @click="saveNavState(subItem.path)">
+        <!-- 菜单滚动容器：限制高度，菜单项过多时在侧边栏内部滚动，避免整页下拉 -->
+        <div class="menu-scroll">
+          <el-menu background-color="#333744"
+                   text-color="#fff"
+                   active-text-color="#409EFF"
+                   unique-opened
+                   :collapse="isCollapse"
+                   :collapse-transition="false"
+                   router
+                   :default-active="$route.path">
+            <!-- 一级菜单 -->
+            <el-submenu :index="item.id + ''"
+                        v-for="item in menulist"
+                        :key="item.id">
+              <!-- 一级菜单的模板区域 -->
               <template slot="title">
                 <!-- 图标 -->
-                <i :class="subItem.icon"></i>
+                <i :class="item.icon"></i>
                 <!-- 文本 -->
-                <span>{{ subItem.title }}</span>
+                <span>{{ item.title }}</span>
               </template>
-            </el-menu-item>
-          </el-submenu>
-        </el-menu>
+
+              <!-- 二级菜单 -->
+              <el-menu-item :index="subItem.path"
+                            v-for="subItem in item.childList"
+                            :key="subItem.id"
+                            @click="saveNavState(subItem.path)">
+                <template slot="title">
+                  <!-- 图标 -->
+                  <i :class="subItem.icon"></i>
+                  <!-- 文本 -->
+                  <span>{{ subItem.title }}</span>
+                </template>
+              </el-menu-item>
+            </el-submenu>
+          </el-menu>
+        </div>
       </el-aside>
       <!-- 右侧内容主体 -->
       <el-main>
@@ -119,6 +123,11 @@ export default {
 <style lang="less" scoped>
 .home-container {
   height: 100%;
+
+  // 主体区域高度 = 视口高度 - 顶部 el-header（Element UI 默认 60px）
+  > .el-container {
+    height: calc(100vh - 60px);
+  }
 }
 .el-header {
   background-color: #373d41;
@@ -143,6 +152,18 @@ export default {
 
 .el-aside {
   background-color: #333744;
+  // 纵向 flex：上方折叠按钮固定，下方菜单区域占满剩余高度
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // 菜单滚动区：超出部分在侧边栏内滚动
+  .menu-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .el-menu {
     border-right: none;
   }

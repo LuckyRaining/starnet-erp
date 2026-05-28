@@ -21,6 +21,18 @@
                           end-placeholder="结束日期">
           </el-date-picker>
         </el-col>
+        <el-col :span="6">
+          <el-select v-model="params.supplierId"
+                     filterable
+                     clearable
+                     placeholder="全部供应商">
+            <el-option v-for="supplier in supplierList"
+                       :key="supplier.id"
+                       :label="supplier.name"
+                       :value="supplier.id">
+            </el-option>
+          </el-select>
+        </el-col>
         <el-col :span="1.5">
           <el-button type="primary"
                      @click="search">查询</el-button>
@@ -39,6 +51,9 @@
                 ref="table"
                 show-summary
                 :summary-method="getSummaries">
+        <!-- <el-table-column label="供应商"
+                         prop="supplierName"
+                         width="120"></el-table-column> -->
         <el-table-column label="单据日期"
                          prop="issueDate"></el-table-column>
         <el-table-column label="单据编号"
@@ -71,6 +86,7 @@ export default {
         endDate: '',
         supplierId: ''
       },
+      supplierList: [],
       list: [],
       rangedDate: []
     }
@@ -78,6 +94,8 @@ export default {
   watch: {},
   created() {},
   mounted() {
+    this.getSupplierList()
+
     let params = this.$route.query.params
     if (params !== undefined) {
       if (params.supplierId !== undefined) {
@@ -109,8 +127,22 @@ export default {
     // 清空
     clear() {
       this.rangedDate = []
-      this.params = {}
+      this.params = {
+        startDate: '',
+        endDate: '',
+        supplierId: ''
+      }
       this.getList()
+    },
+    // 获取供应商列表
+    async getSupplierList() {
+      const { data: result } = await this.$http.post('/supplier/page', {
+        current: 1,
+        size: 10000
+      })
+      if (!result.success) return this.$message.error(result.message)
+
+      this.supplierList = result.data.supplierPage.records
     },
     // 获取列表
     async getList() {

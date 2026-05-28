@@ -54,7 +54,7 @@
                          prop="expenseAmount"></el-table-column>
         <el-table-column label="往来单位"
                          prop="relatedUnit"></el-table-column>
-        <el-table-column label="摘要"
+        <el-table-column label="备注"
                          prop="remark"></el-table-column>
       </el-table>
     </el-card>

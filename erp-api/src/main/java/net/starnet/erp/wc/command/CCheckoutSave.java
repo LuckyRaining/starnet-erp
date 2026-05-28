@@ -57,22 +57,22 @@ public class CCheckoutSave extends BaseCommand {
 
     @Override
     protected void init() throws Exception {
-        // BizException 为后端展示
-        if (!Define.validateCheckoutType(checkout.getType())) {
-            throw new BizException("采购类型不正确！");
-        }
+        // 校验数据
+
+        // Assert 为 前端 + 后端 展示，BizException 仅为后端展示
+        // 校验 采购类型 是否合法
+        Assert.notFalse(Define.validateCheckoutType(checkout.getType()), "出库类型不正确！");
+
+        // 校验 客户ID 是否合法
+        Assert.notBlank(checkout.getCustomerId(), "客户ID不能为空！");
+        Customer customer = customerService.getById(checkout.getCustomerId());
+        // 校验 客户 是否存在
+        Assert.notNull(customer, "ID为【" + checkout.getCustomerId() + "】的客户不存在！");
+
     }
 
     @Override
     protected void doCommand() throws Exception {
-        // 校验数据
-        Assert.notBlank(checkout.getCustomerId(), "供应商ID不能为空！");
-        Customer customer = customerService.getById(checkout.getCustomerId());
-        Assert.notNull(customer, "ID为【" + checkout.getCustomerId() + "】的供应商不存在！");
-
-        // 同 init() 初始化校验，但 Assert 为前端展示
-        Assert.notFalse(Define.validateCheckoutType(checkout.getType()), "类型不正确！");
-
         // 计算
         // 出库单ID（更新时必填，新增时不传）
         if (StrKit.isBlank(checkout.getId())) { // checkout.id 为空时，即没传，为“新增”的意思
@@ -226,7 +226,7 @@ public class CCheckoutSave extends BaseCommand {
 
             // 处理 库存：其他出库 为 出库
             // 更新 库存商品 wc_stock，新增 出入库记录 wc_stock_record
-            stockService.handleStock(persistedIssueProduct, Define.STOCK_TYPE_IN);
+            stockService.handleStock(persistedIssueProduct, Define.STOCK_TYPE_OUT);
 
             persistedIssueProductList.add(persistedIssueProduct);
         }

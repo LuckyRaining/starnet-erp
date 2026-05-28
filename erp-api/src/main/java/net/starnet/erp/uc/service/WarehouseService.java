@@ -23,7 +23,7 @@ public interface WarehouseService extends IService<Warehouse> {
     Page<Warehouse> pageSearch(long current, long size, JSONObject query);
 
     /**
-     * 根据Id获取名称
+     * 根据Id 获取名称
      *
      * @param id
      * @return
@@ -31,7 +31,7 @@ public interface WarehouseService extends IService<Warehouse> {
     String getNameById(String id);
 
     /**
-     * 根据ID列表获取
+     * 根据ID列表 获取
      *
      * @param idList
      * @return

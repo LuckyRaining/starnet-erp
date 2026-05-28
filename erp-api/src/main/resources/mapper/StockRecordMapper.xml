@@ -29,8 +29,9 @@
         ORDER BY sr.productId ASC, sr.issueDate ASC
     </select>
 
-    <!-- 不同的商品ID列表 -->
+    <!-- 不同的 商品ID列表 -->
     <select id="distinctProductIdList" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.lang.String">
+        # 下面的 SQL 语句仅从 wc_stock_record 表的 productId 列中 选取唯一不同的值，也就是去掉 productId 列重复值：
         SELECT DISTINCT(sr.`productId`) from wc_stock_record sr WHERE 1 = 1
         <if test="query.productIdList != null and query.productIdList.size() > 0">
             AND sr.`productId` IN
@@ -44,14 +45,18 @@
                 #{warehouseId}
             </foreach>
         </if>
+        <!-- <if test="startDate != null and startDate != ''"> -->
+        <!-- AND sr.`issueDate` <![CDATA[ >= ]]> #{startDate} -->
+        <!-- </if> -->
         <if test="query.endDate != null and query.endDate != ''">
             AND sr.`issueDate` <![CDATA[  <= ]]> #{query.endDate}
         </if>
         ORDER BY sr.productId ASC
     </select>
 
-    <!-- 商品所在仓库列表 -->
-    <select id="distinctWarehouseIdListByProduct" resultType="java.lang.String">
+    <!-- 商品所在仓库 列表 -->
+    <select id="distinctWarehouseIdListByProduct" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.lang.String">
+        # 下面的 SQL 语句仅从 wc_stock_record 表的 warehouseId 列中 选取唯一不同的值，也就是去掉 warehouseId 列重复值：
         SELECT DISTINCT(sr.`warehouseId`) from wc_stock_record sr WHERE 1 = 1
         <if test="productId != null and productId != ''">
             AND sr.`productId` = #{productId}
@@ -71,8 +76,8 @@
         ORDER BY sr.warehouseId ASC
     </select>
 
-    <!-- 商品在仓库最近的出入记录 -->
-    <select id="findLatestRecord" resultType="net.starnet.erp.wc.model.StockRecord">
+    <!-- 商品所在仓库 最近的 出入记录 -->
+    <select id="findLatestRecord" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.StockRecord">
         SELECT sr.* from wc_stock_record sr WHERE 1 = 1
         <if test="productId != null and productId != ''">
             AND sr.`productId` = #{productId}
@@ -91,6 +96,7 @@
 
     <!-- 不同的商品仓库ID列表 -->
     <select id="distinctProductWarehouseIdList" parameterType="com.alibaba.fastjson.JSONObject" resultType="net.starnet.erp.wc.model.StockRecord">
+        # 下面的 SQL 语句仅从 wc_stock_record 表的 productId, warehouseId 两列中 选取唯一的、不同的组合，也就是去掉 不同的 productId, warehouseId 列组合情况：
         SELECT DISTINCT sr.`productId`, sr.`warehouseId` from wc_stock_record sr WHERE 1 = 1
         <if test="query.productIdList != null and query.productIdList.size() > 0">
             AND sr.`productId` IN

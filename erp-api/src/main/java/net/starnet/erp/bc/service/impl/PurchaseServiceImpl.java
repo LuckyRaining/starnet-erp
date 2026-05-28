@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.kingborn.core.util.StrKit;
 import net.starnet.erp.bc.dao.PurchaseDao;
 import net.starnet.erp.bc.model.Purchase;
 import net.starnet.erp.bc.service.PurchaseService;
@@ -30,6 +31,10 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, Purchase> impl
 
     @Override
     public List<Purchase> findCheckedListBySupplier(String supplierId) {
-        return this.list(new QueryWrapper<Purchase>().eq("supplierId", supplierId).eq("checked", true).orderByDesc("createdTime"));
+        QueryWrapper<Purchase> wrapper = new QueryWrapper<Purchase>().eq("checked", true);
+        if (StrKit.notBlank(supplierId)) {
+            wrapper.eq("supplierId", supplierId);
+        }
+        return this.list(wrapper.orderByDesc("createdTime"));
     }
 }

@@ -71,7 +71,9 @@ public class CTransferPage extends BaseCommand {
         User auditor;
         User lister;
         for (Transfer transfer : TransferPage.getRecords()) {
-            transfer.put("productList", getProductList(transfer));
+            List<TransferProduct> productList = getProductList(transfer);
+            transfer.put("productList", productList);
+            appendProductDisplayFields(transfer, productList);
 
             if (StrKit.notBlank(transfer.getListerId())) {
                 lister = userService.getById(transfer.getListerId());
@@ -113,5 +115,24 @@ public class CTransferPage extends BaseCommand {
         }
 
         return transferProductList;
+    }
+
+    /**
+     * 列表展示用：仅一条调拨商品时展示商品/单位/仓库信息，多条时上述字段显示为破折号。
+     */
+    private void appendProductDisplayFields(Transfer transfer, List<TransferProduct> transferProductList) {
+        if (transferProductList != null && transferProductList.size() == 1) {
+            TransferProduct transferProduct = transferProductList.get(0);
+            transfer.put("productName", transferProduct.get("productName"));
+            transfer.put("unitName", transferProduct.get("unitName"));
+            transfer.put("fromWarehouseName", transferProduct.get("fromWarehouseName"));
+            transfer.put("toWarehouseName", transferProduct.get("toWarehouseName"));
+            transfer.put("quantity", transferProduct.getQuantity());
+        } else {
+            transfer.put("productName", "-");
+            transfer.put("unitName", "-");
+            transfer.put("fromWarehouseName", "-");
+            transfer.put("toWarehouseName", "-");
+        }
     }
 }

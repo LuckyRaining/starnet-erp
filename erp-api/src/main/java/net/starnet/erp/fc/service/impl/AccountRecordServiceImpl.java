@@ -98,9 +98,11 @@ public class AccountRecordServiceImpl extends ServiceImpl<AccountRecordDao, Acco
     public List<AccountRecord> analysisList(String startDate, String endDate, List<String> accountIdList) {
         QueryWrapper<AccountRecord> wrapper = new QueryWrapper<>();
         if (StrKit.notBlank(startDate)) {
+            // issueDate >= startDate
             wrapper.ge("issueDate", startDate);
         }
         if (StrKit.notBlank(endDate)) {
+            //  issueDate <= endDate
             wrapper.le("issueDate", endDate);
         }
         if (accountIdList != null && accountIdList.size() > 0) {

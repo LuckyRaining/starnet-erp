@@ -108,7 +108,7 @@ public class CAnalysisPurchaseDetailList extends BaseCommand {
             Assert.notNull(supplier, "ID为【" + purchase.getSupplierId() + "】的供应商不存在！");
             issueProduct.put("supplierName", supplier.getName());
 
-            // 商品展示信息
+            // 商品信息
             Product product = productService.getById(issueProduct.getProductId());
             Assert.notNull(product, "ID为【" + issueProduct.getProductId() + "】的商品不存在！");
             issueProduct.put("productCode", product.getCode());

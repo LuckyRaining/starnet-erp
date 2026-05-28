@@ -91,12 +91,12 @@ public class CAnalysisPurchaseSupplierSummaryList extends BaseCommand {
         List<PurchaseSupplierSummary> summaryList = issueProductService.analysisPurchaseListBySupplier(query);
 
         for (PurchaseSupplierSummary summary : summaryList) {
-            // businessId 指向 bc_purchase.id
+            // 供应商信息
             Supplier supplier = supplierService.getById(summary.getSupplierId());
             Assert.notNull(supplier, "ID为【" + summary.getSupplierId() + "】的供应商不存在！");
             summary.put("supplierName", supplier.getName());
 
-            // 商品展示信息
+            // 商品信息
             Product product = productService.getById(summary.getProductId());
             Assert.notNull(product, "ID为【" + summary.getProductId() + "】的商品不存在！");
             summary.put("productName", product.getName());
