@@ -51,7 +51,7 @@
 
 ## 摘 要
 
-为解决传统零售收银系统操作繁琐、存在数据孤岛以及高峰期工作效率低下的问题，“星络”智能收银系统应运而生——面向中小微零售商家提供一款高效、便捷、智能化的企业资源管理系统。该系统采用前后端分离架构，在后端使用Spring Boot开发RESTful API，进行业务处理、数据存储以及安全性防护；Web前端基于Vue.js结合Element UI构建动态的管理系统页面；移动端通过Uni-App编写微信小程序，利用uni.scanCode()方法实现扫码；数据库采用MySQL来建立35张核心数据表并进行相应的索引优化。该系统包含六个主要部分：基础信息管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款追踪）、仓库管理（多个仓库间调拨、出入库记录查询）、财务管理（收款付款抵消、应收应付自动监测）以及数据分析（多种报表展示）。经过测试，该系统稳定可靠，主要接口响应速度都在200毫秒之内，扫码识别率在良好的光线下超过95%，各项功能均正常运行，单据审核机制合理有效，应收应付账款自动跟踪准确无误，可以满足小型零售企业的日常管理需求。经测试证明了基于Spring Boot和Vue的前后端分离的设计方式对于建设小型收银系统是切实可行并且有效的，对小型零售企业数字化升级具有一定的指导意义。
+为解决传统零售收银系统操作繁琐、存在数据孤岛以及高峰期工作效率低下的问题，“星络”智能收银系统应运而生——面向中小微零售商家提供一款高效、便捷、智能化的企业资源管理系统。该系统采用前后端分离架构，在后端使用Spring Boot开发RESTful API，进行业务处理、数据存储以及安全性防护；Web前端基于Vue.js结合Element UI构建动态的管理系统页面；移动端通过Uni-App编写微信小程序，利用uni.scanCode()方法实现扫码；数据库采用MySQL来建立35张核心数据表并进行相应的索引优化。此系统包含六个主要部分：基础信息管理（客户、供应商、商品、仓库等）、采购管理（购货单审核、入库、应付账款自动生成）、销售管理（销货单审核、出库、应收账款追踪）、仓库管理（多个仓库间调拨、出入库记录查询）、财务管理（收款付款抵消、应收应付自动监测）以及数据分析（多种报表展示）。经过测试，该系统稳定可靠，主要接口响应速度都在200毫秒之内，扫码识别率在良好的光线下超过95%，各项功能均正常运行，单据审核机制合理有效，应收应付账款自动跟踪准确无误，可以满足小型零售企业的日常管理需求。本文证明了基于Spring Boot和Vue的前后端分离的设计方式对于建设小型收银系统是切实可行并且有效的，对小型零售企业数字化升级具有一定的指导意义。
 
 **关键词：** 收银系统; SpringBoot; MySQL数据库; 条码识别
 
@@ -59,7 +59,7 @@
 
 ## ABSTRACT
 
-To address the issues of cumbersome operations, data silos, and low efficiency during peak hours in traditional retail POS systems, the “StarNet” Smart POS System was developed—an efficient, convenient, and intelligent enterprise resource management system designed for small and medium-sized retail businesses. The system employs a frontend-backend separation architecture. On the backend, Spring Boot is used to develop RESTful APIs for business processing, data storage, and security protection; the web frontend utilizes Vue.js combined with Element UI to build dynamic management system pages; the mobile end uses Uni-App to develop a WeChat Mini Program, leveraging the `uni.scanCode()` method to enable QR code scanning; and MySQL is used to establish 35 core data tables with corresponding index optimization. The system consists of six main components: Basic Information Management (customers, suppliers, products, warehouses, etc.), Procurement Management (purchase order approval, inventory receipt, and automatic generation of accounts payable), Sales Management (sales order approval, inventory issuance, and accounts receivable tracking), Warehouse Management (inter-warehouse transfers and inventory transaction queries), Financial Management (payment offsetting and automatic monitoring of accounts receivable and payable), and Data Analysis (multiple report displays). Testing has confirmed that the system is stable and reliable, with response times for major interfaces under 200 milliseconds, a barcode recognition rate exceeding 95% under good lighting conditions, and all functions operating normally. The document approval mechanism is reasonable and effective, and the automatic tracking of accounts receivable and payable is accurate and error-free, meeting the daily management needs of small retail enterprises. Furthermore, testing has demonstrated that a front-end/back-end separation design based on Spring Boot and Vue is both feasible and effective for building a small-scale POS system, and offers valuable guidance for the digital transformation of small retail enterprises.
+To address the issues of cumbersome operations, data silos, and low efficiency during peak hours in traditional retail POS systems, the “StarNet” Smart POS System was developed—an efficient, convenient, and intelligent enterprise resource management system designed for small and medium-sized retail businesses. The system employs a frontend-backend separation architecture. On the backend, Spring Boot is used to develop RESTful APIs for business processing, data storage, and security protection; the web frontend utilizes Vue.js combined with Element UI to build dynamic management system pages; the mobile end uses Uni-App to develop a WeChat Mini Program, leveraging the `uni.scanCode()` method to enable QR code scanning; and MySQL is used to establish 35 core data tables with corresponding index optimization. The system comprises six main components: Basic Information Management (customers, suppliers, products, warehouses, etc.), Procurement Management (purchase order approval, inventory receipt, and automatic generation of accounts payable), Sales Management (sales order approval, inventory issuance, and accounts receivable tracking), Warehouse Management (inter-warehouse transfers and inventory transaction queries), Financial Management (payment offsetting and automatic monitoring of accounts receivable and payable), and Data Analysis (multiple report displays). Testing has confirmed that the system is stable and reliable, with response times for major interfaces under 200 milliseconds, a barcode recognition rate exceeding 95% under good lighting conditions, and all functions operating normally. The document approval mechanism is reasonable and effective, and the automatic tracking of accounts receivable and payable is accurate and error-free, meeting the daily management needs of small retail enterprises. This paper demonstrates that a front-end/back-end separation design based on Spring Boot and Vue is both feasible and effective for building a small-scale POS system, and offers valuable guidance for the digital transformation of small retail enterprises.
 
 **Key words:** Cashier System; SpringBoot; MySQL database; Barcode Recognition
 
@@ -117,7 +117,7 @@ To address the issues of cumbersome operations, data silos, and low efficiency d
 - 销售管理（bc）：覆盖订单、销货/销退、审核、出库与收款流程。  
 - 资金管理（fc）：覆盖收付款、应收应付账款和账户流水管理。  
 - 统计分析（sc）：提供采购、销售、库存、资金等维度报表分析。  
-- 基础资料（uc）：维护客户、供应商、商品、仓库、职员、账户等数据。  
+- 基础资料（uc）：维护客户、供应商、商品、仓库、职员、账户等主数据。  
 - 仓库管理（wc）：支持调拨、其他出入库、库存查询及流水追溯。
 
 (3)基础资料管理
@@ -272,7 +272,11 @@ graph TB
 
 #### 2.2.3 销售人员用例分析
 
-除管理员外，零售企业日常经营中还涉及大量面向客户的销售业务，需要由销售人员完成下单、出库结算与回款跟进等工作。在具体单据中，销货单通过“销售人员”字段关联职员信息以记录实际经手人。创建销货单时，需选择客户与销售人员，填写商品明细，系统按数量、单价、折扣率自动计算金额、优惠后金额、本次收款与本次欠款，并维护收款状态（未收款、部分收款、已收款）。收款单可通过“选择源单”功能，按客户筛选已审核的销货单，录入本次核销金额并完成预收款计算。销售人员的用例图如图2所示。
+除管理员外，零售企业日常经营中还涉及大量面向客户的销售业务，需要由销售人员完成下单、出库结算与回款跟进等工作。结合星络收银系统（starnet-erp）的实际实现，销售人员主要通过 Web 端（erp-web）开展业务：登录后进入“销货”菜单处理客户订单、销货单与销货退货单；在“资金”菜单中登记收款单并与已审核销货单进行核销；在“报表”菜单中查询销售明细、销售汇总及客户应收账款等数据。为支持上述流程，系统还允许销售人员在基础资料中查阅客户、商品信息，并通过库存类报表了解可售数量。
+
+在具体单据中，销货单通过“销售人员”字段关联职员信息以记录实际经手人；制单人、审核人则关联系统登录用户。创建销货单时，需选择客户与销售人员，填写联系人、地址、电话及商品明细，系统按数量、单价、折扣率自动计算金额、优惠后金额、本次收款与本次欠款，并维护收款状态（未收款、部分收款、已收款）。保存后，系统同步写入出库记录、库存变动与应收账款；单据审核采用单向确认机制，仅允许由未审核变为已审核。收款单可通过“选择源单”功能，按客户筛选已审核的销货单，录入本次核销金额并完成预收款计算。
+
+从业务分工看，销售人员用例聚焦于“接单—销货—收款—对账”闭环，一般不涉及购货、付款、系统配置等管理性操作。销售人员用例图如图2所示。
 
 *图2 销售人员用例图*
 
